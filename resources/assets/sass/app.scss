@@ -12,3 +12,20 @@
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
+
+ul.list {
+	list-style: none;
+	li {
+		padding: .5rem;
+	}
+	li:nth-child(even) {
+		background-color: $list-color-light;
+	}
+	li:nth-child(odd) {
+		background-color: $list-color-dark;
+	}
+}
+
+.thumb {
+	cursor: pointer;
+}

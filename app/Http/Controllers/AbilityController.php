@@ -10,35 +10,13 @@ use tt2larp\Models\Ability;
 class AbilityController extends Controller
 {
 	/**
-	 * lists all abilities in a searchable interface
+	 * Main entry point for Abilities, everything happens in Vuejs
 	 */
-	public function index()
+	public function portal()
 	{
-		$abilities = Ability::all();
+		$abilities = Ability::select('id', 'name')->orderBy('name')->get();
 
-		return view('ability.list')->with(compact('abilities'));
-	}
-
-	/**
-	 * view a single ability
-	 */
-	public function view(Request $request, $id)
-	{
-		$ability = ability::find($id);
-
-		if ($ability === null) abort(422, "Ability $id doesn't exist.");
-
-		return view('ability.view')->with(compact('ability'));
-	}
-
-	/**
-	 * edit a single ability
-	 */
-	public function edit(Request $request, $id = null)
-	{
-		$ability = Ability::with('abilities')->find($id);
-
-		return view('ability.edit')->with(compact('ability'));
+		return view('ability.portal')->with(compact('abilities'));
 	}
 
 	/**
@@ -46,16 +24,18 @@ class AbilityController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		abort(500, "not implmented");
-
 		$id = $request->id;
 
 		$ability = Ability::find($id);
 
 		if ($ability === null) $ability = new Ability();
 
+		$ability->name = $request->name;
+
 		$ability->save();
 
-		return new JsonResponse(['success' => true]);
+		$abilities = Ability::select('id', 'name')->orderBy('name')->get();
+
+		return new JsonResponse($abilities);
 	}
 }

@@ -5,19 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
-    <!-- Fonts -->
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
 
-    <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
 	@yield ('css')
@@ -37,7 +31,7 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
 						<li class="nav-item"><a class="nav-link" href="{{ route('list characters') }}">@lang ('i.characters')</a></li>
-						<li class="nav-item"><a class="nav-link" href="{{ route('list abilities') }}">@lang ('i.abilities')</a></li>
+						<li class="nav-item"><a class="nav-link" href="{{ route('ability portal') }}">@lang ('i.abilities')</a></li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -79,6 +73,7 @@
         </main>
     </div>
 
+<script src="{{ asset('js/app.js') }}"></script>
 @yield ('js')
 </body>
 </html>

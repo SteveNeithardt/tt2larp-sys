@@ -15,9 +15,7 @@ Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
 
-Route::get('/ability/list', 'AbilityController@index')->name('list abilities');
-Route::get('/ability/{id}', 'AbilityController@view')->where(['id' => '[0-9]+'])->name('view ability');
-Route::get('/ability/edit/{id?}', 'AbilityController@edit')->where(['id' => '[0-9]+'])->name('edit ability');
+Route::get('/ability', 'AbilityController@portal')->name('ability portal');
 Route::post('/ability/store', 'AbilityController@store')->name('store ability');
 
 Route::get('/character/list', 'CharacterController@index')->name('list characters');
