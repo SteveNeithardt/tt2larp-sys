@@ -28,15 +28,16 @@
 					<input class="form-control my-2" type="text" v-model="player" placeholder="@lang ('i.player')">
 					<textarea class="form-control my-2" v-model="description"></textarea>
 					<hr>
-					<div class="d-flex">
-						<div v-for="ability in abilities">
-							@{{ ability.name }}
-							<select v-model="ability.value">
-								<option value="0">0</option>
-								<option value="1">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-							</select>
+					<div class="d-flex justify-content-around flex-wrap">
+						<div v-for="ability in abilities" class="p-2 col-md-3">
+							<!--<ability-select :name="ability.name" :value="ability.value" :id="ability.id" v-on:update:value="update_ability_value($event.id, $event.value)"></ability-select>-->
+							<div>@{{ ability.name }}</div>
+							<div>
+								<input type="radio" id="ability.name" value="0" v-model="ability.value">
+								<input type="radio" id="ability.name" value="1" v-model="ability.value">
+								<input type="radio" id="ability.name" value="2" v-model="ability.value">
+								<input type="radio" id="ability.name" value="3" v-model="ability.value">
+							</div>
 						</div>
 					</div>
 					<span v-if="valid" class="btn btn-primary mt-3" v-on:click="submit()" v-cloak>@lang ('i.submit')</span>
@@ -98,6 +99,7 @@ new Vue({
 				.catch(errors => {});
 		},
 		edit: function(id = -1) {
+			this.editing = false;
 			var result = this.characters.filter(c => c.id == id);
 			if (result.length == 1) {
 				var character = result[0];
@@ -105,12 +107,13 @@ new Vue({
 				this.name = character.name;
 				this.player = character.player;
 				this.description = character.description;
-				for (ability in this.abilities) {
-					var ab = character.abilities.filter(a => a.name == ability.name);
+				for (var index in this.abilities) {
+					var ability = this.abilities[index];
+					var ab = character.abilities.filter(a => a.id == ability.id);
 					if (ab.length == 1) {
 						ability.value = ab[0].value;
 					} else {
-						ability.value = null;
+						ability.value = 0;
 					}
 				}
 			} else {
@@ -118,11 +121,17 @@ new Vue({
 				this.name = null;
 				this.player = null;
 				this.description = null;
-				for (ability in this.abilities) {
-					ability.value = null;
+				for (index in this.abilities) {
+					this.abilities[index].value = 0;
 				}
 			}
 			this.editing = true;
+		},
+		update_ability_value: function(ability_id, new_value) {
+			var ability = this.abilities.filter(a => a.id = ability_id);
+			if (ability.length == 1)
+				console.log(ability[0]);
+			console.log(ability_id + ' -> ' + new_value);
 		},
 		submit: function() {
 			axios.post("{{ route('store character') }}", {

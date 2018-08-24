@@ -26,6 +26,10 @@ class AbilityController extends Controller
 	{
 		$abilities = Ability::select('id', 'name')->orderBy('name')->get();
 
+		foreach ($abilities as $ability) {
+			$ability->value = 0;
+		}
+
 		return new JsonResponse($abilities);
 	}
 
@@ -46,6 +50,6 @@ class AbilityController extends Controller
 
 		$abilities = Ability::select('id', 'name')->orderBy('name')->get();
 
-		return new JsonResponse($abilities);
+		return $this->getList();
 	}
 }

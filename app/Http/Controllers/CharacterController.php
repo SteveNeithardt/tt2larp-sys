@@ -13,7 +13,7 @@ class CharacterController extends Controller
 	/**
 	 * Main entry point for Abilities, everything happens in Vuejs
 	 */
-	public function index()
+	public function portal()
 	{
 		return view('character.portal');
 	}
@@ -59,14 +59,16 @@ class CharacterController extends Controller
 		foreach ($request->abilities as $ab) {
 			$id = $ab["id"];
 			if (isset($abilities[$id]) && isset($ab["value"])) {
-				$relations_array[$id] = ["value" => $ab["value"]];
+				$val = $ab["value"];
+				if ($val > 0) {
+					$val = max($val, 3);
+					$relations_array[$id] = ["value" => $ab["value"]];
+				}
 			}
 		}
 
 		$character->abilities()->sync($relations_array);
 
-		$characters = Character::with('abilities')->get();
-
-		return new JsonResponse($characters);
+		return $this->getList();
 	}
 }
