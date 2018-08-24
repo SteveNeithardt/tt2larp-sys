@@ -16,12 +16,12 @@ Auth::routes();
 Route::get('/', 'HomeController@index')->name('home');
 
 Route::get('/ability/list', 'AbilityController@index')->name('list abilities');
-Route::get('/ability/{id}', 'AbilityController@view')->name('view ability');
-Route::get('/ability/{id}/edit', 'AbilityController@edit')->name('edit ability');
-Route::post('/ability/{id}/edit', 'AbilityController@store')->name('store ability');
+Route::get('/ability/{id}', 'AbilityController@view')->where(['id' => '[0-9]+'])->name('view ability');
+Route::get('/ability/edit/{id?}', 'AbilityController@edit')->where(['id' => '[0-9]+'])->name('edit ability');
+Route::post('/ability/store', 'AbilityController@store')->name('store ability');
 
 Route::get('/character/list', 'CharacterController@index')->name('list characters');
-Route::get('/character/{id}', 'CharacterController@view')->name('view character');
-Route::get('/character/{id}/edit', 'CharacterController@edit')->name('edit character');
-Route::post('/character/{id}/edit', 'CharacterController@store')->name('store character');
+Route::get('/character/{id}', 'CharacterController@view')->where(['id' => '[0-9]+'])->name('view character');
+Route::get('/character/edit/{id?}', 'CharacterController@edit')->where(['id' => '[0-9]+'])->name('edit character');
+Route::post('/character/store', 'CharacterController@store')->name('store character');
 

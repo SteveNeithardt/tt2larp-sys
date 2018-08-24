@@ -22,7 +22,7 @@ class AbilityController extends Controller
 	/**
 	 * view a single ability
 	 */
-	public function view($id, Request $request)
+	public function view(Request $request, $id)
 	{
 		$ability = ability::find($id);
 
@@ -34,19 +34,21 @@ class AbilityController extends Controller
 	/**
 	 * edit a single ability
 	 */
-	public function edit($id, Request $request)
+	public function edit(Request $request, $id = null)
 	{
 		$ability = Ability::with('abilities')->find($id);
 
-		return view('ability.view')->with(compact('ability'));
+		return view('ability.edit')->with(compact('ability'));
 	}
 
 	/**
 	 * store a single ability (insert/update)
 	 */
-	public function store($id, Request $request)
+	public function store(Request $request)
 	{
 		abort(500, "not implmented");
+
+		$id = $request->id;
 
 		$ability = Ability::find($id);
 

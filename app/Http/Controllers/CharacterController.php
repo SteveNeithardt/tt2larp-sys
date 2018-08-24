@@ -16,37 +16,39 @@ class CharacterController extends Controller
 	{
 		$characters = Character::with('abilities')->get();
 
-		return view('characters.list')->with(compact('characters'));
+		return view('character.list')->with(compact('characters'));
 	}
 
 	/**
 	 * view a single character
 	 */
-	public function view($id, Request $request)
+	public function view(Request $request, $id)
 	{
 		$character = Character::find($id);
 
 		if ($character === null) abort(422, "Character $id doesn't exist.");
 
-		return view('characters.view')->with(compact('character'));
+		return view('character.view')->with(compact('character'));
 	}
 
 	/**
 	 * edit a single character
 	 */
-	public function edit($id, Request $request)
+	public function edit(Request $request, $id = null)
 	{
 		$character = Character::with('abilities')->find($id);
 
-		return view('characters.view')->with(compact('character'));
+		return view('character.edit')->with(compact('character'));
 	}
 
 	/**
 	 * store a single character (insert/update)
 	 */
-	public function store($id, Request $request)
+	public function store(Request $request)
 	{
 		abort(500, "not implmented");
+
+		$id = $request->id;
 
 		$character = Character::find($id);
 

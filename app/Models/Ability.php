@@ -1,6 +1,6 @@
 <?php
 
-namespace tt2larp;
+namespace tt2larp\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,6 +13,6 @@ class Ability extends Model
 	 */
 	public function characters()
 	{
-		$this->belongsToMany(Character::class, 'character_abilities', 'ability_id', 'character_id');
+		$this->belongsToMany(Character::class, 'character_abilities', 'ability_id', 'character_id')->withPivot('value');
 	}
 }
