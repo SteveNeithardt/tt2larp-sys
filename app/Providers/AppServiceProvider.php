@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace tt2larp\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

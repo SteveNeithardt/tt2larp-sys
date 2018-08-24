@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::get('/station/{id}/window_info', 'StationController@window_info')->name('station window info');
+Route::post('/station/{id}/action', 'StationController@action')->name('station action');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

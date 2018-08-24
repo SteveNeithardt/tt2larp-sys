@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace tt2larp\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;

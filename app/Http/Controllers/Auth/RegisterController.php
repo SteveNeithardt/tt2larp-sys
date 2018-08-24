@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace tt2larp\Http\Controllers\Auth;
 
-use App\User;
-use App\Http\Controllers\Controller;
+use tt2larp\User;
+use tt2larp\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -59,7 +59,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return \tt2larp\User
      */
     protected function create(array $data)
     {
