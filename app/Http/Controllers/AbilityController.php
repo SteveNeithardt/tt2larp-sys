@@ -20,6 +20,16 @@ class AbilityController extends Controller
 	}
 
 	/**
+	 * returns all abilities
+	 */
+	public function getList()
+	{
+		$abilities = Ability::select('id', 'name')->orderBy('name')->get();
+
+		return new JsonResponse($abilities);
+	}
+
+	/**
 	 * store a single ability (insert/update)
 	 */
 	public function store(Request $request)

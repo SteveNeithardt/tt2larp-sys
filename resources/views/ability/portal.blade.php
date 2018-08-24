@@ -39,14 +39,14 @@ new Vue({
 	data() {
 		return {
 			abilities: {!! json_encode($abilities) !!},
+			editing: false,
 			id: null,
 			name: null,
-			editing: false,
 		}
 	},
 	methods: {
 		edit: function(id = -1) {
-			result = this.abilities.filter(a => a.id == id);
+			var result = this.abilities.filter(a => a.id == id);
 			if (result.length == 1) {
 				this.id = result[0].id;
 				this.name = result[0].name;
@@ -57,14 +57,16 @@ new Vue({
 			this.editing = true;
 		},
 		submit: function() {
-			axios.post("{{ route('store ability') }}", { name: this.name, id: this.id })
-				.then(response => {
-					this.abilities = response.data;
-					this.id = null;
-					this.name = null;
-					this.editing = false;
-				})
-				.catch(errors => {});
+			axios.post("{{ route('store ability') }}", {
+				name: this.name,
+				id: this.id,
+			}).then(response => {
+				this.abilities = response.data;
+				this.id = null;
+				this.name = null;
+				this.editing = false;
+			})
+			.catch(errors => {});
 		},
 	},
 });

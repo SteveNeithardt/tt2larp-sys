@@ -13,6 +13,6 @@ class Character extends Model
 	 */
 	public function abilities()
 	{
-		$this->belongsToMany(Ability::class, 'character_abilities', 'character_id', 'ability_id')->withPivot('value');
+		return $this->belongsToMany(Ability::class, 'character_abilities', 'character_id', 'ability_id')->withPivot('value');
 	}
 }
