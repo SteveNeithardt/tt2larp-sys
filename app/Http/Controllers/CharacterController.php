@@ -11,7 +11,7 @@ use tt2larp\Models\Character;
 class CharacterController extends Controller
 {
 	/**
-	 * Main entry point for Abilities, everything happens in Vuejs
+	 * Main entry point for Characters, everything happens in Vuejs
 	 */
 	public function portal()
 	{
@@ -27,7 +27,7 @@ class CharacterController extends Controller
 			$q->select('id', 'name');
 		}])->get();
 
-		foreach($characters as $character) {
+		foreach ($characters as $character) {
 			foreach ($character->abilities as $ability) {
 				$ability->value = $ability->pivot->value;
 				unset($ability->pivot);

@@ -19,7 +19,13 @@ Route::get('/ability', 'AbilityController@portal')->name('ability portal');
 Route::get('/ability/list', 'AbilityController@getList')->name('get abilities');
 Route::post('/ability/store', 'AbilityController@store')->name('store ability');
 
-Route::get('/character', 'CharacterController@portal')->name('list characters');
+Route::get('/character', 'CharacterController@portal')->name('character portal');
 Route::get('/character/list', 'CharacterController@getList')->name('get characters');
 Route::post('/character/store', 'CharacterController@store')->name('store character');
+
+Route::get('/problem', 'ProblemController@portal')->name('problem portal');
+Route::get('/problem/list', 'ProblemController@getList')->name('get problems');
+Route::post('/problem/store', 'ProblemController@store')->name('store problem');
+Route::get('/problem/{id}/list', 'ProblemController@getStepList')->name('get steps');
+Route::post('/problem/{id}/step/store', 'ProblemController@storeStep')->name('store step');
 

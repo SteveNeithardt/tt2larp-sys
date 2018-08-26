@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddCharactersTable extends Migration
+class AddStepsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class AddCharactersTable extends Migration
      */
     public function up()
     {
-		Schema::create('characters', function(Blueprint $table) {
+		Schema::create('steps', function (Blueprint $table) {
 			$table->increments('id');
 			$table->string('name');
-			$table->string('player');
 			$table->text('description');
 			$table->timestamps();
 		});
@@ -29,6 +28,6 @@ class AddCharactersTable extends Migration
      */
     public function down()
     {
-		Schema::dropTable('characters');
+		Schema::dropTable('steps');
     }
 }

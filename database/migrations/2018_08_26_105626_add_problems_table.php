@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddPlayerNameDistinctionToCharacters extends Migration
+class AddProblemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddPlayerNameDistinctionToCharacters extends Migration
      */
     public function up()
     {
-		Schema::table('characters', function (Blueprint $table) {
-			$table->string('player')->after('name');
+		Schema::create('problems', function (Blueprint $table) {
+			$table->increments('id');
+			$table->string('name');
+			$table->timestamps();
 		});
     }
 
@@ -25,8 +27,6 @@ class AddPlayerNameDistinctionToCharacters extends Migration
      */
     public function down()
     {
-		Schema::table('characters', function (Blueprint $table) {
-			$table->dropColumn('player');
-		});
+		Schema::dropTable('problems');
     }
 }
