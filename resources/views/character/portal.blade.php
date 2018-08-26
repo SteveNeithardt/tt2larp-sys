@@ -9,6 +9,9 @@
 @section ('content')
 <div class="container" id="vue">
 	<div class="row justify-content-center">
+		<div class="col-md-12 mb-3">
+			<h2>@lang ('i.characters')</h2>
+		</div>
 		<div class="col-md-6">
 			<div class="card">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
