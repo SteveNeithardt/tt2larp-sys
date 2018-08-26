@@ -102,7 +102,15 @@ new Vue({
 				.catch(errors => {});
 		},
 		edit: function(id = -1) {
-			this.editing = false;
+			this.editing = true;
+			this.id = null;
+			this.name = null;
+			this.player = null;
+			this.description = null;
+			for (index in this.abilities) {
+				this.abilities[index].value = 0;
+			}
+			if (id == -1) return;
 			var result = this.characters.filter(c => c.id == id);
 			if (result.length == 1) {
 				var character = result[0];
@@ -119,16 +127,7 @@ new Vue({
 						ability.value = 0;
 					}
 				}
-			} else {
-				this.id = null;
-				this.name = null;
-				this.player = null;
-				this.description = null;
-				for (index in this.abilities) {
-					this.abilities[index].value = 0;
-				}
 			}
-			this.editing = true;
 		},
 		update_ability_value: function(ability_id, new_value) {
 			var ability = this.abilities.filter(a => a.id = ability_id);

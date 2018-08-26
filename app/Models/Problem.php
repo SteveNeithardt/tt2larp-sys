@@ -23,4 +23,19 @@ class Problem extends Model
 	{
 		return $this->steps()->wherePivot('first_step', '=', 1);
 	}
+
+	/**
+	 * gets all related steps as list ordered by name
+	 */
+	public function getSteps()
+	{
+		$steps = $this->steps()->select('id', 'name')->orderBy('name')->get();
+
+		foreach ($steps as $step) {
+			$step->first_step = $step->pivot->first_step;
+			unset($step->pivot);
+		}
+
+		return $steps;
+	}
 }

@@ -57,15 +57,15 @@ new Vue({
 	},
 	methods: {
 		edit: function(id = -1) {
+			this.editing = true;
+			this.id = null;
+			this.name = null;
+			if (id == -1) return;
 			var result = this.abilities.filter(a => a.id == id);
 			if (result.length == 1) {
 				this.id = result[0].id;
 				this.name = result[0].name;
-			} else {
-				this.id = null;
-				this.name = null;
 			}
-			this.editing = true;
 		},
 		submit: function() {
 			axios.post("{{ route('store ability') }}", {
