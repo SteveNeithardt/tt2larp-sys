@@ -14,13 +14,15 @@ class AddStepNextStepsTable extends Migration
     public function up()
     {
 		Schema::create('step_next_steps', function (Blueprint $table) {
+			$table->increments('id');
 			$table->unsignedInteger('step_id');
 			$table->unsignedInteger('next_step_id');
-			$table->unsignedInteger('ability_id');
-			$table->integer('min_value');
+			$table->enum('type', ['ability', 'code']);
+			$table->unsignedInteger('ability_id')->nullable();
+			$table->integer('min_value')->nullable();
+			$table->string('code')->nullable();
 			$table->timestamps();
 
-			$table->primary(['step_id', 'next_step_id']);
 			$table->foreign('step_id')->references('id')->on('steps');
 			$table->foreign('next_step_id')->references('id')->on('steps');
 			$table->foreign('ability_id')->references('id')->on('abilities');

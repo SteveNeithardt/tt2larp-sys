@@ -49,12 +49,14 @@ class Step extends Model
 			$nextStep = Step::find($stepNextStep->next_step_id);
 
 			$edges[] = [
-				'id' => $stepNextStep->step_id . ':' . $stepNextStep->next_step_id,
+				'id' => $stepNextStep->id,
 				'from' => $stepNextStep->step_id,
 				'to' => $stepNextStep->next_step_id,
 				'arrows' => 'to',
+				'type' => $stepNextStep->type,
 				'ability_id' => $stepNextStep->ability_id,
-				'min_value' => $stepNextStep->min_value
+				'min_value' => $stepNextStep->min_value,
+				'code' => $stepNextStep->code,
 			];
 
 			$tree = $nextStep->getTree();

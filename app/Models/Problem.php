@@ -29,7 +29,7 @@ class Problem extends Model
 	 */
 	public function getSteps()
 	{
-		$steps = $this->steps()->select('id', 'name')->orderBy('name')->get();
+		$steps = $this->steps()->select('id', 'name', 'description')->orderBy('name')->get();
 
 		foreach ($steps as $step) {
 			$step->first_step = $step->pivot->first_step;

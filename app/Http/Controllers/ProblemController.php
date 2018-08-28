@@ -5,8 +5,10 @@ namespace tt2larp\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use tt2larp\Models\Ability;
 use tt2larp\Models\Problem;
 use tt2larp\Models\Step;
+use tt2larp\Models\StepNextStep;
 
 class ProblemController extends Controller
 {
@@ -56,6 +58,15 @@ class ProblemController extends Controller
 		$first = $problem->firstSteps->first();
 		$tree = [];
 		if ($first !== null) $tree = $first->getTree();
+		$toadd = [];
+		foreach ($steps as $step) {
+			foreach ($tree['nodes'] as $node) {
+				if ($node['id'] == $step->id)
+					continue 2;
+			}
+			$toadd[] = [ 'id' => $step->id, 'label' => $step->name ];
+		}
+		$tree['nodes'] = array_merge($tree['nodes'], $toadd);
 
 		return new JsonResponse(compact('steps', 'tree'));
 	}
@@ -80,6 +91,8 @@ class ProblemController extends Controller
 		$step->save();
 
 		$problem->steps()->attach($step);
+
+		return new JsonResponse(['success' => true]);
 	}
 
 	/**
@@ -92,28 +105,63 @@ class ProblemController extends Controller
 		if ($problem === null) abort(422, "Problem $id doesn't exist.");
 
 		$request->validate([
+			'id' => 'nullable|integer',
 			'step_id' => 'required|integer',
 			'next_step_id' => 'required|integer',
-			'ability_id' => 'required|integer',
-			'min_value' => 'required|integer',
+			'type' => 'required|string',//@todo: validate enum?
+			'ability_id' => 'nullable|integer',
+			'min_value' => 'nullable|integer',
+			'code' => 'nullable|string',
 		]);
 
+		$id = $request->id;
+
 		$stepId = $request->step_id;
-		$step = Step::find($step_id);
+		$step = Step::find($stepId);
 		if ($step === null) abort(422, "Step $stepId doesn't exist.");
 
 		$nextStepId = $request->next_step_id;
 		$nextStep = Step::find($nextStepId);
 		if ($nextStep === null) abort(422, "Step $nextStepId doesn't exist.");
 
-		$abilityId = $request->ability_id;
-		$ability = Ability::find($abilityId);
-		if ($ability === null) abort(422, "Ability $abilityId doesn't exist.");
+		$stepNextStep = StepNextStep::find($id);
+		//$stepNextStep = StepNextStep::where('step_id', '=', $stepId)->where('next_step_id', '=', $nextStepId)->first();
 
-		$min_value = min(0, max(3, $request->min_value));
+		$type = $request->type;
+		switch ($type) {
+			case 'ability':
+				$abilityId = $request->ability_id;
+				if ($abilityId === null) abort(422, "AbilityId can't be null when type is 'ability'.");
+				$ability = Ability::find($abilityId);
+				if ($ability === null) abort(422, "Ability $abilityId doesn't exist.");
+				$min_value = min(3, max(0, (int)$request->min_value));
 
-		$stepNextStep = StepNextStep::where('step_id', '=', $stepId)->where('next_step_id', '=', $nextStepId)->first();
-		if ($min_value === 0) {
+				$delete_condition = function() use ($min_value) {
+					return $min_value === 0;
+				};
+				$assign = function($stepNextStep) use ($abilityId, $min_value) {
+					$stepNextStep->ability_id = $abilityId;
+					$stepNextStep->min_value = $min_value;
+				};
+
+				break;
+			case 'code':
+				$code = $request->code;
+				if ($code === null) abort(422, "Code can't be null when type is 'code'.");
+
+				$delete_condition = function() use ($code) {
+					return strlen($code) < 3;
+				};
+				$assign = function($stepNextStep) use ($code) {
+					$stepNextStep->code = $code;
+				};
+
+				break;
+			default:
+				abort(422, "Unknown $type for step_next_steps.");
+		}
+
+		if ($delete_condition()) {
 			if ($stepNextStep !== null) { 
 				$stepNextStep->delete();
 			}
@@ -123,10 +171,13 @@ class ProblemController extends Controller
 				$stepNextStep->step_id = $stepId;
 				$stepNextStep->next_step_id = $nextStepId;
 			}
-			$stepNextStep->ability_id = $abilityId;
-			$stepNextStep->min_value = $min_value;
+			$stepNextStep->type = $type;
+
+			$assign($stepNextStep);
 
 			$stepNextStep->save();
 		}
+
+		return new JsonResponse([ 'success' => true ]);
 	}
 }
