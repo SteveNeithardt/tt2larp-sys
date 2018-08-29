@@ -18,8 +18,8 @@
 				<div class="card-body">
 					<ul class="list">
 						<li class="thumb" v-for="character in filtered_characters" v-on:click="edit(character.id)" v-cloak>@{{ character.name }}</li>
-						<li class="thumb text-primary" v-on:click="edit()" v-cloak>@lang ('i.add')</li>
 					</ul>
+					<span class="btn btn-primary mt-2" v-on:click="edit()" v-cloak>@lang ('i.add')</span>
 				</div>
 			</div>
 		</div>
@@ -33,7 +33,6 @@
 					<hr>
 					<div class="d-flex justify-content-around flex-wrap">
 						<div v-for="ability in abilities" class="p-2 col-md-3">
-							<!--<ability-select :name="ability.name" :value="ability.value" :id="ability.id" v-on:update:value="update_ability_value($event.id, $event.value)"></ability-select>-->
 							<div>@{{ ability.name }}</div>
 							<div>
 								<input type="radio" id="ability.name" value="0" v-model="ability.value">
@@ -128,12 +127,6 @@ new Vue({
 					}
 				}
 			}
-		},
-		update_ability_value: function(ability_id, new_value) {
-			var ability = this.abilities.filter(a => a.id = ability_id);
-			if (ability.length == 1)
-				console.log(ability[0]);
-			console.log(ability_id + ' -> ' + new_value);
 		},
 		submit: function() {
 			axios.post("{{ route('store character') }}", {

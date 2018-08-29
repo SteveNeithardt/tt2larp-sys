@@ -18,8 +18,8 @@
 				<div class="card-body">
 					<ul class="list">
 						<li class="thumb" v-for="ability in filtered_abilities" v-on:click="edit(ability.id)" v-cloak>@{{ ability.name }}</li>
-						<li class="thumb text-primary" v-on:click="edit()" v-cloak>@lang ('i.add')</li>
 					</ul>
+					<span class="btn btn-primary mt-2" v-on:click="edit()" v-cloak>@lang ('i.add')</span>
 				</div>
 			</div>
 		</div>

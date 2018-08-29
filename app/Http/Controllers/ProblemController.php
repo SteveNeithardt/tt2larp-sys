@@ -56,19 +56,9 @@ class ProblemController extends Controller
 		$steps = $problem->getSteps();
 
 		$first = $problem->firstSteps->first();
-		$tree = [];
-		if ($first !== null) $tree = $first->getTree();
-		$toadd = [];
-		foreach ($steps as $step) {
-			foreach ($tree['nodes'] as $node) {
-				if ($node['id'] == $step->id)
-					continue 2;
-			}
-			$toadd[] = [ 'id' => $step->id, 'label' => $step->name ];
-		}
-		$tree['nodes'] = array_merge($tree['nodes'], $toadd);
+		if ($first !== null) $edges = $first->getEdges();
 
-		return new JsonResponse(compact('steps', 'tree'));
+		return new JsonResponse(compact('steps', 'edges'));
 	}
 
 	/**

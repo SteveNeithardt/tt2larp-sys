@@ -3,6 +3,10 @@
 @section ('css')
 <style>
 [v-cloak] { display:none; }
+#vis {
+height:400px;
+border: 1px solid #bbb;
+}
 </style>
 <link href="{{ asset('css/vis.css') }}" rel="stylsheet" type="text/css">
 @endsection
@@ -25,11 +29,11 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-md-6" v-if="editing_problem" v-cloak>
+		<div class="col-md-12 mb-4" v-if="editing_problem" v-cloak>
 			<div class="card">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.problem name')" v-model="problem_name"></div>
 				<div class="card-body">
-					<div id="vis" style="height:300px;"></div>
+					<div id="vis"></div>
 					<span class="btn btn-primary mt-3" v-on:click="addEdge(true)" v-if="!selecting_edge">@lang ('i.add edge')</span>
 					<span class="btn btn-outline-info mt-3" v-on:click="addEdge(false)" v-if="selecting_edge">@lang ('i.cancel')</span>
 				</div>
@@ -57,7 +61,7 @@
 				<div class="card-body">
 					<div v-if="edge_type == 'ability'">
 						<select v-model="edge_ability_id">
-							<option v-for="ability in abilities" :value="ability.id">@{{ ability.name }}</option>
+							<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }} + @{{ ability.id }}</option>
 						</select>
 						<div>
 							<input type="radio" id="ability.name" value="0" v-model="edge_ability_value">
@@ -93,7 +97,7 @@ new Vue({
 			problem_id: null,
 			problem_name: null,
 			steps: null,
-			tree: null,
+			edges: null,
 
 			editing_step: false,
 			step_id: null,
@@ -116,10 +120,17 @@ new Vue({
 	vis: {
 		instance: null,
 		options: {
-			layout: {
-				hierarchical: {
-					direction: 'UD',
+			edges: {
+				arrows: "to",
+				length: 200,
+				smooth: {
+					enabled: true,
+					type: "dynamic",
+					roundness: 0.7,
 				},
+			},
+			physics: {
+				solver: "repulsion",
 			},
 		},
 	},
@@ -155,6 +166,25 @@ new Vue({
 				(this.edge_type == 'code' && this.edge_code != null && this.edge_code.length > 2))
 			);
 		},
+		tree: function() {
+			var nodes = this.steps.map(s => {
+				return { id: s.id, label: s.name };
+			});
+			var edges = this.edges.map(e => {
+				var label = 'undefined';
+				if (e.type == 'ability') {
+					var result = this.abilities.filter(a => a.id == e.ability_id);
+					if (result.length == 1) {
+						label = result[0].name + '(' + e.min_value + ')';
+					}
+				} else if (e.type == 'code') {
+					label = e.code;
+				}
+
+				return { id: e.id, from: e.from, to: e.to, label: label };
+			});
+			return { nodes: nodes, edges: edges };
+		},
 	},
 	methods: {
 		fetch_problems: function() {
@@ -180,7 +210,7 @@ new Vue({
 			axios.get(url.replace('%R%', this.problem_id))
 				.then(response => {
 					this.steps = response.data.steps;
-					this.tree = response.data.tree;
+					this.edges = response.data.edges;
 					this.vis_make();
 				})
 				.catch(errors => {});
@@ -190,7 +220,7 @@ new Vue({
 			this.problem_id = null;
 			this.problem_name = null;
 			this.steps = null;
-			this.tree = null;
+			this.edges = null;
 
 			this.vis_destroy();
 			this.resetStep();
@@ -247,7 +277,7 @@ new Vue({
 		editEdge: function(edge_id) {
 			this.resetStep();
 			this.resetEdge();
-			var result = this.tree.edges.filter(e => e.id == edge_id);
+			var result = this.edges.filter(e => e.id == edge_id);
 			if (result.length == 1) {
 				var edge = result[0];
 				this.edge_id = edge.id;
