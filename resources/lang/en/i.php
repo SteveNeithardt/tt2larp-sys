@@ -34,5 +34,6 @@ return [
 	'add edge' => 'Add link',
 	'save edge' => 'Save link',
 
+	'library' => 'Library',
 
 ];
