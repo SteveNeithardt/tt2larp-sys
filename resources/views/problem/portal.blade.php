@@ -61,7 +61,7 @@ border: 1px solid #bbb;
 				<div class="card-body">
 					<div v-if="edge_type == 'ability'">
 						<select v-model="edge_ability_id">
-							<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }} + @{{ ability.id }}</option>
+							<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }}</option>
 						</select>
 						<div>
 							<input type="radio" id="ability.name" value="0" v-model="edge_ability_value">
