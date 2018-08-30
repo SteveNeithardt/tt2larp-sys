@@ -25,6 +25,8 @@ return [
 
 	'problems' => 'Problems',
 	'problem name' => 'Problem name',
+	'edit name' => 'Edit name',
+	'save name' => 'Save name',
 
 	'add step' => 'Add step',
 	'step description' => 'Step description',
@@ -36,4 +38,5 @@ return [
 
 	'library' => 'Library',
 
+	'Problem named \':name\' already exists' => 'Problem named \':name\' already exists',
 ];

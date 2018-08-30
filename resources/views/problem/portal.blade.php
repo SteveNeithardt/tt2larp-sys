@@ -25,13 +25,27 @@ border: 1px solid #bbb;
 					<ul class="list">
 						<li class="thumb" v-for="problem in filtered_problems" v-on:click="editProblem(problem.id)" v-cloak>@{{ problem.name }}</li>
 					</ul>
-					<span class="btn btn-primary" v-on:click="editProblem()">@lang ('i.add')</li>
+					<span class="btn btn-primary" v-if="!adding_problem" v-on:click="addProblem()">@lang ('i.add')</span>
+					<input class="form-control" type="text" v-model="problem_name" v-if="adding_problem">
+					<span class="btn btn-primary mt-3" v-if="adding_problem && valid_problem" v-on:click="storeProblem()">@lang ('i.submit')</span>
 				</div>
 			</div>
 		</div>
 		<div class="col-md-12 mb-4" v-if="editing_problem" v-cloak>
 			<div class="card">
-				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.problem name')" v-model="problem_name"></div>
+				<div class="card-header d-flex">
+					<div v-if="!adding_problem">
+						@{{ problem_name }}
+						<span class="btn btn-outline-primary ml-3" v-on:click="addProblem()">@lang ('i.edit name')</span>
+					</div>
+					<div class="col-md-8" v-if="adding_problem">
+						<input class="form-control" type="text" placeholder="@lang ('i.problem name')" v-model="problem_name">
+					</div>
+					<div class="col-md-3" v-if="adding_problem">
+						<span class="btn btn-primary" v-on:click="storeProblem(false)">@lang ('i.save name')</span>
+						<span class="btn btn-outline-secondary" v-on:click="resetAddProblem()">@lang ('i.cancel')</span>
+					</div>
+				</div>
 				<div class="card-body">
 					<div id="vis"></div>
 					<span class="btn btn-primary mt-3" v-on:click="addEdge(true)" v-if="!selecting_edge">@lang ('i.add edge')</span>
@@ -93,6 +107,7 @@ new Vue({
 			listing_problems: false,
 			filter_name: null,
 
+			adding_problem: false,
 			editing_problem: false,
 			problem_id: null,
 			problem_name: null,
@@ -138,6 +153,9 @@ new Vue({
 		filtered_problems: function() {
 			if (this.filter_name == null) return this.problems;
 			else return this.problems.filter(a => a.name.indexOf(this.filter_name) > -1);
+		},
+		valid_problem: function() {
+			return (this.problem_name != null && this.problem_name.length > 2);
 		},
 		valid_step: function() {
 			return (this.step_name != null &&
@@ -188,6 +206,7 @@ new Vue({
 	},
 	methods: {
 		fetch_problems: function() {
+			this.resetProblem();
 			axios.get("{{ route('get problems') }}")
 				.then(response => {
 					this.problems = response.data;
@@ -216,23 +235,27 @@ new Vue({
 				.catch(errors => {});
 		},
 		resetProblem: function() {
+			this.adding_problem = false;
 			this.editing_problem = false;
+			this.vis_destroy();
+			this.resetStep();
+			this.resetEdge();
 			this.problem_id = null;
 			this.problem_name = null;
 			this.steps = null;
 			this.edges = null;
 
-			this.vis_destroy();
-			this.resetStep();
-			this.resetEdge();
 		},
-		resetStep: function() {
+		resetAddProblem() {
+			this.adding_problem = false;
+		},
+		resetStep() {
 			this.editing_step = false;
 			this.step_id = null;
 			this.step_name = null;
 			this.step_description = null;
 		},
-		resetEdge: function() {
+		resetEdge() {
 			this.editing_edge = false;
 			this.selecting_edge = false;
 			this.edge_source_id = null;
@@ -240,11 +263,14 @@ new Vue({
 			this.edge_ability_id = null;
 			this.edge_ability_value = 0;
 		},
-		editProblem: function(id = -1) {
+		addProblem() {
+			this.adding_problem = true;
+		},
+		editProblem(id = -1) {
 			this.resetProblem();
+			if (id == -1) return;
 			this.listing_problems = false;
 			this.editing_problem = true;
-			if (id == -1) return;
 
 			var result = this.problems.filter(a => a.id == id);
 			if (result.length == 1) {
@@ -253,7 +279,7 @@ new Vue({
 				this.fetch_steps();
 			}
 		},
-		editStep: function(id = -1) {
+		editStep(id = -1) {
 			this.resetStep();
 			this.resetEdge();
 			this.editing_step = true;
@@ -267,14 +293,14 @@ new Vue({
 				this.step_description = step.description;
 			}
 		},
-		addEdge: function(editing) {
+		addEdge(editing) {
 			if (editing) {
 				this.selecting_edge = true;
 			} else {
 				this.resetEdge();
 			}
 		},
-		editEdge: function(edge_id) {
+		editEdge(edge_id) {
 			this.resetStep();
 			this.resetEdge();
 			var result = this.edges.filter(e => e.id == edge_id);
@@ -289,6 +315,25 @@ new Vue({
 				this.edge_code = edge.code;
 				this.editing_edge = true;
 			}
+		},
+		storeProblem: function(fetch = true) {
+			if (!this.valid_problem) return;
+			axios.post("{{ route('store problem') }}", {
+					id: this.problem_id,
+					name: this.problem_name,
+				})
+				.then(response => {
+					if (response.data.success) {
+						if (fetch) {
+							this.fetch_problems();
+						} else {
+							this.adding_problem = false;
+						}
+					} else {
+						alert(response.data.message);
+					}
+				})
+				.catch(errors => {});
 		},
 		storeStep: function() {
 			if (!this.valid_step) return;

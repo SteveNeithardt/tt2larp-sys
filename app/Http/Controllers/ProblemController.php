@@ -37,7 +37,33 @@ class ProblemController extends Controller
 	 */
 	public function store(Request $request)
 	{
+		$request->validate([
+			'id' => 'nullable|integer',
+			'name' => 'required|string|min:3',
+		]);
 
+		$name = $request->name;
+		if (Problem::where('name', '=', $name)->count() > 0) {
+			return new JsonResponse([ 'success' => false, 'message' => __( "Problem named ':name' already exists", [ 'name' => $name ] ) ]);
+		}
+
+		$id = $request->id;
+		$problem = Problem::find($id);
+		if ($problem === null) {
+			$problem = new Problem();
+			$problem->name = $name;
+			$problem->save();
+			$step = new Step();
+			$step->name = 'UNDEFINED';
+			$step->description = 'REPLACE ME';
+			$step->save();
+			$problem->steps()->sync([ $step->id => [ 'first_step' => 1 ] ]);
+		} else {
+			$problem->name = $name;
+			$problem->save();
+		}
+
+		return new JsonResponse([ 'success' => true ]);
 	}
 
 	/**

@@ -30,3 +30,4 @@ Route::get('/problem/{problem_id}/list', 'ProblemController@getStepList')->name(
 Route::post('/problem/{problem_id}/node/store', 'ProblemController@storeNode')->name('store node');
 Route::post('/problem/{problem_id}/edge/store', 'ProblemController@storeEdge')->name('store edge');
 
+Route::get('/library', 'LibraryController@portal')->name('library portal');
