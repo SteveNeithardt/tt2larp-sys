@@ -31,3 +31,8 @@ Route::post('/problem/{problem_id}/node/store', 'ProblemController@storeNode')->
 Route::post('/problem/{problem_id}/edge/store', 'ProblemController@storeEdge')->name('store edge');
 
 Route::get('/library', 'LibraryController@portal')->name('library portal');
+Route::get('/library/list', 'LibraryController@getList')->name('get articles');
+Route::post('/library/store', 'LibraryController@store')->name('store article');
+Route::get('/library/{article_id}/list', 'LibraryController@getPartList')->name('get parts');
+Route::post('/library/{article_id}/part/store', 'LibraryController@storePart')->name('store part');
+

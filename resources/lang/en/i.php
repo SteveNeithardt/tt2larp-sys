@@ -37,6 +37,13 @@ return [
 	'save edge' => 'Save link',
 
 	'library' => 'Library',
+	'code' => 'Code',
+	'edit article' => 'Edit article',
 
-	'Problem named \':name\' already exists' => 'Problem named \':name\' already exists',
+	'add part' => 'Add part',
+	'save part' => 'Save part',
+
+	'Problem named \':name\' already exists.' => 'Problem named \':name\' already exists.',
+	'Article named \':name\' already exists.' => 'Article named \':name\' already exists.',
+	'Article with code \':code\' already exists.' => 'Article with code \':code\' already exists.',
 ];

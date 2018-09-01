@@ -44,7 +44,7 @@ class ProblemController extends Controller
 
 		$name = $request->name;
 		if (Problem::where('name', '=', $name)->count() > 0) {
-			return new JsonResponse([ 'success' => false, 'message' => __( "Problem named ':name' already exists", [ 'name' => $name ] ) ]);
+			return new JsonResponse([ 'success' => false, 'message' => __( "Problem named ':name' already exists.", [ 'name' => $name ] ) ]);
 		}
 
 		$id = $request->id;
@@ -73,11 +73,11 @@ class ProblemController extends Controller
 	 * where $steps are all related steps to the program
 	 * and $tree is the relations between all steps
 	 */
-	public function getStepList($id)
+	public function getStepList($problem_id)
 	{
-		$problem = Problem::find($id);
+		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $id doesn't exist.");
+		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
 
 		$steps = $problem->getSteps();
 
@@ -90,17 +90,16 @@ class ProblemController extends Controller
 	/**
 	 * store a single step (insert/update)
 	 */
-	public function storeNode(Request $request, $id)
+	public function storeNode(Request $request, $problem_id)
 	{
-		$problem = Problem::find($id);
+		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $id doesn't exist.");
+		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
 
 		$stepId = $request->step_id;
 		$step = Step::find($stepId);
 		if ($step === null) {
 			$step = new Step();
-			$step->id = $stepId;
 		}
 		$step->name = $request->name;
 		$step->description = $request->description;
@@ -114,11 +113,11 @@ class ProblemController extends Controller
 	/**
 	 * store a single edge (insert/update)
 	 */
-	public function storeEdge(Request $request, $id)
+	public function storeEdge(Request $request, $problem_id)
 	{
-		$problem = Problem::find($id);
+		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $id doesn't exist.");
+		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
 
 		$request->validate([
 			'id' => 'nullable|integer',

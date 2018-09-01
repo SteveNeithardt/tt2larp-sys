@@ -23,7 +23,7 @@ border: 1px solid #bbb;
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
 				<div class="card-body">
 					<ul class="list">
-						<li class="thumb" v-for="problem in filtered_problems" v-on:click="editProblem(problem.id)" v-cloak>@{{ problem.name }}</li>
+						<li class="thumb" v-for="problem in filtered_problems" v-on:click="editProblem(problem.id)">@{{ problem.name }}</li>
 					</ul>
 					<span class="btn btn-primary" v-if="!adding_problem" v-on:click="addProblem()">@lang ('i.add')</span>
 					<input class="form-control" type="text" v-model="problem_name" v-if="adding_problem">
