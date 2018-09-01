@@ -31,6 +31,6 @@ class AddPivotTableForCharactersAndAbilities extends Migration
      */
     public function down()
     {
-		Schema::dropTable('character_abilities');
+		Schema::dropIfExists('character_abilities');
     }
 }

@@ -15,7 +15,8 @@ class AddArticlesTable extends Migration
     {
 		Schema::create('articles', function (Blueprint $table) {
 			$table->increments('id');
-			$table->string('name');
+			$table->string('name')->unique();
+			$table->string('code')->unique();
 			$table->timestamps();
 		});
     }
@@ -27,6 +28,6 @@ class AddArticlesTable extends Migration
      */
     public function down()
     {
-		Schema::dropTable('articles');
+		Schema::dropIfExists('articles');
     }
 }

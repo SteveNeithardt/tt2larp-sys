@@ -31,6 +31,6 @@ class AddPartsTable extends Migration
      */
     public function down()
     {
-		Schema::dropTable('parts');
+		Schema::dropIfExists('parts');
     }
 }

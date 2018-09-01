@@ -27,6 +27,6 @@ class AddAbilitiesTable extends Migration
      */
     public function down()
     {
-		Schema::dropTable('abilities');
+		Schema::dropIfExists('abilities');
     }
 }

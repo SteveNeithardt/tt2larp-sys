@@ -36,6 +36,6 @@ class AddStepNextStepsTable extends Migration
      */
     public function down()
     {
-		Schema::dropTable('step_next_steps');
+		Schema::dropIfExists('step_next_steps');
     }
 }

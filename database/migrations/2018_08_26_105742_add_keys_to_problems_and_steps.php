@@ -31,6 +31,6 @@ class AddKeysToProblemsAndSteps extends Migration
      */
     public function down()
     {
-		Schema::dropTable('problem_steps');
+		Schema::dropIfExists('problem_steps');
     }
 }
