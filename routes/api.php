@@ -20,3 +20,4 @@ use Illuminate\Http\Request;
 //    return $request->user();
 //});
 
+Route::get('/library/article', 'LibraryController@article')->name('get article');

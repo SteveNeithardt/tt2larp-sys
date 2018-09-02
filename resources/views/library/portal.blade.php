@@ -99,7 +99,10 @@ new Vue({
 	computed: {
 		filtered_articles() {
 			if (this.filter_name == null) return this.articles;
-			else return this.articles.filter(a => a.name.indexOf(this.filter_name) > -1);
+			else return this.articles.filter(a =>
+				a.name.indexOf(this.filter_name) > -1 ||
+				(a.code != null && a.code.indexOf(this.filter_name) > -1)
+			);
 		},
 		valid_article() {
 			return (this.article_name != null &&

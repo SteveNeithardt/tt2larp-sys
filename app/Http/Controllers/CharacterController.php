@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 
 use tt2larp\Models\Ability;
 use tt2larp\Models\Character;
+use tt2larp\Models\Code;
 
 class CharacterController extends Controller
 {
@@ -25,13 +26,20 @@ class CharacterController extends Controller
 	{
 		$characters = Character::select('id', 'name', 'player', 'description')->with(['abilities'=>function($q) {
 			$q->select('id', 'name');
-		}])->get();
+		}])->with('codes')->get();
 
 		foreach ($characters as $character) {
 			foreach ($character->abilities as $ability) {
 				$ability->value = $ability->pivot->value;
 				unset($ability->pivot);
 			}
+			$code = $character->codes->first();
+			if ($code !== null) {
+				$character->code = $character->codes->first()->code;
+			} else {
+				$character->code = null;
+			}
+			unset($character->codes);
 		}
 
 		return new JsonResponse($characters);
@@ -42,6 +50,14 @@ class CharacterController extends Controller
 	 */
 	public function store(Request $request)
 	{
+		$request->validate([
+			'id' => 'nullable|integer',
+			'name' => 'required|string|min:3',
+			'description' => 'nullable|string',
+			'player' => 'required|string|min:3',
+			'code' => 'required|string|min:3',
+		]);
+
 		$id = $request->id;
 
 		$character = Character::find($id);
@@ -68,6 +84,12 @@ class CharacterController extends Controller
 		}
 
 		$character->abilities()->sync($relations_array);
+
+		try {
+			$character->assignCode($request->code);
+		} catch (RuntimeException $e) {
+			//silentreturn new JsonResponse([ 'success' => false, 'message' => $e->message ]);
+		}
 
 		return $this->getList();
 	}

@@ -16,10 +16,18 @@ trait HasCodeTrait
 
 	/**
 	 * helper method for associating code
+	 *
+	 * @param  $code
+	 * @return void
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function assignCode($code)
 	{
-		if ($this->code === $code) return;
+		if ($this->codes()->count() > 0) {
+			$local = $this->codes()->first();
+			if ($local->code === $code) return;
+		}
 
 		$c = Code::find($code);
 		if ($c !== null) {
@@ -32,6 +40,8 @@ trait HasCodeTrait
 		} else {
 			$this->codes()->create([ 'code' => $code ]);
 		}
+
+		if (isset($local)) $local->delete();
 	}
 
 	/**

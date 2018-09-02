@@ -5,8 +5,12 @@ namespace tt2larp\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use ReflectionClass;
+use RuntimeException;
+
 use tt2larp\Models\Ability;
 use tt2larp\Models\Article;
+use tt2larp\Models\Code;
 use tt2larp\Models\Part;
 
 class LibraryController extends Controller
@@ -24,7 +28,17 @@ class LibraryController extends Controller
 	 */
 	public function getList()
 	{
-		$articles = Article::all();
+		$articles = Article::with('codes')->get();
+
+		foreach ($articles as $article) {
+			$code = $article->codes->first();
+			if ($code !== null) {
+				$article->code = $article->codes->first()->code;
+			} else {
+				$article->code = null;
+			}
+			unset($article->codes);
+		}
 
 		return new JsonResponse($articles);
 	}
@@ -40,26 +54,25 @@ class LibraryController extends Controller
 			'code' => 'required|string|min:3',
 		]);
 
-		$name = $request->name;
-		$code = $request->code;
-		if (Article::where('code', '=', $code)->count() > 0) {
-			return new JsonResponse([ 'success' => false, 'message' => __( "Article with code ':code' already exists.", ['code' => $code ] ) ]);
-		}
-		if (Article::where('name', '=', $name)->count() > 0) {
-			return new JsonResponse([ 'success' => false, 'message' => __( "Article named ':name' already exists.", [ 'name' => $name ] ) ]);
-		}
-
 		$id = $request->id;
 		$article = Article::find($id);
 		if ($article === null) {
 			$article = new Article();
-			$article->name = $name;
-			$article->code = $code;
-			$article->save();
+		}
+
+		$name = $request->name;
+		if ($name !== $article->name && Article::where('name', '=', $name)->count() > 0) {
+			return new JsonResponse([ 'success' => false, 'message' => __( "Article named ':name' already exists.", [ 'name' => $name ] ) ]);
 		} else {
 			$article->name = $name;
-			$article->code = $code;
-			$article->save();
+		}
+
+		$article->save();
+
+		try {
+			$article->assignCode($request->code);
+		} catch (RuntimeException $e) {
+			return new JsonResponse([ 'success' => false, 'message' => $e->message ]);
 		}
 
 		return new JsonResponse(['success' => true ]);
@@ -121,4 +134,20 @@ class LibraryController extends Controller
 
 		return new JsonResponse([ 'success' => true ]);
 	}
+
+	/**
+	 * Return Article Part that is available according to inputs
+	 */
+	//public function article(Request $request)
+	//{
+		//$codes = $request->codes;
+//
+		//if (!$codes is array) abort(422);
+//
+		//$candidates = Code::findMany($codes);
+//
+		//foreach ($candidates as $candidate) {
+			//{$candidate->model}::find($candidate->model_id);
+		//}
+	//}
 }
