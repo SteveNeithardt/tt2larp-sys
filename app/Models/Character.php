@@ -4,8 +4,12 @@ namespace tt2larp\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use tt2larp\Traits\HasCodeTrait;
+
 class Character extends Model
 {
+	use HasCodeTrait;
+
 	protected $table = 'characters';
 
 	/**

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddArticlesTable extends Migration
+class AddCodesMorphTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class AddArticlesTable extends Migration
      */
     public function up()
     {
-		Schema::create('articles', function (Blueprint $table) {
-			$table->increments('id');
-			$table->string('name')->unique();
-			$table->timestamps();
+		Schema::create('codes', function (Blueprint $table) {
+			$table->string('code')->primary();
+			$table->unsignedInteger('coded_id');
+			$table->string('coded_type');
 		});
     }
 
@@ -27,6 +27,6 @@ class AddArticlesTable extends Migration
      */
     public function down()
     {
-		Schema::dropIfExists('articles');
+		Schema::dropIfExists('codes');
     }
 }
