@@ -28,7 +28,9 @@ Route::get('/problem/list', 'ProblemController@getList')->name('get problems');
 Route::post('/problem/store', 'ProblemController@store')->name('store problem');
 Route::get('/problem/{problem_id}/list', 'ProblemController@getStepList')->name('get steps');
 Route::post('/problem/{problem_id}/node/store', 'ProblemController@storeNode')->name('store node');
+Route::post('/problem/{problem_id}/node/delete', 'ProblemController@deleteNode')->name('delete node');
 Route::post('/problem/{problem_id}/edge/store', 'ProblemController@storeEdge')->name('store edge');
+Route::post('/problem/{problem_id}/edge/delete', 'ProblemController@deleteEdge')->name('delete edge');
 
 Route::get('/library', 'LibraryController@portal')->name('library portal');
 Route::get('/library/list', 'LibraryController@getList')->name('get articles');

@@ -9,6 +9,14 @@ class Step extends Model
 	protected $table = 'steps';
 
 	/**
+	 * Problem(s) this step is related to
+	 */
+	public function problem()
+	{
+		return $this->belongsToMany(Problem::class, 'problem_steps', 'step_id', 'problem_id')->withPivot('first_step');
+	}
+
+	/**
 	 * Next Step instances
 	 */
 	public function nextSteps()

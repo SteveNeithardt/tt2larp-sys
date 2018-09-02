@@ -58,7 +58,11 @@ border: 1px solid #bbb;
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.step name')" v-model="step_name"></div>
 				<div class="card-body">
 					<textarea class="form-control" v-model="step_description" placeholder="@lang ('i.step description')"></textarea>
-					<span class="btn btn-primary mt-3" v-on:click="storeStep()" v-if="valid_step">@lang ('i.save step')</span>
+					<div class="mt-3">
+						<span class="btn btn-primary mr-2" v-on:click="storeStep()" v-if="valid_step">@lang ('i.save step')</span>
+						<span class="btn btn-outline-danger mr-2" v-on:click="deleteStep()" v-if="can_delete_step">@lang ('i.delete')</span>
+						<span class="btn btn-outline-secondary" v-on:click="resetStep()">@lang ('i.cancel')</span>
+					</div>
 				</div>
 			</div>
 			<div v-if="!editing_step && !editing_edge" v-cloak>
@@ -87,7 +91,11 @@ border: 1px solid #bbb;
 					<div v-if="edge_type == 'code'">
 						<input class="form-control" type="text" v-model="edge_code" placeholder="@lang ('i.code')">
 					</div>
-					<span class="btn btn-primary mt-3" v-on:click="storeEdge()" v-if="valid_edge">@lang ('i.save edge')</span>
+					<div class="mt-3">
+						<span class="btn btn-primary mr-2" v-on:click="storeEdge()" v-if="valid_edge">@lang ('i.save edge')</span>
+						<span class="btn btn-outline-danger mr-2" v-on:click="deleteEdge()" v-if="can_delete_edge">@lang ('i.delete')</span>
+						<span class="btn btn-outline-secondary" v-on:click="resetEdge()">@lang ('i.cancel')</span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -163,6 +171,22 @@ new Vue({
 				this.step_description != null &&
 				this.step_description.length > 0);
 		},
+		can_delete_step() {
+			if (this.step_id == null) return false;
+
+			var first = this.steps.filter(s => s.first_step == 1 && s.id == this.step_id);
+			if (first.length > 0) return false;
+
+			var result = this.edges.filter(e => e.to == this.step_id || e.from == this.step_id);
+			if (result.length > 0) return false;
+
+			return true;
+		},
+		can_delete_edge() {
+			if (this.edge_id == null) return false;
+
+			return true;
+		},
 		edge_source: function() {
 			if (this.edge_source_id != null) {
 				var result = this.steps.filter(s => s.id == this.edge_source_id);
@@ -186,6 +210,7 @@ new Vue({
 		},
 		tree: function() {
 			var nodes = this.steps.map(s => {
+				if (s.first_step == 1) return { id: s.id, label: s.name, color: { background: 'lightgreen', highlight: { background: 'lightgreen' } } };
 				return { id: s.id, label: s.name };
 			});
 			var edges = this.edges.map(e => {
@@ -351,6 +376,20 @@ new Vue({
 				})
 				.catch(errors => {});
 		},
+		deleteStep() {
+			if (!this.can_delete_step) return;
+
+			const url = "{{ route('delete node', ['problem_id' => '%R%']) }}";
+			axios.post(url.replace('%R%', this.problem_id), {
+					step_id: this.step_id,
+				})
+				.then(response => {
+					if (response.data.success) {
+						this.fetch_steps();
+					}
+				})
+				.catch(errors => {});
+		},
 		storeEdge: function() {
 			if (!this.valid_edge) return;
 
@@ -363,6 +402,20 @@ new Vue({
 					ability_id: this.edge_ability_id,
 					min_value: this.edge_ability_value,
 					code: this.edge_code,
+				})
+				.then(response => {
+					if (response.data.success) {
+						this.fetch_steps();
+					}
+				})
+				.catch(errors => {});
+		},
+		deleteEdge() {
+			if (!this.can_delete_edge) return;
+
+			const url = "{{ route('delete edge', ['problem_id' => '%R%']) }}";
+			axios.post(url.replace('%R%', this.problem_id), {
+					edge_id: this.edge_id,
 				})
 				.then(response => {
 					if (response.data.success) {

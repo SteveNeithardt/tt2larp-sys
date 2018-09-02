@@ -111,6 +111,31 @@ class ProblemController extends Controller
 	}
 
 	/**
+	 * deletes a single node
+	 */
+	public function deleteNode(Request $request, $problem_id)
+	{
+		$problem = Problem::find($problem_id);
+
+		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
+
+		$request->validate([
+			'step_id' => 'required|integer',
+		]);
+
+		$step_id = $request->step_id;
+		$step = Step::find($step_id);
+		if ($step === null) {
+			return new JsonResponse([ 'success' => false ]);
+		}
+
+		$step->problem()->detach();
+		$step->delete();
+
+		return new JsonResponse([ 'success' => true ]);
+	}
+
+	/**
 	 * store a single edge (insert/update)
 	 */
 	public function storeEdge(Request $request, $problem_id)
@@ -192,6 +217,30 @@ class ProblemController extends Controller
 
 			$stepNextStep->save();
 		}
+
+		return new JsonResponse([ 'success' => true ]);
+	}
+
+	/**
+	 * deletes a single edge
+	 */
+	public function deleteEdge(Request $request, $problem_id)
+	{
+		$problem = Problem::find($problem_id);
+
+		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
+
+		$request->validate([
+			'edge_id' => 'required|integer',
+		]);
+
+		$edge_id = $request->edge_id;
+		$edge = StepNextStep::find($edge_id);
+		if ($edge === null) {
+			return new JsonResponse([ 'success' => false ]);
+		}
+
+		$edge->delete();
 
 		return new JsonResponse([ 'success' => true ]);
 	}

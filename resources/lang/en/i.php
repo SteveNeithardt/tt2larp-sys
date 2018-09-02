@@ -13,6 +13,7 @@ return [
 	'cancel' => 'Cancel',
 	'edit' => 'Edit',
 	'submit' => 'Submit',
+	'delete' => 'Delete',
 
 	// step_next_step
 	'select type' => 'Select type...',
