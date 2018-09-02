@@ -2,6 +2,8 @@
 
 namespace tt2larp\Http\Controllers;
 
+use Validator;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -12,6 +14,8 @@ use tt2larp\Models\Ability;
 use tt2larp\Models\Article;
 use tt2larp\Models\Code;
 use tt2larp\Models\Part;
+
+//use tt2larp\Http\Requests\GetArticle;
 
 class LibraryController extends Controller
 {
@@ -138,16 +142,21 @@ class LibraryController extends Controller
 	/**
 	 * Return Article Part that is available according to inputs
 	 */
-	//public function article(Request $request)
-	//{
-		//$codes = $request->codes;
-//
-		//if (!$codes is array) abort(422);
-//
-		//$candidates = Code::findMany($codes);
-//
-		//foreach ($candidates as $candidate) {
-			//{$candidate->model}::find($candidate->model_id);
-		//}
-	//}
+	//public function article(GetArticle $request)
+	public function article(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+		//$request->validate([
+			'codes' => 'required|array',
+			'codes.*' => 'required|string|distinct|min:3',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$codes = Code::findMany($request->codes);
+
+		dd('hi!');
+	}
 }
