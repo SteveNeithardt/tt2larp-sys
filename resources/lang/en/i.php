@@ -7,26 +7,32 @@ return [
     |--------------------------------------------------------------------------
 	*/
 
+	// general
 	'add' => 'Add',
 	'back' => 'Back',
 	'cancel' => 'Cancel',
 	'edit' => 'Edit',
 	'submit' => 'Submit',
 
+	// step_next_step
 	'select type' => 'Select type...',
 	'abilities' => 'Abilities',
 	'ability type' => 'ability',
 	'code type' => 'code',
 
+	// characters
 	'characters' => 'Characters',
 	'search' => 'Search...',
 	'name' => 'Name',
 	'player' => 'Player',
 
+	// problems
 	'problems' => 'Problems',
 	'problem name' => 'Problem name',
 	'edit name' => 'Edit name',
 	'save name' => 'Save name',
+
+	'Problem named \':name\' already exists.' => 'Problem named \':name\' already exists.',
 
 	'add step' => 'Add step',
 	'step description' => 'Step description',
@@ -36,6 +42,7 @@ return [
 	'add edge' => 'Add link',
 	'save edge' => 'Save link',
 
+	// articles
 	'library' => 'Library',
 	'code' => 'Code',
 	'edit article' => 'Edit article',
@@ -43,7 +50,9 @@ return [
 	'add part' => 'Add part',
 	'save part' => 'Save part',
 
-	'Problem named \':name\' already exists.' => 'Problem named \':name\' already exists.',
 	'Article named \':name\' already exists.' => 'Article named \':name\' already exists.',
-	'Article with code \':code\' already exists.' => 'Article with code \':code\' already exists.',
+
+	// api get article part
+	'More than one article present in input array.' => 'More than one article present in input array.',
+	'No article present in input array.' => 'No article present in input array.',
 ];

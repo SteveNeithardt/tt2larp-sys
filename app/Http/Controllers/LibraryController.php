@@ -15,8 +15,6 @@ use tt2larp\Models\Article;
 use tt2larp\Models\Code;
 use tt2larp\Models\Part;
 
-//use tt2larp\Http\Requests\GetArticle;
-
 class LibraryController extends Controller
 {
 	/**
@@ -141,12 +139,13 @@ class LibraryController extends Controller
 
 	/**
 	 * Return Article Part that is available according to inputs
+	 * 
+	 * @param  array of codes (strings)
+	 * @return array of paragraphs (strings)
 	 */
-	//public function article(GetArticle $request)
 	public function article(Request $request)
 	{
 		$validator = Validator::make($request->all(), [
-		//$request->validate([
 			'codes' => 'required|array',
 			'codes.*' => 'required|string|distinct|min:3',
 		]);
@@ -157,6 +156,42 @@ class LibraryController extends Controller
 
 		$codes = Code::findMany($request->codes);
 
-		dd('hi!');
+		$characters = [];
+		$article = null;
+		foreach ($codes as $code) {
+			$instance = $code->coded;
+			if ($instance instanceof Character) {
+				$characters[] = $instance;
+			} else if ($instance instanceof Article) {
+				if ($article !== null) {
+					return new JsonResponse([ 'success' => false, 'message' => __('More than one article present in input array.') ], 422);
+				}
+				$article = $instance;
+			}
+		}
+		if ($article === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('No article present in input array.') ], 422);
+		}
+
+		$abilities = Ability::CollapseCharacters($characters);
+
+		$parts = [];
+		foreach ($article->parts as $part) {
+			$ability_id = $part->ability_id;
+			$min_value = $part->min_value;
+			if ($ability_id === null || $min_value === null) {
+				$parts[] = $part;
+			} else {
+				if (isset($abilities[$ability_id]) && $abilities[$abillity_id] >= $min_value) {
+					$parts[] = $part;
+				}
+			}
+		}
+
+		if (count($parts) === 0) {
+			return new JsonResponse([ 'success' => false, 'message' => 'not enough info' ]);
+		}
+
+		return new JsonResponse([ 'success' => true, 'parts' => array_column($parts, 'description') ]);
 	}
 }
