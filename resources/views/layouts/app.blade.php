@@ -30,6 +30,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
+						<li class="nav-item"><a class="nav-link" href="{{ route('station portal') }}">@lang ('i.stations')</a></li>
 						<li class="nav-item"><a class="nav-link" href="{{ route('library portal') }}">@lang ('i.library')</a></li>
 						<li class="nav-item"><a class="nav-link" href="{{ route('problem portal') }}">@lang ('i.problems')</a></li>
 						<li class="nav-item"><a class="nav-link" href="{{ route('character portal') }}">@lang ('i.characters')</a></li>

@@ -12,6 +12,7 @@ use RuntimeException;
 
 use tt2larp\Models\Ability;
 use tt2larp\Models\Article;
+use tt2larp\Models\Character;
 use tt2larp\Models\Code;
 use tt2larp\Models\Part;
 
@@ -182,7 +183,7 @@ class LibraryController extends Controller
 			if ($ability_id === null || $min_value === null) {
 				$parts[] = $part;
 			} else {
-				if (isset($abilities[$ability_id]) && $abilities[$abillity_id] >= $min_value) {
+				if (isset($abilities[$ability_id]) && $abilities[$ability_id] >= $min_value) {
 					$parts[] = $part;
 				}
 			}

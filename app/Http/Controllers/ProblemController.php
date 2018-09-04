@@ -148,10 +148,11 @@ class ProblemController extends Controller
 			'id' => 'nullable|integer',
 			'step_id' => 'required|integer',
 			'next_step_id' => 'required|integer',
-			'type' => 'required|string',//@todo: validate enum?
-			'ability_id' => 'nullable|integer',
-			'min_value' => 'nullable|integer',
-			'code' => 'nullable|string',
+			'abilities' => 'required|array',
+			'abilities.*.id' => 'required|integer',
+			'abilities.*.value' => 'required|integer',
+			'codes' => 'required|array',
+			'codes.*' => 'requred|string',
 		]);
 
 		$id = $request->id;
@@ -165,58 +166,83 @@ class ProblemController extends Controller
 		if ($nextStep === null) abort(422, "Step $nextStepId doesn't exist.");
 
 		$stepNextStep = StepNextStep::find($id);
-		//$stepNextStep = StepNextStep::where('step_id', '=', $stepId)->where('next_step_id', '=', $nextStepId)->first();
 
-		$type = $request->type;
-		switch ($type) {
-			case 'ability':
-				$abilityId = $request->ability_id;
-				if ($abilityId === null) abort(422, "AbilityId can't be null when type is 'ability'.");
-				$ability = Ability::find($abilityId);
-				if ($ability === null) abort(422, "Ability $abilityId doesn't exist.");
-				$min_value = min(3, max(0, (int)$request->min_value));
-
-				$delete_condition = function() use ($min_value) {
-					return $min_value === 0;
-				};
-				$assign = function($stepNextStep) use ($abilityId, $min_value) {
-					$stepNextStep->ability_id = $abilityId;
-					$stepNextStep->min_value = $min_value;
-				};
-
-				break;
-			case 'code':
-				$code = $request->code;
-				if ($code === null) abort(422, "Code can't be null when type is 'code'.");
-
-				$delete_condition = function() use ($code) {
-					return strlen($code) < 3;
-				};
-				$assign = function($stepNextStep) use ($code) {
-					$stepNextStep->code = $code;
-				};
-
-				break;
-			default:
-				abort(422, "Unknown $type for step_next_steps.");
-		}
-
-		if ($delete_condition()) {
-			if ($stepNextStep !== null) { 
-				$stepNextStep->delete();
+		$pivot = [];
+		foreach ($request->abilities as $ability) {
+			if (Ability::find($ability->id) === null) {
+				continue;
 			}
-		} else {
-			if ($stepNextStep === null) {
-				$stepNextStep = new StepNextStep();
-				$stepNextStep->step_id = $stepId;
-				$stepNextStep->next_step_id = $nextStepId;
-			}
-			$stepNextStep->type = $type;
-
-			$assign($stepNextStep);
-
-			$stepNextStep->save();
+			$pivot[ $ability->id ] = [ 'value' => $ability->value ];
 		}
+		$stepNextStep->abilities()->sync($pivot);
+
+		$found = [];
+		foreach ($request->codes as $codestr) {
+			$code = Code::find($codestr);
+			if ($code !== null) {
+				$instance = $code->instance;
+				if ($instance instanceOf StepNextStep && $instance->id == $stepNextStep->id) {
+					$found[] = $code;
+				}
+			} else {
+				$code = new Code();
+				$code->code = $codestr;
+				$found[] = $code;
+			}
+		}
+		$stepNextStep->codes()->delete();
+		$stepNextStep->codes()->saveMany($found);
+
+		//$type = $request->type;
+		//switch ($type) {
+			//case 'ability':
+				//$abilityId = $request->ability_id;
+				//if ($abilityId === null) abort(422, "AbilityId can't be null when type is 'ability'.");
+				//$ability = Ability::find($abilityId);
+				//if ($ability === null) abort(422, "Ability $abilityId doesn't exist.");
+				//$min_value = min(3, max(0, (int)$request->min_value));
+//
+				//$delete_condition = function() use ($min_value) {
+					//return $min_value === 0;
+				//};
+				//$assign = function($stepNextStep) use ($abilityId, $min_value) {
+					//$stepNextStep->ability_id = $abilityId;
+					//$stepNextStep->min_value = $min_value;
+				//};
+//
+				//break;
+			//case 'code':
+				//$code = $request->code;
+				//if ($code === null) abort(422, "Code can't be null when type is 'code'.");
+//
+				//$delete_condition = function() use ($code) {
+					//return strlen($code) < 3;
+				//};
+				//$assign = function($stepNextStep) use ($code) {
+					//$stepNextStep->code = $code;
+				//};
+//
+				//break;
+			//default:
+				//abort(422, "Unknown $type for step_next_steps.");
+		//}
+//
+		//if ($delete_condition()) {
+			//if ($stepNextStep !== null) { 
+				//$stepNextStep->delete();
+			//}
+		//} else {
+			//if ($stepNextStep === null) {
+				//$stepNextStep = new StepNextStep();
+				//$stepNextStep->step_id = $stepId;
+				//$stepNextStep->next_step_id = $nextStepId;
+			//}
+			//$stepNextStep->type = $type;
+//
+			//$assign($stepNextStep);
+//
+			//$stepNextStep->save();
+		//}
 
 		return new JsonResponse([ 'success' => true ]);
 	}

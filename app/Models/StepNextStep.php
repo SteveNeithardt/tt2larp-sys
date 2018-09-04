@@ -8,6 +8,8 @@ class StepNextStep extends Model
 {
 	protected $table = 'step_next_steps';
 
+	//@todo possibliity of having 'AND' relations within a single step (some kind of morphto many-to-many relationship to abilities)
+
 	/**
 	 * Step that spawned this
 	 */
@@ -25,10 +27,18 @@ class StepNextStep extends Model
 	}
 
 	/**
-	 * Ability this instance requires
+	 * Abilities this instance requires
 	 */
-	public function ability()
+	public function abilities()
 	{
-		return $this->belongsTo(Ability::class, 'ability_id', 'id');
+		return $this->belongsToMany(Ability::class, 'step_next_step_abilities', 'step_next_step_id', 'ability_id', 'id', 'id')->withPivot('value');
+	}
+	
+	/**
+	 * Codes this instance requires
+	 */
+	public function codes()
+	{
+		return $this->morphMany(Code::class, 'coded');
 	}
 }

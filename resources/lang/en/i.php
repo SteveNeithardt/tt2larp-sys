@@ -53,7 +53,16 @@ return [
 
 	'Article named \':name\' already exists.' => 'Article named \':name\' already exists.',
 
-	// api get article part
+	// api get article
 	'More than one article present in input array.' => 'More than one article present in input array.',
 	'No article present in input array.' => 'No article present in input array.',
+
+	// stations
+	'stations' => 'Stations',
+
+	// api try station problem
+	'More than one character present in input array.' => 'More than one character present in input array.',
+	'Station :name (:id) is not a ProblemStation.' => 'Station :name (:id) is not a ProblemStation.',
+	'There are no problems on this station.' => 'There are no problems on this station.',
+	'Nobody is interracting with this station.' => 'Nobody is interracting with this station.',
 ];

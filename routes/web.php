@@ -38,3 +38,5 @@ Route::post('/library/store', 'LibraryController@store')->name('store article');
 Route::get('/library/{article_id}/list', 'LibraryController@getPartList')->name('get parts');
 Route::post('/library/{article_id}/part/store', 'LibraryController@storePart')->name('store part');
 
+Route::get('/station', 'StationController@portal')->name('station portal');
+Route::get('/station/list', 'StationController@getList')->name('get stations');

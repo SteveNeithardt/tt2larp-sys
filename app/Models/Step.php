@@ -21,7 +21,7 @@ class Step extends Model
 	 */
 	public function nextSteps()
 	{
-		return $this->belongsToMany(Step::class, 'step_next_steps', 'step_id', 'next_step_id')->withPivot('ability_id', 'min_value');
+		return $this->belongsToMany(Step::class, 'step_next_steps', 'step_id', 'next_step_id');
 	}
 
 	/**
@@ -29,7 +29,7 @@ class Step extends Model
 	 */
 	public function stepNextSteps()
 	{
-		return $this->hasMany(StepNextStep::class, 'step_id', 'id')->with('ability');
+		return $this->hasMany(StepNextStep::class, 'step_id', 'id')->with('abilities')->with('codes');
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Step extends Model
 	 */
 	public function stepPreviousSteps()
 	{
-		return $this->hasMany(StepNextStep::class, 'next_step_id', 'id')->with('ability');
+		return $this->hasMany(StepNextStep::class, 'next_step_id', 'id')->with('abilities')->with('codes');
 	}
 
 	/**
@@ -53,15 +53,21 @@ class Step extends Model
 
 			$nextStep = Step::find($stepNextStep->next_step_id);
 
-			$all_edges[] = [
+			$edge = [
 				'id' => $stepNextStep->id,
 				'from' => $stepNextStep->step_id,
 				'to' => $stepNextStep->next_step_id,
-				'type' => $stepNextStep->type,
-				'ability_id' => $stepNextStep->ability_id,
-				'min_value' => $stepNextStep->min_value,
-				'code' => $stepNextStep->code,
+				'codes' => [],
+				'abilities' => [],
 			];
+			foreach ($stepNextStep->codes as $code) {
+				$edge['codes'][] = $code->code;
+			}
+			foreach ($stepNextStep->abilities as $ability) {
+				$edge['abilities'][] = (object)[ 'id' => $ability->id, 'value' => $ability->pivot->value ];
+			}
+
+			$all_edges[] = $edge;
 
 			$new_edges = $nextStep->getEdges();
 			$all_edges = array_merge($all_edges, $new_edges);

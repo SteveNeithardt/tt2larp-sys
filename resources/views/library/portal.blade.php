@@ -56,9 +56,18 @@
 			<div class="card" v-if="editing_part">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.part name')" v-model="part_name"></div>
 				<div class="card-body">
+					<div class="d-flex justify-content-between mb-3">
+						<select v-model="part_ability_id">
+							<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }}</option>
+						</select>
+						<input type="number" class="form-control col-md-4" v-model="part_ability_value">
+					</div>
 					<textarea class="form-control" v-model="part_description" placeholder="@lang ('i.part description')"></textarea>
-					<span class="btn btn-primary mt-3 mr-2" v-on:click="storePart()" v-if="valid_part">@lang ('i.save part')</span>
-					<span class="btn btn-outline-secondary mt-3" v-on:click="resetPart()">@lang ('i.cancel')</span>
+					<div class="mt-3">
+						<span class="btn btn-primary mr-2" v-on:click="storePart()" v-if="valid_part">@lang ('i.save part')</span>
+						<span class="btn btn-outline-danger mr-2" v-on:click="deletePart()">@lang ('i.delete')</span>
+						<span class="btn btn-outline-secondary" v-on:click="resetPart()">@lang ('i.cancel')</span>
+					</div>
 				</div>
 			</div>
 			<div v-if="!editing_part" v-cloak>
@@ -138,6 +147,7 @@ new Vue({
 				.catch(errors => {});
 		},
 		fetch_parts() {
+			this.resetPart();
 			const url = "{{ route('get parts', ['article_id' => '%R%']) }}";
 			axios.get(url.replace('%R%', this.article_id))
 				.then(response => {
@@ -200,7 +210,8 @@ new Vue({
 				this.part_id = part.id;
 				this.part_name = part.name;
 				this.part_description = part.description;
-				//etc
+				this.part_ability_id = part.ability_id;
+				this.part_ability_value = part.min_value;
 			}
 		},
 		storeArticle(fetch = true) {
@@ -241,6 +252,9 @@ new Vue({
 					}
 				})
 				.catch(errors => {});
+		},
+		deletePart() {
+			alert("TODO");
 		},
 		fetch_data: function() {
 			this.fetch_articles();

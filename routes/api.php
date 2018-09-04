@@ -21,3 +21,4 @@ use Illuminate\Http\Request;
 //});
 
 Route::get('/library/article', 'LibraryController@article')->name('get article');
+Route::get('/station/problem', 'StationController@tryProblem')->name('try station problem');

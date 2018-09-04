@@ -35,4 +35,26 @@ class Ability extends Model
 		}
 		return $abilities;
 	}
+
+	/**
+	 * Return a list of valid abilities from the $second argument.
+	 *
+	 * @param  $first array of Ability with pivot
+	 * @param  $second array of Ability with pivot
+	 * @return array of abilities
+	 */
+	static public function CompareAllInFirst($first, $second)
+	{
+		$valid = [];
+		foreach ($first as $target) {
+			foreach ($second as $candidate) {
+				if ($target->id === $candidate->id) {
+					if ($target->pivot->value <= $candidate->pivot->value) {
+						$valid = $candidate;
+					}
+				}
+			}
+		}
+		return $valid;
+	}
 }

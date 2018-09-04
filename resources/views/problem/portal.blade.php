@@ -69,28 +69,25 @@ border: 1px solid #bbb;
 				<span class="btn btn-primary" v-on:click="editStep()">@lang ('i.add step')</span>
 			</div>
 			<div class="card" v-if="editing_edge" v-cloak>
-				<div class="card-header">@{{ edge_source }} --&gt; @{{ edge_target }}
-					<select v-model="edge_type">
-						<option>@lang ('i.select type')</option>
-						<option value="ability">@lang ('i.ability type')</option>
-						<option value="code">@lang ('i.code type')</option>
-					</select>
+				<div class="card-header">
+					<b>@{{ edge_source }}</b> --&gt; <b>@{{ edge_target }}</b> (@{{ edge_id }})
 				</div>
 				<div class="card-body">
-					<div v-if="edge_type == 'ability'">
-						<select v-model="edge_ability_id">
-							<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }}</option>
-						</select>
-						<div>
-							<input type="radio" id="ability.name" value="0" v-model="edge_ability_value">
-							<input type="radio" id="ability.name" value="1" v-model="edge_ability_value">
-							<input type="radio" id="ability.name" value="2" v-model="edge_ability_value">
-							<input type="radio" id="ability.name" value="3" v-model="edge_ability_value">
+					<div class="d-flex">
+						<div class="col-md-6">
+							<ul class="list">
+								<li v-for="code in edge_codes">@{{ code }}<span class="delete" v-on:click="deleteEdgeCode(code)"></span></li>
+							</ul>
+							<span class="btn btn-outline-primary mt-2" v-on:click="addEdgeCode()">@lang ('i.add code')</span>
+						</div>
+						<div class="col-md-6">
+							<ul class="list">
+								<li v-for="ability in edge_abilities">@{{ ability_name(ability.id) }}<span class="delete" v-on:click="deleteEdgeAbility(ability.id)"></span></li>
+							</ul>
+							<span class="btn btn-outline-primary mt-2" v-on:click="addEdgeAbility()">@lang ('i.add code')</span>
 						</div>
 					</div>
-					<div v-if="edge_type == 'code'">
-						<input class="form-control" type="text" v-model="edge_code" placeholder="@lang ('i.code')">
-					</div>
+					<hr/>
 					<div class="mt-3">
 						<span class="btn btn-primary mr-2" v-on:click="storeEdge()" v-if="valid_edge">@lang ('i.save edge')</span>
 						<span class="btn btn-outline-danger mr-2" v-on:click="deleteEdge()" v-if="can_delete_edge">@lang ('i.delete')</span>
@@ -132,10 +129,8 @@ new Vue({
 			edge_id: null,
 			edge_source_id: null,
 			edge_target_id: null,
-			edge_type: null,
-			edge_ability_id: null,
-			edge_ability_value: null,
-			edge_code: null,
+			edge_codes: null,
+			edge_abilities: null,
 
 			abilities: null,
 		}
@@ -145,7 +140,7 @@ new Vue({
 		options: {
 			edges: {
 				arrows: "to",
-				length: 200,
+				length: 300,
 				smooth: {
 					enabled: true,
 					type: "dynamic",
@@ -154,6 +149,12 @@ new Vue({
 			},
 			physics: {
 				solver: "repulsion",
+				repulsion: {
+					nodeDistance: 150,
+				},
+				stabilization: {
+					enabled: true,
+				},
 			},
 		},
 	},
@@ -209,21 +210,23 @@ new Vue({
 			);
 		},
 		tree: function() {
+			var _this = this;
 			var nodes = this.steps.map(s => {
 				if (s.first_step == 1) return { id: s.id, label: s.name, color: { background: 'lightgreen', highlight: { background: 'lightgreen' } } };
 				return { id: s.id, label: s.name };
 			});
 			var edges = this.edges.map(e => {
 				var label = 'undefined';
-				if (e.type == 'ability') {
-					var result = this.abilities.filter(a => a.id == e.ability_id);
-					if (result.length == 1) {
-						label = result[0].name + '(' + e.min_value + ')';
-					}
-				} else if (e.type == 'code') {
-					label = e.code;
+				if (e.codes.length > 0) {
+					label = "'" + e.codes.join("'\n'") + "'";
 				}
-
+				if (e.abilities.length > 0) {
+					if (label == 'undefined') { label = ''; }
+					if (label != '') { label = label + "\n"; }
+					label = label + e.abilities.map(a => {
+						return _this.ability_name(a.id) + "(" + a.value + ")";
+					}).join("\n");
+				}
 				return { id: e.id, from: e.from, to: e.to, label: label };
 			});
 			return { nodes: nodes, edges: edges };
@@ -334,10 +337,8 @@ new Vue({
 				this.edge_id = edge.id;
 				this.edge_source_id = edge.from;
 				this.edge_target_id = edge.to;
-				this.edge_type = edge.type;
-				this.edge_ability_id = edge.ability_id;
-				this.edge_ability_value = edge.min_value;
-				this.edge_code = edge.code;
+				this.edge_abilities = edge.abilities;
+				this.edge_codes = edge.codes;
 				this.editing_edge = true;
 			}
 		},
@@ -379,6 +380,8 @@ new Vue({
 		deleteStep() {
 			if (!this.can_delete_step) return;
 
+			alert("TODO warning alerts");
+
 			const url = "{{ route('delete node', ['problem_id' => '%R%']) }}";
 			axios.post(url.replace('%R%', this.problem_id), {
 					step_id: this.step_id,
@@ -398,10 +401,8 @@ new Vue({
 					id: this.edge_id,
 					step_id: this.edge_source_id,
 					next_step_id: this.edge_target_id,
-					type: this.edge_type,
-					ability_id: this.edge_ability_id,
-					min_value: this.edge_ability_value,
-					code: this.edge_code,
+					abilities: this.edge_abilities,
+					codes: this.edge_codes,
 				})
 				.then(response => {
 					if (response.data.success) {
@@ -412,6 +413,8 @@ new Vue({
 		},
 		deleteEdge() {
 			if (!this.can_delete_edge) return;
+
+			alert("TODO warning alerts");
 
 			const url = "{{ route('delete edge', ['problem_id' => '%R%']) }}";
 			axios.post(url.replace('%R%', this.problem_id), {
@@ -430,6 +433,13 @@ new Vue({
 				this.listing_problems = true;
 				return;
 			}
+		},
+		ability_name(ability_id) {
+			var result = this.abilities.filter(a => a.id == ability_id);
+			if (result.length == 1) {
+				return result[0].name;
+			}
+			return 'N/A';
 		},
 		vis_destroy: function() {
 			if (this.$options.vis.instance != null) {
@@ -457,6 +467,9 @@ new Vue({
 				} else if (params.edges.length > 0) {
 					_this.editEdge(params.edges[0]);
 				}
+			});
+			this.$options.vis.instance.on('stabilizationIterationsDone', function() {
+				_this.$options.vis.instance.setOptions({ nodes: { physics: false } });
 			});
 		},
 		fetch_data: function() {

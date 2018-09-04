@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddCodesMorphTable extends Migration
+class AlterStepNextStepTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,12 @@ class AddCodesMorphTable extends Migration
      */
     public function up()
     {
-		Schema::create('codes', function (Blueprint $table) {
-			$table->string('code')->primary();
-			$table->morphs('coded');
+		Schema::table('step_next_steps', function (Blueprint $table) {
+			$table->dropColumn('type');
+			$table->dropForeign(['ability_id']);
+			$table->dropColumn('ability_id');
+			$table->dropColumn('min_value');
+			$table->dropColumn('code');
 		});
     }
 
@@ -26,6 +29,6 @@ class AddCodesMorphTable extends Migration
      */
     public function down()
     {
-		Schema::dropIfExists('codes');
+		// nope, will refactor this anyway
     }
 }
