@@ -11,8 +11,12 @@
 |
 */
 
-Auth::routes();
+//Auth::routes();
+Route::get('/login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('/login', 'Auth\LoginController@login');
+Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
+Route::group([ 'middleware' => 'auth' ], function() {
 Route::get('/', 'HomeController@index')->name('home');
 
 Route::get('/ability', 'AbilityController@portal')->name('ability portal');
@@ -40,3 +44,4 @@ Route::post('/library/{article_id}/part/store', 'LibraryController@storePart')->
 
 Route::get('/station', 'StationController@portal')->name('station portal');
 Route::get('/station/list', 'StationController@getList')->name('get stations');
+});

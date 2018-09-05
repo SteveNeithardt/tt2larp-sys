@@ -37,6 +37,7 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
+		throw new \BadMethodCallException("This behavior has been disabled");
         $this->middleware('guest');
     }
 

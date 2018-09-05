@@ -35,6 +35,8 @@ return [
 
 	'Problem named \':name\' already exists.' => 'Problem named \':name\' already exists.',
 
+	'regen graph' => 'Regenerate graph',
+
 	'add step' => 'Add step',
 	'step description' => 'Step description',
 	'step name' => 'Step name',
@@ -42,6 +44,9 @@ return [
 
 	'add edge' => 'Add link',
 	'save edge' => 'Save link',
+
+	'add code' => 'Add Code',
+	'add ability' => 'Add Ability',
 
 	// articles
 	'library' => 'Library',

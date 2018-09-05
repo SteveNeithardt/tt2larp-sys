@@ -48,13 +48,14 @@ border: 1px solid #bbb;
 				</div>
 				<div class="card-body">
 					<div id="vis"></div>
-					<span class="btn btn-primary mt-3" v-on:click="addEdge(true)" v-if="!selecting_edge">@lang ('i.add edge')</span>
-					<span class="btn btn-outline-info mt-3" v-on:click="addEdge(false)" v-if="selecting_edge">@lang ('i.cancel')</span>
+					<span class="btn btn-primary mt-3" v-on:click="addEdge(true)" v-if="!selecting_edge && !editing_step && !editing_edge">@lang ('i.add edge')</span>
+					<span class="btn btn-outline-secondary mt-3" v-on:click="addEdge(false)" v-if="selecting_edge">@lang ('i.cancel')</span>
+					<span class="btn btn-outline-success mt-3 ml-2" v-on:click="vis_make()" v-if="!selecting_edge && !editing_step && !editing_edge">@lang ('i.regen graph')</span>
 				</div>
 			</div>
 		</div>
-		<div class="col-md-6" v-if="editing_problem" v-cloak>
-			<div class="card" v-if="editing_step" v-cloak>
+		<div class="col-md-6" v-if="editing_step" v-cloak>
+			<div class="card">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.step name')" v-model="step_name"></div>
 				<div class="card-body">
 					<textarea class="form-control" v-model="step_description" placeholder="@lang ('i.step description')"></textarea>
@@ -65,10 +66,12 @@ border: 1px solid #bbb;
 					</div>
 				</div>
 			</div>
-			<div v-if="!editing_step && !editing_edge" v-cloak>
-				<span class="btn btn-primary" v-on:click="editStep()">@lang ('i.add step')</span>
-			</div>
-			<div class="card" v-if="editing_edge" v-cloak>
+		</div>
+		<div class="col-md-6" v-if="editing_problem && !editing_step && !editing_edge && !selecting_edge" v-cloak>
+			<span class="btn btn-primary" v-on:click="editStep()">@lang ('i.add step')</span>
+		</div>
+		<div class="col-md-9" v-if="editing_edge" v-cloak>
+			<div class="card">
 				<div class="card-header">
 					<b>@{{ edge_source }}</b> --&gt; <b>@{{ edge_target }}</b> (@{{ edge_id }})
 				</div>
@@ -76,15 +79,24 @@ border: 1px solid #bbb;
 					<div class="d-flex">
 						<div class="col-md-6">
 							<ul class="list">
-								<li v-for="code in edge_codes">@{{ code }}<span class="delete" v-on:click="deleteEdgeCode(code)"></span></li>
+								<li v-for="c in edge_codes" class="d-flex justify-content-between align-items-center">
+									<input type="text" class="form-control col-md-10" v-model="c.code">
+									<div class="delete-icon" v-on:click="deleteEdgeCode(c.code)"></div>
+								</li>
 							</ul>
 							<span class="btn btn-outline-primary mt-2" v-on:click="addEdgeCode()">@lang ('i.add code')</span>
 						</div>
 						<div class="col-md-6">
 							<ul class="list">
-								<li v-for="ability in edge_abilities">@{{ ability_name(ability.id) }}<span class="delete" v-on:click="deleteEdgeAbility(ability.id)"></span></li>
+								<li v-for="edge_ability in edge_abilities" class="d-flex justify-content-between align-items-center">
+									<select class="col-md-8" v-model="edge_ability.id">
+										<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }}</option>
+									</select>
+									<input type="number" class="form-control col-md-2" v-model="edge_ability.value">
+									<div class="delete-icon" v-on:click="deleteEdgeAbility(edge_ability.id)"></div>
+								</li>
 							</ul>
-							<span class="btn btn-outline-primary mt-2" v-on:click="addEdgeAbility()">@lang ('i.add code')</span>
+							<span class="btn btn-outline-primary mt-2" v-on:click="addEdgeAbility()">@lang ('i.add ability')</span>
 						</div>
 					</div>
 					<hr/>
@@ -129,8 +141,8 @@ new Vue({
 			edge_id: null,
 			edge_source_id: null,
 			edge_target_id: null,
-			edge_codes: null,
-			edge_abilities: null,
+			edge_codes: [],
+			edge_abilities: [],
 
 			abilities: null,
 		}
@@ -203,11 +215,9 @@ new Vue({
 			return null;
 		},
 		valid_edge: function() {
-			return (this.edge_source != null &&
-				this.edge_target != null &&
-				((this.edge_type == 'ability' && this.edge_ability_id != null && this.edge_ability_value != null) ||
-				(this.edge_type == 'code' && this.edge_code != null && this.edge_code.length > 2))
-			);
+			if (this.edge_source == null) return false;
+			if (this.edge_target == null) return false;
+			return true;
 		},
 		tree: function() {
 			var _this = this;
@@ -218,7 +228,7 @@ new Vue({
 			var edges = this.edges.map(e => {
 				var label = 'undefined';
 				if (e.codes.length > 0) {
-					label = "'" + e.codes.join("'\n'") + "'";
+					label = "'" + e.codes.map(c => c.code).join("'\n'") + "'";
 				}
 				if (e.abilities.length > 0) {
 					if (label == 'undefined') { label = ''; }
@@ -288,8 +298,8 @@ new Vue({
 			this.selecting_edge = false;
 			this.edge_source_id = null;
 			this.edge_target_id = null;
-			this.edge_ability_id = null;
-			this.edge_ability_value = 0;
+			this.edge_codes = [];
+			this.edge_abilities = [];
 		},
 		addProblem() {
 			this.adding_problem = true;
@@ -327,6 +337,12 @@ new Vue({
 			} else {
 				this.resetEdge();
 			}
+		},
+		addEdgeCode() {
+			this.edge_codes.push({ code: "" });
+		},
+		addEdgeAbility() {
+			this.edge_abilities.push({ id: -1, value: 0 });
 		},
 		editEdge(edge_id) {
 			this.resetStep();
@@ -410,6 +426,12 @@ new Vue({
 					}
 				})
 				.catch(errors => {});
+		},
+		deleteEdgeCode(code) {
+			this.edge_codes = this.edge_codes.filter(c => c.code != code);
+		},
+		deleteEdgeAbility(ability_id) {
+			this.edge_abilities = this.edge_abilities.filter(a => a.id != ability_id);
 		},
 		deleteEdge() {
 			if (!this.can_delete_edge) return;

@@ -67,7 +67,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => tt2larp\User::class,
+            'model' => tt2larp\Models\User::class,
         ],
 
         // 'users' => [

@@ -61,7 +61,7 @@ class Step extends Model
 				'abilities' => [],
 			];
 			foreach ($stepNextStep->codes as $code) {
-				$edge['codes'][] = $code->code;
+				$edge['codes'][] = (object)[ 'code' => $code->code ];
 			}
 			foreach ($stepNextStep->abilities as $ability) {
 				$edge['abilities'][] = (object)[ 'id' => $ability->id, 'value' => $ability->pivot->value ];

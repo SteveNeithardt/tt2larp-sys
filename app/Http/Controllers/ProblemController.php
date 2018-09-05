@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 use tt2larp\Models\Ability;
+use tt2larp\Models\Code;
 use tt2larp\Models\Problem;
 use tt2larp\Models\Step;
 use tt2larp\Models\StepNextStep;
@@ -144,16 +145,17 @@ class ProblemController extends Controller
 
 		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
 
-		$request->validate([
+		$validation = [
 			'id' => 'nullable|integer',
 			'step_id' => 'required|integer',
 			'next_step_id' => 'required|integer',
-			'abilities' => 'required|array',
+			'abilities' => 'present|array',
 			'abilities.*.id' => 'required|integer',
 			'abilities.*.value' => 'required|integer',
-			'codes' => 'required|array',
-			'codes.*' => 'requred|string',
-		]);
+			'codes' => 'present|array',
+			'codes.*.code' => 'required|string',
+		];
+		$request->validate($validation);
 
 		$id = $request->id;
 
@@ -166,83 +168,62 @@ class ProblemController extends Controller
 		if ($nextStep === null) abort(422, "Step $nextStepId doesn't exist.");
 
 		$stepNextStep = StepNextStep::find($id);
+		if ($stepNextStep === null) {
+			$stepNextStep = new StepNextStep();
+			$stepNextStep->step_id = $request->step_id;
+			$stepNextStep->next_step_id = $request->next_step_id;
+			$stepNextStep->save();
+		}
 
 		$pivot = [];
 		foreach ($request->abilities as $ability) {
-			if (Ability::find($ability->id) === null) {
+			if (Ability::find($ability['id']) === null) {
 				continue;
 			}
-			$pivot[ $ability->id ] = [ 'value' => $ability->value ];
+			$pivot[ $ability['id'] ] = [ 'value' => $ability['value'] ];
 		}
 		$stepNextStep->abilities()->sync($pivot);
 
-		$found = [];
-		foreach ($request->codes as $codestr) {
+		// as we cannot use sync() with morphMany relations,
+		// we have to go the hard way along...
+		$codes = $stepNextStep->codes;
+
+		// prepare all codes that were in request, labeled as
+		$found = [];// when they are already in StepNextStep and as
+		$new = [];// when they need to be added later on
+		// note that codes found but associated to another instance are ignored.
+		foreach ($request->codes as $c) {
+			$codestr = $c['code'];
 			$code = Code::find($codestr);
 			if ($code !== null) {
-				$instance = $code->instance;
+				$instance = $code->coded;
 				if ($instance instanceOf StepNextStep && $instance->id == $stepNextStep->id) {
 					$found[] = $code;
 				}
 			} else {
 				$code = new Code();
 				$code->code = $codestr;
-				$found[] = $code;
+				$new[] = $code;
 			}
 		}
-		$stepNextStep->codes()->delete();
-		$stepNextStep->codes()->saveMany($found);
 
-		//$type = $request->type;
-		//switch ($type) {
-			//case 'ability':
-				//$abilityId = $request->ability_id;
-				//if ($abilityId === null) abort(422, "AbilityId can't be null when type is 'ability'.");
-				//$ability = Ability::find($abilityId);
-				//if ($ability === null) abort(422, "Ability $abilityId doesn't exist.");
-				//$min_value = min(3, max(0, (int)$request->min_value));
-//
-				//$delete_condition = function() use ($min_value) {
-					//return $min_value === 0;
-				//};
-				//$assign = function($stepNextStep) use ($abilityId, $min_value) {
-					//$stepNextStep->ability_id = $abilityId;
-					//$stepNextStep->min_value = $min_value;
-				//};
-//
-				//break;
-			//case 'code':
-				//$code = $request->code;
-				//if ($code === null) abort(422, "Code can't be null when type is 'code'.");
-//
-				//$delete_condition = function() use ($code) {
-					//return strlen($code) < 3;
-				//};
-				//$assign = function($stepNextStep) use ($code) {
-					//$stepNextStep->code = $code;
-				//};
-//
-				//break;
-			//default:
-				//abort(422, "Unknown $type for step_next_steps.");
-		//}
-//
-		//if ($delete_condition()) {
-			//if ($stepNextStep !== null) { 
-				//$stepNextStep->delete();
-			//}
-		//} else {
-			//if ($stepNextStep === null) {
-				//$stepNextStep = new StepNextStep();
-				//$stepNextStep->step_id = $stepId;
-				//$stepNextStep->next_step_id = $nextStepId;
-			//}
-			//$stepNextStep->type = $type;
-//
-			//$assign($stepNextStep);
-//
-			//$stepNextStep->save();
-		//}
+		// look through existing codes, comparing to found codes.
+		// those that aren't needed anymore are deleted on the spot.
+		foreach ($codes as $code) {
+			$delete = true;
+			foreach ($found as $c) {
+				if ($code->code === $c->code) {
+					$delete = false;
+					break;
+				}
+			}
+			if ($delete === true) {
+				$code->delete();
+			}
+		}
+
+		// finally save all new codes.
+		$stepNextStep->codes()->saveMany($new);
 
 		return new JsonResponse([ 'success' => true ]);
 	}
