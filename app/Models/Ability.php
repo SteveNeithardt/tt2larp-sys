@@ -50,7 +50,7 @@ class Ability extends Model
 			foreach ($second as $candidate) {
 				if ($target->id === $candidate->id) {
 					if ($target->pivot->value <= $candidate->pivot->value) {
-						$valid = $candidate;
+						$valid[] = $candidate;
 					}
 				}
 			}

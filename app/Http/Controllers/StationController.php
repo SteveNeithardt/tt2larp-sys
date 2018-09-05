@@ -7,10 +7,13 @@ use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use tt2larp\Models\Ability;
 use tt2larp\Models\Code;
+use tt2larp\Models\Character;
 use tt2larp\Models\LibraryStation;
 use tt2larp\Models\ProblemStation;
 use tt2larp\Models\Station;
+use tt2larp\Models\StepNextStep;
 
 class StationController extends Controller
 {
@@ -129,7 +132,7 @@ class StationController extends Controller
 			return new JsonResponse([ 'success' => true, 'messages' => $failure_messages ]);
 		}
 
-		$nextStep = $successfulNextStep->nextSteps()->first();
+		$nextStep = $successfulNextStep->nextStep;
 
 		$station->step()->associate($nextStep);
 

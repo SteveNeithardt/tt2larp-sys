@@ -19,11 +19,11 @@ class StepNextStep extends Model
 	}
 
 	/**
-	 * Next Step instances
+	 * Next Step instance
 	 */
-	public function nextSteps()
+	public function nextStep()
 	{
-		return $this->belongsTo(Step::class, 'next_id', 'id');
+		return $this->belongsTo(Step::class, 'next_step_id', 'id');
 	}
 
 	/**

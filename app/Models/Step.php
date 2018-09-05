@@ -61,7 +61,7 @@ class Step extends Model
 			$ids[] = $stepNextStep->id;
 			$todo_edges[] = $stepNextStep;
 
-			$nextStep = Step::find($stepNextStep->next_step_id);
+			$nextStep = $stepNextStep->nextStep;//Step::find($stepNextStep->next_step_id);
 
 			$edge = [
 				'id' => $stepNextStep->id,
@@ -83,8 +83,9 @@ class Step extends Model
 
 		// go through edges and iterate
 		foreach ($todo_edges as $stepNextStep) {
-			$nextStep = Step::find($stepNextStep->next_step_id);
-			$new_edges = $nextStep->getEdges($ids);
+			//$nextStep = Step::find($stepNextStep->next_step_id);
+			//$new_edges = $nextStep->getEdges($ids);
+			$new_edges = $stepNextStep->nextStep->getEdges($ids);
 			$all_edges = array_merge($all_edges, $new_edges);
 		}
 
