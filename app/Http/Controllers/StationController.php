@@ -135,6 +135,7 @@ class StationController extends Controller
 		$nextStep = $successfulNextStep->nextStep;
 
 		$station->step()->associate($nextStep);
+		$station->save();
 
 		return new JsonResponse([ 'success' => true, 'message' => $nextStep->description ]);
 	}
