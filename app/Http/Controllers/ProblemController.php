@@ -154,6 +154,7 @@ class ProblemController extends Controller
 			'abilities.*.value' => 'required|integer',
 			'codes' => 'present|array',
 			'codes.*.code' => 'required|string',
+			'message' => 'nullable|string',
 		];
 		$request->validate($validation);
 
@@ -172,8 +173,9 @@ class ProblemController extends Controller
 			$stepNextStep = new StepNextStep();
 			$stepNextStep->step_id = $request->step_id;
 			$stepNextStep->next_step_id = $request->next_step_id;
-			$stepNextStep->save();
 		}
+		$stepNextStep->failure_message = $request->message;
+		$stepNextStep->save();
 
 		$pivot = [];
 		foreach ($request->abilities as $ability) {

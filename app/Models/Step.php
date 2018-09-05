@@ -43,13 +43,23 @@ class Step extends Model
 	/**
 	 * gets all related step ids, ordered along the execution tree
 	 * (uses step_next_steps)
+	 *
+	 * @param  $ids (array) integers
+	 *     they are the ids of stepnextsteps already scanned.
+	 *     (should avoid loops and duplication)
 	 */
-	public function getEdges()
+	public function getEdges($ids = [])
 	{
 		$all_edges = [];
 
+		// get all current edges
+		$todo_edges = [];
 		foreach ($this->stepNextSteps as $stepNextStep) {
-			//$nodes[$stepNextStep->next_step_id] = [ 'id' => $stepNextStep->ability_id, 'min_value' => $stepNextStep->min_value ];
+			if (in_array($stepNextStep->id, $ids)) {
+				continue;// edge already added in
+			}
+			$ids[] = $stepNextStep->id;
+			$todo_edges[] = $stepNextStep;
 
 			$nextStep = Step::find($stepNextStep->next_step_id);
 
@@ -57,6 +67,7 @@ class Step extends Model
 				'id' => $stepNextStep->id,
 				'from' => $stepNextStep->step_id,
 				'to' => $stepNextStep->next_step_id,
+				'message' => $stepNextStep->failure_message,
 				'codes' => [],
 				'abilities' => [],
 			];
@@ -68,8 +79,12 @@ class Step extends Model
 			}
 
 			$all_edges[] = $edge;
+		}
 
-			$new_edges = $nextStep->getEdges();
+		// go through edges and iterate
+		foreach ($todo_edges as $stepNextStep) {
+			$nextStep = Step::find($stepNextStep->next_step_id);
+			$new_edges = $nextStep->getEdges($ids);
 			$all_edges = array_merge($all_edges, $new_edges);
 		}
 

@@ -76,7 +76,10 @@ border: 1px solid #bbb;
 					<b>@{{ edge_source }}</b> --&gt; <b>@{{ edge_target }}</b> (@{{ edge_id }})
 				</div>
 				<div class="card-body">
-					<div class="d-flex">
+					<div class="d-flex flex-wrap">
+						<div class="col-md-12">
+							<textarea class="form-control my-3" placeholder="@lang ('i.failure message')" v-model="edge_message"></textarea>
+						</div>
 						<div class="col-md-6">
 							<ul class="list">
 								<li v-for="c in edge_codes" class="d-flex justify-content-between align-items-center">
@@ -143,6 +146,7 @@ new Vue({
 			edge_target_id: null,
 			edge_codes: [],
 			edge_abilities: [],
+			edge_message: null,
 
 			abilities: null,
 		}
@@ -300,6 +304,7 @@ new Vue({
 			this.edge_target_id = null;
 			this.edge_codes = [];
 			this.edge_abilities = [];
+			this.edge_message = null;
 		},
 		addProblem() {
 			this.adding_problem = true;
@@ -355,6 +360,7 @@ new Vue({
 				this.edge_target_id = edge.to;
 				this.edge_abilities = edge.abilities;
 				this.edge_codes = edge.codes;
+				this.edge_message = edge.message;
 				this.editing_edge = true;
 			}
 		},
@@ -419,6 +425,7 @@ new Vue({
 					next_step_id: this.edge_target_id,
 					abilities: this.edge_abilities,
 					codes: this.edge_codes,
+					message: this.edge_message,
 				})
 				.then(response => {
 					if (response.data.success) {

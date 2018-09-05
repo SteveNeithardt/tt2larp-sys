@@ -141,8 +141,15 @@ class LibraryController extends Controller
 	/**
 	 * Return Article Part that is available according to inputs
 	 * 
-	 * @param  array of codes (strings)
-	 * @return array of paragraphs (strings)
+	 * @param  GET
+	 *     - codes (array|required)
+	 *     - codes.* (string|required|distinct|min:3)
+	 * @return json
+	 *     - success (boolean|required)
+	 *     - errors (object|optional)
+	 *     - message (string|optional)
+	 *     - parts (array|optional)
+	 *     - parts.* (string|required)
 	 */
 	public function article(Request $request)
 	{

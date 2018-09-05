@@ -7,6 +7,9 @@ use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use tt2larp\Models\Code;
+use tt2larp\Models\LibraryStation;
+use tt2larp\Models\ProblemStation;
 use tt2larp\Models\Station;
 
 class StationController extends Controller
@@ -32,13 +35,20 @@ class StationController extends Controller
 	/**
 	 * try to solve problem
 	 *
+	 * @param  GET
+	 *     - station_id (integer|required)
+	 *     - codes (array|required)
+	 *     - codes.* (string|required|distinct|min:3)
+	 *
 	 * @return json
 	 *     - success (boolean|required)
-	 *     - errors (array|optional)
+	 *     - errors (object|optional)
 	 *     - message (string|optional)
+	 *     - messages (array|optional)
+	 *     - messages.* (string|required)
 	 *     - @todo add necessary fields for the frontend
 	 */
-	public function tryProblem()
+	public function tryProblem(Request $request)
 	{
 		$validator = Validator::make($request->all(), [
 			'station_id' => 'required|integer',
@@ -76,8 +86,10 @@ class StationController extends Controller
 			return new JsonResponse([ 'success' => true, 'message' => $step->description ]);
 		}
 
+		// from all codes sent through the api
 		$codes = Code::findMany($request->codes);
 
+		// filter out the valid StepNextStep instances and find the Character performing the duty.
 		$stepNextSteps = [];
 		$character = null;
 		foreach ($codes as $code) {
@@ -93,8 +105,19 @@ class StationController extends Controller
 		}
 
 		$successfulNextStep = null;
-		foreach ($stepNextSteps as $stepNextStep) {
-			if ($stepNextStep->step_id === $step->id) {
+		$failure_messages = [];
+		$failure_messages[] = $step->description;
+		foreach ($step->stepNextSteps as $stepNextStep) {
+			$failure_messages[] = $stepNextStep->failure_message;
+
+			foreach ($stepNextSteps as $potential) {
+				if ($stepNextStep->id === $potential->id) {
+					$successfulNextStep = $stepNextStep;
+					break;
+				}
+			}
+
+			if ($character !== null) {
 				$valid = Ability::CompareAllInFirst($stepNextStep->abilities, $character->abilities);
 				if (count($valid) > 0) {
 					$successfulNextStep = $stepNextStep;
@@ -103,7 +126,7 @@ class StationController extends Controller
 			}
 		}
 		if ($successfulNextStep === null) {
-			return new JsonResponse([ 'success' => true, 'message' => $successfulNextStep->failure_message ]);
+			return new JsonResponse([ 'success' => true, 'messages' => $failure_messages ]);
 		}
 
 		$nextStep = $successfulNextStep->nextSteps()->first();
