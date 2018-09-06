@@ -17,31 +17,32 @@ Route::post('/login', 'Auth\LoginController@login');
 Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::group([ 'middleware' => 'auth' ], function() {
-Route::get('/', 'HomeController@index')->name('home');
+	Route::get('/', 'HomeController@index')->name('home');
 
-Route::get('/ability', 'AbilityController@portal')->name('ability portal');
-Route::get('/ability/list', 'AbilityController@getList')->name('get abilities');
-Route::post('/ability/store', 'AbilityController@store')->name('store ability');
+	Route::get('/ability', 'AbilityController@portal')->name('ability portal');
+	Route::get('/ability/list', 'AbilityController@getList')->name('get abilities');
+	Route::post('/ability/store', 'AbilityController@store')->name('store ability');
 
-Route::get('/character', 'CharacterController@portal')->name('character portal');
-Route::get('/character/list', 'CharacterController@getList')->name('get characters');
-Route::post('/character/store', 'CharacterController@store')->name('store character');
+	Route::get('/character', 'CharacterController@portal')->name('character portal');
+	Route::get('/character/list', 'CharacterController@getList')->name('get characters');
+	Route::post('/character/store', 'CharacterController@store')->name('store character');
 
-Route::get('/problem', 'ProblemController@portal')->name('problem portal');
-Route::get('/problem/list', 'ProblemController@getList')->name('get problems');
-Route::post('/problem/store', 'ProblemController@store')->name('store problem');
-Route::get('/problem/{problem_id}/list', 'ProblemController@getStepList')->name('get steps');
-Route::post('/problem/{problem_id}/node/store', 'ProblemController@storeNode')->name('store node');
-Route::post('/problem/{problem_id}/node/delete', 'ProblemController@deleteNode')->name('delete node');
-Route::post('/problem/{problem_id}/edge/store', 'ProblemController@storeEdge')->name('store edge');
-Route::post('/problem/{problem_id}/edge/delete', 'ProblemController@deleteEdge')->name('delete edge');
+	Route::get('/problem', 'ProblemController@portal')->name('problem portal');
+	Route::get('/problem/list', 'ProblemController@getList')->name('get problems');
+	Route::post('/problem/store', 'ProblemController@store')->name('store problem');
+	Route::get('/problem/{problem_id}/list', 'ProblemController@getStepList')->name('get steps');
+	Route::post('/problem/{problem_id}/node/store', 'ProblemController@storeNode')->name('store node');
+	Route::post('/problem/{problem_id}/node/delete', 'ProblemController@deleteNode')->name('delete node');
+	Route::post('/problem/{problem_id}/edge/store', 'ProblemController@storeEdge')->name('store edge');
+	Route::post('/problem/{problem_id}/edge/delete', 'ProblemController@deleteEdge')->name('delete edge');
 
-Route::get('/library', 'LibraryController@portal')->name('library portal');
-Route::get('/library/list', 'LibraryController@getList')->name('get articles');
-Route::post('/library/store', 'LibraryController@store')->name('store article');
-Route::get('/library/{article_id}/list', 'LibraryController@getPartList')->name('get parts');
-Route::post('/library/{article_id}/part/store', 'LibraryController@storePart')->name('store part');
+	Route::get('/library', 'LibraryController@portal')->name('library portal');
+	Route::get('/library/list', 'LibraryController@getList')->name('get articles');
+	Route::post('/library/store', 'LibraryController@store')->name('store article');
+	Route::get('/library/{article_id}/list', 'LibraryController@getPartList')->name('get parts');
+	Route::post('/library/{article_id}/part/store', 'LibraryController@storePart')->name('store part');
 
-Route::get('/station', 'StationController@portal')->name('station portal');
-Route::get('/station/list', 'StationController@getList')->name('get stations');
+	Route::get('/station', 'StationController@portal')->name('station portal');
+	Route::get('/station/list', 'StationController@getList')->name('get stations');
+	Route::post('/station/names', 'StationController@setNames')->name('set station names');
 });

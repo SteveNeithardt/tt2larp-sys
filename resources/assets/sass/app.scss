@@ -65,11 +65,11 @@ ul.list {
 
 .edit-icon {
 	cursor: pointer;
-	background: $success;
+	background: $primary;
 	width: 23px;
 	height: 23px;
 	border-radius: 50%;
-	border: 1px solid $success;
+	border: 1px solid $primary;
 	position: relative;
 	&::after, &::before {
 		content: "";
@@ -94,10 +94,91 @@ ul.list {
 	&:hover {
 		background: $body-bg;
 		&::after {
-			background: $success;
+			background: $primary;
 		}
 		&::before {
-			border-right-color: $success;
+			border-right-color: $primary;
 		}
 	}
 }
+
+.cancel-icon {
+	cursor: pointer;
+	background: white;
+	width: 23px;
+	height: 23px;
+	border-radius: 50%;
+	border: 4px solid $danger;
+	position: relative;
+	&::after {
+		content: "";
+		position: absolute;
+		width: 9px;
+		height: 5px;
+		top: 5px;
+		left: 3px;
+		background: $danger
+	}
+	&:hover {
+		border-color: $secondary;
+		&::after {
+			background: $secondary;
+		}
+	}
+}
+
+.save-icon {
+	cursor: pointer;
+	background: $success;
+	width: 23px;
+	height: 23px;
+	border-radius: 50%;
+	border: 1px solid $success;
+	position: relative;
+	&::after, &::before {
+		content: "";
+		position: absolute;
+		background: white;
+		transform: rotate(45deg);
+	}
+	&::after {
+		width: 3px;
+		height: 12px;
+		top: 5px;
+		left: 11px;
+	}
+	&::before {
+		width: 7px;
+		height: 3px;
+		top: 10px;
+		left: 3px;
+	}
+	&:hover {
+		background: white;
+		&::after, &::before {
+			background: $success;
+		}
+	}
+}
+
+.loading-icon {
+	&, &::after {
+		width: 23px;
+		height: 23px;
+		border-radius: 50%;
+	}
+	position: relative;
+	border: 2px solid mix($info, white, 30%);
+	border-right-color: $info;
+	animation: loading 1s infinite linear
+}
+
+@keyframes loading {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+

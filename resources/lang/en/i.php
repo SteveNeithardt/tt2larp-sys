@@ -64,6 +64,8 @@ return [
 
 	// stations
 	'stations' => 'Stations',
+	'offline' => 'Offline',
+	'last activity at %A%' => 'last activity at %A%',
 
 	// api try station problem
 	'More than one character present in input array.' => 'More than one character present in input array.',

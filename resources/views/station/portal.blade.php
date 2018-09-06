@@ -10,15 +10,36 @@
 <div class="container" id="vue">
 	<div class="row justify-content-center">
 		<div class="col-md-12 mb-3">
-			<h2>@lang ('i.stations')</h2>
+			<h2 class="d-flex align-items-center">
+				@lang ('i.stations')
+				<div class="edit-icon ml-2" v-if="!editing_names" v-on:click="edit_names(true)" v-cloak></div>
+				<div class="save-icon ml-2" v-if="editing_names" v-on:click="save_names()" v-cloak></div>
+				<div class="cancel-icon ml-2" v-if="editing_names" v-on:click="edit_names(false)" v-cloak></div>
+				<div class="loading-icon ml-2" v-if="loading" v-cloak></div>
+			</h2>
 		</div>
-		<div class="col-md-8" v-if="listing_stations" v-cloak>
-			<div class="card">
-				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
-				<div class="card-body">
-					<ul class="list">
-						<li class="thumb" v-for="station in filtered_stations" v-on:click="editStation(station.id)">@{{ station.name }}</li>
-					</ul>
+		<div class="col-md-12 d-flex flex-wrap align-items-stretch" v-if="listing_stations" v-cloak>
+			<div class="col-md-3" v-for="station in stations">
+				<div class="card" v-cloak>
+					<div class="card-header">
+						<h4 class="my-1" v-if="!editing_names">@{{ station.name }}</h4>
+						<input type="text" class="form-control" v-if="editing_names" v-model="station.name">
+					</div>
+					<div class="card-body">
+						<div v-bind:class="activity_warning(station.last_ping)">@{{ last_activity_text(station.last_ping) }}</div>
+						<p>TODO :</p>
+						<ul>
+							<li>actions to perform from here</li>
+							<li>last connection</li>
+							<li>whatever...
+								<ul>
+									<li>active problem</li>
+									<li>log of players that went here (omigod)</li>
+									<li>webcam link..!</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -32,32 +53,74 @@ new Vue({
 	el: '#vue',
 	data() {
 		return {
+			loading: true,
+			editing_names: false,
 			listing_stations: false,
 			stations: null,
-			filter_name: null,
 		}
 	},
 	computed: {
-		filtered_stations() {
-			if (this.filter_name == null) return this.stations;
-			else return this.stations.filter(s => s.name.indexOf(this.filter_name) > -1);
-		},
 	},
 	methods: {
 		fetch_stations() {
-			this.resetStation();
+			if (this.editing_names) return;
+			this.loading = true;
 			axios.get("{{ route('get stations') }}")
 				.then(response => {
 					this.stations = response.data;
 					this.listing_stations = true;
-				})
-				.catch(errors => {});
+					this.loading = false;
+				}).catch(errors => {
+					this.loading = false;
+				});
 		},
-		resetStation() {
+		last_activity_text(timestamp) {
+			if (timestamp == null) {
+				return "@lang ('i.offline')";
+			}
+			return "@lang ('i.last activity at %A%')".replace('%A%', timestamp);
+		},
+		activity_warning(timestamp) {
+			if (timestamp == null) {
+				return "alert alert-danger";
+			}
+			if ((new Date) - (new Date(timestamp)) > 30000) {
+				return "alert alert-warning";
+			}
+			return "alert alert-success";
+		},
+		edit_names(edit) {
+			if (this.loading) return;
+			this.editing_names = edit;
+		},
+		save_names() {
+			if (this.loading) return;
+			this.loading = true;
+			var stations = this.stations.map(s => {
+				return { id: s.id, name: s.name };
+			});
+			axios.post("{{ route('set station names') }}", {
+				stations: stations,
+			}).then(response => {
+				this.editing_names = false;
+				if (response.data.success) {
+					this.fetch_stations();
+				}
+				this.loading = false;
+			}).catch(errors => {
+				this.loading = false;
+			});
+		},
+		fetch_data() {
+			this.fetch_stations();
+
+			setInterval(function () {
+				this.fetch_stations();
+			}.bind(this), 5000);
 		},
 	},
 	mounted() {
-		this.$nextTick(this.fetch_stations);
+		this.$nextTick(this.fetch_data);
 	},
 });
 </script>

@@ -36,6 +36,29 @@ class StationController extends Controller
 	}
 
 	/**
+	 * edit all station names at once
+	 */
+	public function setNames(Request $request)
+	{
+		$request->validate([
+			'stations' => 'required|array',
+			'stations.*.id' => 'required|distinct|integer',
+			'stations.*.name' => 'required|distinct|string',
+		]);
+
+		foreach ($request->stations as $s) {
+			$station = Station::find($s['id']);
+			if ($station === null) {
+				throw new \LogicException("This is impossible. You cheated.");
+			}
+			$station->name = $s['name'];
+			$station->save();
+		}
+
+		return new JsonResponse([ 'success' => true ]);
+	}
+
+	/**
 	 * try to solve problem
 	 *
 	 * @param  GET
@@ -69,6 +92,9 @@ class StationController extends Controller
 		if ($basestation === null) {
 			return new JsonResponse([ 'success' => false, 'message' => "Station $station_id doesn't exist." ], 422);
 		}
+
+		$basestation->last_ping = now();
+		$basestation->save();
 
 		$station = $basestation->station;
 		if (! $station instanceof ProblemStation) {
