@@ -57,10 +57,9 @@
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.part name')" v-model="part_name"></div>
 				<div class="card-body">
 					<div class="d-flex justify-content-between mb-3">
-						<select v-model="part_ability_id">
+						<div><select2 v-model="part_ability_id" :options="abilities">
 							<option value="-1">@lang ('i.no ability')</option>
-							<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }}</option>
-						</select>
+						</select2></div>
 						<input type="number" class="form-control col-md-4" v-model="part_ability_value">
 					</div>
 					<textarea class="form-control" v-model="part_description" placeholder="@lang ('i.part description')"></textarea>
@@ -121,7 +120,6 @@ new Vue({
 				this.article_code.length > 2);
 		},
 		valid_part() {
-			console.log("id: " + this.part_ability_id + " v: " + this.part_ability_value);
 			return (
 				this.part_name != null &&
 				this.part_name.length > 2 &&
@@ -168,7 +166,9 @@ new Vue({
 		fetch_abilities: function() {
 			axios.get("{{ route('get abilities') }}")
 				.then(response => {
-					this.abilities = response.data;
+					this.abilities = response.data.map(a => {
+						return { id: a.id, text: a.name };
+					});
 				})
 				.catch(errors => {});
 		},
@@ -188,7 +188,7 @@ new Vue({
 			this.part_id = null;
 			this.part_name = null;
 			this.part_description = null;
-			this.part_ability_id = null;
+			this.part_ability_id = -1;
 			this.part_ability_value = null;
 		},
 		addArticle() {
@@ -220,7 +220,7 @@ new Vue({
 				this.part_id = part.id;
 				this.part_name = part.name;
 				this.part_description = part.description;
-				this.part_ability_id = part.ability_id;
+				this.part_ability_id = part.ability_id == null ? -1 : part.ability_id;
 				this.part_ability_value = part.min_value;
 			}
 		},
@@ -251,7 +251,7 @@ new Vue({
 					id: this.part_id,
 					name: this.part_name,
 					description: this.part_description,
-					ability_id: this.part_ability_id,
+					ability_id: this.part_ability_id < 0 ? null : this.part_ability_id,
 					min_value: this.part_ability_value,
 				})
 				.then(response => {

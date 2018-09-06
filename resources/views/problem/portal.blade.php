@@ -92,9 +92,7 @@ border: 1px solid #bbb;
 						<div class="col-md-6">
 							<ul class="list">
 								<li v-for="edge_ability in edge_abilities" class="d-flex justify-content-between align-items-center">
-									<select class="col-md-8" v-model="edge_ability.id">
-										<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }}</option>
-									</select>
+									<div class="col-md-8"><select2 v-model="edge_ability.id" :options="abilities"/></div>
 									<input type="number" class="form-control col-md-2" v-model="edge_ability.value">
 									<div class="delete-icon" v-on:click="deleteEdgeAbility(edge_ability.id)"></div>
 								</li>
@@ -259,7 +257,9 @@ new Vue({
 		fetch_abilities: function() {
 			axios.get("{{ route('get abilities') }}")
 				.then(response => {
-					this.abilities = response.data;
+					this.abilities = response.data.map(a => {
+						return { id: a.id, text: a.name };
+					});
 				})
 				.catch(errors => {});
 		},
@@ -466,7 +466,7 @@ new Vue({
 		ability_name(ability_id) {
 			var result = this.abilities.filter(a => a.id == ability_id);
 			if (result.length == 1) {
-				return result[0].name;
+				return result[0].text;
 			}
 			return 'N/A';
 		},
