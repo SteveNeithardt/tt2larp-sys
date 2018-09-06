@@ -30,7 +30,7 @@ class StationController extends Controller
 	 */
 	public function getList()
 	{
-		$stations = Station::with('station')->get();
+		$stations = Station::with('station')->orderBy('name')->get();
 
 		return new JsonResponse($stations);
 	}

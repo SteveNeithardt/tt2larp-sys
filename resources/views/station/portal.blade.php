@@ -18,8 +18,8 @@
 				<div class="loading-icon ml-2" v-if="loading" v-cloak></div>
 			</h2>
 		</div>
-		<div class="col-md-12 d-flex flex-wrap align-items-stretch" v-if="listing_stations" v-cloak>
-			<div class="col-md-3" v-for="station in stations">
+		<div class="col-md-12 d-flex flex-wrap" v-if="listing_stations" v-cloak>
+			<div class="col-md-4 my-3" v-for="station in stations">
 				<div class="card" v-cloak>
 					<div class="card-header">
 						<h4 class="my-1" v-if="!editing_names">@{{ station.name }}</h4>
@@ -27,18 +27,29 @@
 					</div>
 					<div class="card-body">
 						<div v-bind:class="activity_warning(station.last_ping)">@{{ last_activity_text(station.last_ping) }}</div>
-						<p>TODO :</p>
-						<ul>
-							<li>actions to perform from here</li>
-							<li>last connection</li>
-							<li>whatever...
-								<ul>
-									<li>active problem</li>
-									<li>log of players that went here (omigod)</li>
-									<li>webcam link..!</li>
-								</ul>
-							</li>
-						</ul>
+						<div v-if="station.station_type.indexOf('Library') > 0">
+							<p>@lang ('i.Nothing to do in the library')</p>
+						</div>
+						<div v-if="station.station_type.indexOf('Problem') > 0">
+							<p>TODO :</p>
+							<ul>
+								<li>actions to perform from here
+									<ul>
+										<li>launch a new active problem</li>
+										<li>advance problem one step, manually</li>
+										<li>reverse problem one step, manually</li>
+										<li>direct link to editor?</li>
+									</ul>
+								</li>
+								<li>whatever...
+									<ul>
+										<li>active problem</li>
+										<li>log of players that went here (omigod)</li>
+										<li>webcam link..!</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -92,6 +103,9 @@ new Vue({
 		edit_names(edit) {
 			if (this.loading) return;
 			this.editing_names = edit;
+			if (edit == false) {
+				this.fetch_stations();
+			}
 		},
 		save_names() {
 			if (this.loading) return;

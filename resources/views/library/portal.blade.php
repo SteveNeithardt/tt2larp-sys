@@ -58,6 +58,7 @@
 				<div class="card-body">
 					<div class="d-flex justify-content-between mb-3">
 						<select v-model="part_ability_id">
+							<option value="-1">@lang ('i.no ability')</option>
 							<option v-for="ability in abilities" v-bind:value="ability.id">@{{ ability.name }}</option>
 						</select>
 						<input type="number" class="form-control col-md-4" v-model="part_ability_value">
@@ -120,11 +121,20 @@ new Vue({
 				this.article_code.length > 2);
 		},
 		valid_part() {
-			return (this.part_name != null &&
+			console.log("id: " + this.part_ability_id + " v: " + this.part_ability_value);
+			return (
+				this.part_name != null &&
 				this.part_name.length > 2 &&
-				this.part_description != null &&
-				((this.part_ability_id == null && this.part_ability_value == null) ||
-				(this.part_ability_id != null && this.part_ability_value != null)));
+				this.part_description != null && (
+					(
+						(this.part_ability_id == null || this.part_ability_id < 0) &&
+						(this.part_ability_value == null || this.part_ability_value.length == 0)
+					) || (
+						(this.part_ability_id != null && this.part_ability_id > 0) &&
+						(this.part_ability_value != null && this.part_ability_value > 0)
+					)
+				)
+			);
 		},
 	},
 	watch: {

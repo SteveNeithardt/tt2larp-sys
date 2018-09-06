@@ -55,6 +55,7 @@ return [
 
 	'add part' => 'Add part',
 	'save part' => 'Save part',
+	'no ability' => 'No Ability',
 
 	'Article named \':name\' already exists.' => 'Article named \':name\' already exists.',
 
@@ -66,6 +67,7 @@ return [
 	'stations' => 'Stations',
 	'offline' => 'Offline',
 	'last activity at %A%' => 'last activity at %A%',
+	'Nothing to do in the library' => 'Nothing to do in the library.',
 
 	// api try station problem
 	'More than one character present in input array.' => 'More than one character present in input array.',
