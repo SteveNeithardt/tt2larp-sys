@@ -9,6 +9,16 @@ class ProblemStation extends Model
 	protected $table = 'problem_stations';
 
 	/**
+	 * relations to always eager load
+	 */
+	protected $with = [
+		'problem',
+		'step',
+		'step.stepNextSteps',
+		'step.stepPreviousSteps',
+	];
+
+	/**
 	 * Station(s) referencing this Model
 	 */
 	public function stations()

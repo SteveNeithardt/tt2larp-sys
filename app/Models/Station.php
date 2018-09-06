@@ -12,6 +12,13 @@ class Station extends Model
 	public $timestamps = false;
 
 	/**
+	 * relations to always eager load
+	 */
+	protected $with = [
+		'station'
+	];
+
+	/**
 	 * Get all of the owning station models
 	 */
 	public function station()
