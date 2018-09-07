@@ -68,6 +68,19 @@ return [
 	'offline' => 'Offline',
 	'last activity at %A%' => 'last activity at %A%',
 	'Nothing to do in the library' => 'Nothing to do in the library.',
+	'active problem is \'%P%\'' => 'Current active Problem is \'%P%\'',
+	'currently on step \'%S%\'' => 'on step \'%S%\'',
+	'problem is finished' => 'Problem is finished.',
+	'no active problem' => 'No active Problem.',
+	'cancel problem' => 'Cancel Problem',
+	'assign new problem' => 'Assign new Problem',
+
+	// api set station active problem
+	'The requested problem doesn\'t exist.' => 'The requested problem doesn\'t exist.',
+	'The requested station is not a ProblemStation. Invalid Request.' => 'The requested station is not a ProblemStation. Invalid Request.',
+
+	// api set station active step
+	'The requested Step doesn\'t exist.' => 'The requested Step doesn\'t exist.',
 
 	// api try station problem
 	'More than one character present in input array.' => 'More than one character present in input array.',

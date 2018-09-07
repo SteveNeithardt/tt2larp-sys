@@ -13,6 +13,7 @@ class ProblemStation extends Model
 	 */
 	protected $with = [
 		'problem',
+		'problem.firstSteps',
 		'step',
 		'step.stepNextSteps',
 		'step.stepPreviousSteps',

@@ -13,24 +13,11 @@
 			<h2 class="d-flex align-items-center">
 				@lang ('i.stations')
 				<div class="edit-icon ml-2" v-if="!editing_names" v-on:click="edit_names(true)" v-cloak></div>
-				<div class="save-icon ml-2" v-if="editing_names" v-on:click="save_names()" v-cloak></div>
 				<div class="cancel-icon ml-2" v-if="editing_names" v-on:click="edit_names(false)" v-cloak></div>
+				<div class="save-icon ml-2" v-if="editing_names" v-on:click="save_names()" v-cloak></div>
 				<div class="loading-icon ml-2" v-if="loading" v-cloak></div>
 			</h2>
 		</div>
-		<div class="col-md-12 d-flex flex-wrap" v-if="listing_stations" v-cloak>
-			<div class="col-md-4 my-3" v-for="station in stations">
-				<div class="card" v-cloak>
-					<div class="card-header">
-						<h4 class="my-1" v-if="!editing_names">@{{ station.name }}</h4>
-						<input type="text" class="form-control" v-if="editing_names" v-model="station.name">
-					</div>
-					<div class="card-body">
-						<div v-bind:class="activity_warning(station.last_ping)">@{{ last_activity_text(station.last_ping) }}</div>
-						<div v-if="station.station_type.indexOf('Library') > 0">
-							<p>@lang ('i.Nothing to do in the library')</p>
-						</div>
-						<div v-if="station.station_type.indexOf('Problem') > 0">
 							<p>TODO :</p>
 							<ul>
 								<li>actions to perform from here
@@ -49,6 +36,42 @@
 									</ul>
 								</li>
 							</ul>
+		<div class="col-md-12 d-flex flex-wrap" v-if="listing_stations" v-cloak>
+			<div class="col-md-4 my-3" v-for="station in stations">
+				<div class="card" v-cloak>
+					<div class="card-header" :class="activity_warning(station.last_ping)">
+						<h4 class="my-1" v-if="!editing_names">@{{ station.name }}</h4>
+						<input type="text" class="form-control" v-if="editing_names" v-model="station.name">
+						<span>@{{ last_activity_text(station.last_ping) }}</span>
+					</div>
+					<div class="card-body">
+						<div v-if="is_library(station)">
+							<div class="alert alert-dark">@lang ('i.Nothing to do in the library')</div>
+						</div>
+						<div v-if="is_problem(station)">
+							<div v-if="ps_has_problem(station)">
+								<div class="alert alert-info">
+									<h5>@{{ "@lang ("i.active problem is '%P%'")".replace('%P%', station.station.problem.name) }}</h5>
+									<h5 v-if="ps_has_step(station)">@{{ "@lang ("i.currently on step '%S%'")".replace('%S%', ps_step_name(station)) }}</h5>
+								</div>
+								<div class="alert alert-success mt-2" v-if="ps_is_finished(station)">@lang ('i.problem is finished')</div>
+							</div>
+							<div v-if="!ps_has_problem(station)">
+								<div class="alert alert-dark">@lang ('i.no active problem')</div>
+							</div>
+							<div>
+								<div class="d-flex align-items-center" v-if="ps_assigning_problem == station.id">
+									<select2 v-model="problem_id" :options="problems">
+										<option value="-1">@lang ('i.no problem')</option>
+									</select2>
+									<div class="cancel-icon ml-2" v-on:click="ps_assign_problem(-1)"></div>
+									<div class="save-icon ml-2" v-on:click="ps_save_problem(station.id)"></div>
+								</div>
+								<div v-else>
+									<div class="btn btn-outline-primary" v-on:click="ps_assign_problem(station.id)" v-if="ps_assigning_problem < 0 && !ps_has_problem(station)">@lang ('i.assign new problem')</div>
+									<div class="btn btn-outline-danger" v-on:click="ps_cancel_problem(station.id)" v-if="ps_assigning_problem < 0 && ps_has_problem(station)">@lang ('i.cancel problem')</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -68,18 +91,36 @@ new Vue({
 			editing_names: false,
 			listing_stations: false,
 			stations: null,
+			problems: null,
+			problem_id: -1,
+			ps_assigning_problem: -1,
 		}
 	},
 	computed: {
 	},
 	methods: {
 		fetch_stations() {
+			if (this.ps_assigning_problem >= 0) return;
 			if (this.editing_names) return;
 			this.loading = true;
 			axios.get("{{ route('get stations') }}")
 				.then(response => {
 					this.stations = response.data;
 					this.listing_stations = true;
+					this.loading = false;
+					this.problem_id = -1;
+					this.ps_assigning_problem = -1;
+				}).catch(errors => {
+					this.loading = false;
+				});
+		},
+		fetch_problems() {
+			this.loading = true;
+			axios.get("{{ route('get problems') }}")
+				.then(response => {
+					this.problems = response.data.map(p => {
+						return { id: p.id, text: p.name };
+					});
 					this.loading = false;
 				}).catch(errors => {
 					this.loading = false;
@@ -93,12 +134,12 @@ new Vue({
 		},
 		activity_warning(timestamp) {
 			if (timestamp == null) {
-				return "alert alert-danger";
+				return "alert-danger";
 			}
 			if ((new Date) - (new Date(timestamp)) > 30000) {
-				return "alert alert-warning";
+				return "alert-warning";
 			}
-			return "alert alert-success";
+			return "alert-success";
 		},
 		edit_names(edit) {
 			if (this.loading) return;
@@ -125,8 +166,67 @@ new Vue({
 				this.loading = false;
 			});
 		},
+		is_library(station) { return station.station_type.indexOf('Library') > -1; },
+		is_problem(station) { return station.station_type.indexOf('Problem') > -1; },
+		ps_has_problem(station) { return station.station.problem != null; },
+		ps_has_step(station) {
+			return station.station.step != null ||
+				this.ps_has_first_step(station);
+		},
+		ps_has_first_step(station) {
+			return station.station.step == null &&
+				station.station.problem.first_steps != null &&
+				station.station.problem.first_steps[0] != null;
+		},
+		ps_step(station) {
+			if (station.station.step != null) return station.station.step;
+			if (this.ps_has_first_step(station)) return station.station.problem.first_steps[0];
+			return null;
+		},
+		ps_step_name(station) {
+			var step = this.ps_step(station);
+			if (step == null) return 'undefined';
+			return step.name;
+		},
+		ps_is_finished(station) {
+			var step = this.ps_step(station);
+			return step == null ||
+				step.step_next_steps == null ||
+				step.step_next_steps.length == 0;
+		},
+		ps_assign_problem(station_id) {
+			this.ps_assigning_problem = station_id;
+		},
+		ps_save_problem(station_id) {
+			if (this.ps_assigning_problem < 0) return;
+			if (this.problem_id != null && this.problem_id >= 0) {
+				this.ps_commit_problem(station_id, this.problem_id);
+			}
+		},
+		ps_cancel_problem(station_id) {
+			var res = confirm("Are you sure?");
+			if (res == true) {
+				this.ps_commit_problem(station_id, -1);
+			}
+		},
+		ps_commit_problem(station_id, problem_id) {
+			this.loading = true;
+			axios.post("{{ route('set station active problem') }}", {
+				station_id: station_id,
+				problem_id: problem_id,
+			}).then (response => {
+				if (response.data.success) {
+					this.ps_assigning_problem = -1;
+					this.fetch_stations();
+				}
+				this.loading = false;
+			}).catch(errors => {
+				this.loading = false;
+			});
+		},
 		fetch_data() {
 			this.fetch_stations();
+			this.fetch_problems();
 
 			setInterval(function () {
 				this.fetch_stations();

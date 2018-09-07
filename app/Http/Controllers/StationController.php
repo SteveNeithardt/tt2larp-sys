@@ -12,6 +12,7 @@ use tt2larp\Models\Code;
 use tt2larp\Models\Character;
 use tt2larp\Models\LibraryStation;
 use tt2larp\Models\ProblemStation;
+use tt2larp\Models\Problem;
 use tt2larp\Models\Station;
 use tt2larp\Models\StepNextStep;
 
@@ -40,11 +41,15 @@ class StationController extends Controller
 	 */
 	public function setNames(Request $request)
 	{
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'stations' => 'required|array',
 			'stations.*.id' => 'required|distinct|integer',
 			'stations.*.name' => 'required|distinct|string',
 		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		foreach ($request->stations as $s) {
 			$station = Station::find($s['id']);
@@ -56,6 +61,82 @@ class StationController extends Controller
 		}
 
 		return new JsonResponse([ 'success' => true ]);
+	}
+
+	/**
+	 * set active Problem on ProblemStation
+	 */
+	public function setActiveProblem(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'station_id' => 'required|integer',
+			'problem_id' => 'required|integer',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$basestation = Station::find($request->station_id);
+		if (! $basestation->station instanceOf ProblemStation) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested station is not a ProblemStation. Invalid Request.') ], 400);
+		}
+
+		$problem_id = $request->problem_id;
+		if ($problem_id < 0) {
+			$basestation->station->problem()->dissociate();
+			$basestation->station->step()->dissociate();
+			$basestation->station->save();
+		} else {
+			$problem = Problem::find($problem_id);
+			if ($problem === null) {
+				return new JsonResponse([ 'success' => false, 'message' => __('i.The requested problem doesn\'t exist.') ], 422);
+			}
+
+			$basestation->station->problem()->associate($problem);
+			$basestation->station->step()->dissociate();
+			$basestation->station->save();
+		}
+
+		return new JsonResponse([ 'success' => true ]);
+	}
+
+	/**
+	 * set active Step on ProblemStation
+	 */
+	public function setActiveStep(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'station_id' => 'required|integer',
+			'step_id' => 'required|integer',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$basestation = Station::find($request->station_id);
+		if (! $basestation->station instanceOf ProblemStation) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested station is not a ProblemStation. Invalid Request.') ], 400);
+		}
+
+		$step = Step::find($request->step_id);
+		if ($step === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested Step doesn\'t exist.') ], 400);
+		}
+
+		$problem = $basestation->station->problem;
+		if ($problem === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.There is no active Problem on the Station.') ], 400);
+		}
+
+		if ($step->problem()->first()->id === $problem->id) {
+			$basestation->station->step()->associate($step);
+			$basestation->station->save();
+			return new JsonResponse([ 'success' => true ]);
+		}
+
+		return new JsonResponse([ 'success' => false, 'message' => __('i.Step doesn\'t belong to active problem.') ], 400);
 	}
 
 	/**
