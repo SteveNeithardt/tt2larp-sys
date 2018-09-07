@@ -18,24 +18,6 @@
 				<div class="loading-icon ml-2" v-if="loading" v-cloak></div>
 			</h2>
 		</div>
-							<p>TODO :</p>
-							<ul>
-								<li>actions to perform from here
-									<ul>
-										<li>launch a new active problem</li>
-										<li>advance problem one step, manually</li>
-										<li>reverse problem one step, manually</li>
-										<li>direct link to editor?</li>
-									</ul>
-								</li>
-								<li>whatever...
-									<ul>
-										<li>active problem</li>
-										<li>log of players that went here (omigod)</li>
-										<li>webcam link..!</li>
-									</ul>
-								</li>
-							</ul>
 		<div class="col-md-12 d-flex flex-wrap" v-if="listing_stations" v-cloak>
 			<div class="col-md-4 my-3" v-for="station in stations">
 				<div class="card" v-cloak>
