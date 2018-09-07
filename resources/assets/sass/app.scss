@@ -107,7 +107,7 @@ ul.list {
 
 .cancel-icon {
 	cursor: pointer;
-	background: white;
+	background: $body-bg;
 	width: 23px;
 	height: 23px;
 	border-radius: 50%;
@@ -141,7 +141,7 @@ ul.list {
 	&::after, &::before {
 		content: "";
 		position: absolute;
-		background: white;
+		background: $body-bg;
 		transform: rotate(45deg);
 	}
 	&::after {
@@ -157,10 +157,59 @@ ul.list {
 		left: 3px;
 	}
 	&:hover {
-		background: white;
+		background: $body-bg;
 		&::after, &::before {
 			background: $success;
 		}
+	}
+}
+
+.left-chevron-icon, .right-chevron-icon {
+	cursor: pointer;
+	background: $primary;
+	width: 23px;
+	height: 23px;
+	border-radius: 50%;
+	border: 1px solid $primary;
+	position: relative;
+	&::after, &::before {
+		content: "";
+		position: absolute;
+		background: $body-bg;
+		width: 12px;
+		height: 3px;
+	}
+	&::after {
+		transform: rotate(-45deg);
+	}
+	&::before {
+		transform: rotate(45deg);
+	}
+	&:hover {
+		background: $body-bg;
+		&::after, &::before {
+			background: $primary;
+		}
+	}
+}
+.left-chevron-icon {
+	&::after {
+		top: 6px;
+		left: 3px;
+	}
+	&::before {
+		bottom: 6px;
+		left: 3px;
+	}
+}
+.right-chevron-icon {
+	&::after {
+		bottom: 6px;
+		right: 3px;
+	}
+	&::before {
+		top: 6px;
+		right: 3px;
 	}
 }
 
@@ -171,7 +220,7 @@ ul.list {
 		border-radius: 50%;
 	}
 	position: relative;
-	border: 2px solid mix($info, white, 30%);
+	border: 2px solid mix($info, $body-bg, 30%);
 	border-right-color: $info;
 	animation: loading 1s infinite linear
 }

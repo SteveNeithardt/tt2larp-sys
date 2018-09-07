@@ -14,6 +14,7 @@ use tt2larp\Models\LibraryStation;
 use tt2larp\Models\ProblemStation;
 use tt2larp\Models\Problem;
 use tt2larp\Models\Station;
+use tt2larp\Models\Step;
 use tt2larp\Models\StepNextStep;
 
 class StationController extends Controller
@@ -34,6 +35,55 @@ class StationController extends Controller
 		$stations = Station::with('station')->orderBy('name')->get();
 
 		return new JsonResponse($stations);
+	}
+
+	/**
+	 * get active step entourage for station
+	 */
+	public function getStepEntourage(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'station_id' => 'required|integer',
+			'forward' => 'required|integer',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$basestation = Station::find($request->station_id);
+		if (! $basestation->station instanceOf ProblemStation) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested station is not a ProblemStation. Invalid Request.') ], 400);
+		}
+
+		$problem = $basestation->station->problem;
+		if ($problem === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.There is no active Problem on the Station.') ], 400);
+		}
+
+		$step = $basestation->station->step;
+		if ($step === null) {
+			$step = $basestation->station->problem->firstSteps()->first();
+			if ($step === null) {
+				return new JsonResponse([ 'success' => false, 'message' => __('i.There is no acive Problem on the Station.') ], 400);
+			}
+		}
+
+		$steps = null;
+		$forward = $request->forward;
+		if ($forward > 0) {
+			$steps = $step->nextSteps->unique();
+		} else if ($forward < 0) {
+			$steps = $step->previousSteps->unique();
+		} else {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.Invalid forward value, must be non-zero.') ], 400);
+		}
+
+		$steps = $steps->map(function ($s) {
+			return [ 'id' => $s->id, 'text' => $s->name ];
+		});
+
+		return new JsonResponse($steps);
 	}
 
 	/**

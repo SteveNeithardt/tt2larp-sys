@@ -15,8 +15,6 @@ class ProblemStation extends Model
 		'problem',
 		'problem.firstSteps',
 		'step',
-		'step.stepNextSteps',
-		'step.stepPreviousSteps',
 	];
 
 	/**

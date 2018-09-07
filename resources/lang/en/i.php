@@ -81,6 +81,7 @@ return [
 
 	// api set station active step
 	'The requested Step doesn\'t exist.' => 'The requested Step doesn\'t exist.',
+	'Invalid forward value, must be non-zero.' => 'Invalid forward value, must be non-zero.',
 
 	// api try station problem
 	'More than one character present in input array.' => 'More than one character present in input array.',

@@ -9,6 +9,14 @@ class Step extends Model
 	protected $table = 'steps';
 
 	/**
+	 * Properties added to a serialization of this instance
+	 */
+	protected $appends = [
+		'nextEdgeCount',
+		'previousEdgeCount',
+	];
+
+	/**
 	 * Problem(s) this step is related to
 	 */
 	public function problem()
@@ -22,6 +30,14 @@ class Step extends Model
 	public function nextSteps()
 	{
 		return $this->belongsToMany(Step::class, 'step_next_steps', 'step_id', 'next_step_id');
+	}
+
+	/**
+	 * Previous Step instances
+	 */
+	public function previousSteps()
+	{
+		return $this->belongsToMany(Step::class, 'step_next_steps', 'next_step_id', 'step_id');
 	}
 
 	/**
@@ -99,5 +115,21 @@ class Step extends Model
 		}
 
 		return $edges;
+	}
+
+	/**
+	 * attribute getter for nextEdgeCount
+	 */
+	public function getNextEdgeCountAttribute()
+	{
+		return $this->stepNextSteps()->count();
+	}
+
+	/**
+	 * attribute getter for previousEdgeCount
+	 */
+	public function getPreviousEdgeCountAttribute()
+	{
+		return $this->stepPreviousSteps()->count();
 	}
 }

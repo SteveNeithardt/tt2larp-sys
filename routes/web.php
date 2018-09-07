@@ -47,4 +47,5 @@ Route::group([ 'middleware' => 'auth' ], function() {
 	Route::post('/station/names', 'StationController@setNames')->name('set station names');
 	Route::post('/station/problem', 'StationController@setActiveProblem')->name('set station active problem');
 	Route::post('/station/step', 'StationController@setActiveStep')->name('set station active step');
+	Route::get('/station/step', 'StationController@getStepEntourage')->name('get station active step entourage');
 });

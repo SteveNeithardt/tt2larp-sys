@@ -52,7 +52,17 @@
 							<div v-if="ps_has_problem(station)">
 								<div class="alert alert-info">
 									<h5>@{{ "@lang ("i.active problem is '%P%'")".replace('%P%', station.station.problem.name) }}</h5>
-									<h5 v-if="ps_has_step(station)">@{{ "@lang ("i.currently on step '%S%'")".replace('%S%', ps_step_name(station)) }}</h5>
+									<h5 class="d-flex align-items-center" v-if="ps_has_step(station)">
+										@{{ "@lang ("i.currently on step '%S%'")".replace('%S%', ps_step_name(station)) }}
+										<div class="left-chevron-icon ml-2" v-if="ps_assigning_step < 0 && ps_has_previous_steps(station)" v-on:click="ps_assign_step(station.id, -1)"></div>
+										<div class="right-chevron-icon ml-2" v-if="ps_assigning_step < 0 && ps_has_next_steps(station)" v-on:click="ps_assign_step(station.id, 1)" v-cloak></div>
+
+									</h5>
+									<div class="d-flex align-items-center" v-if="ps_assigning_step == station.id">
+										<select2 v-if="steps != null" v-model="step_id" :options="steps"></select2>
+										<div class="cancel-icon ml-2" v-on:click="ps_assign_step(-1)"></div>
+										<div class="save-icon ml-2" v-if="step_id >= 0" v-on:click="ps_save_step(station.id)"></div>
+									</div>
 								</div>
 								<div class="alert alert-success mt-2" v-if="ps_is_finished(station)">@lang ('i.problem is finished')</div>
 							</div>
@@ -94,14 +104,30 @@ new Vue({
 			problems: null,
 			problem_id: -1,
 			ps_assigning_problem: -1,
+			steps: null,
+			step_id: -1,
+			ps_assigning_step: -1,
+			ps_step_forward: null,
 		}
 	},
 	computed: {
 	},
+	watch: {
+		ps_assigning_step(after) {
+			if (after < 0) {
+				this.steps = null;
+			} else {
+				this.fetch_steps();
+			}
+		}
+	},
 	methods: {
 		fetch_stations() {
-			if (this.ps_assigning_problem >= 0) return;
-			if (this.editing_names) return;
+			if (this.ps_assigning_problem >= 0 ||
+				this.ps_assigning_step >= 0 ||
+				this.editing_names) {
+				return;
+			}
 			this.loading = true;
 			axios.get("{{ route('get stations') }}")
 				.then(response => {
@@ -121,6 +147,19 @@ new Vue({
 					this.problems = response.data.map(p => {
 						return { id: p.id, text: p.name };
 					});
+					this.loading = false;
+				}).catch(errors => {
+					this.loading = false;
+				});
+		},
+		fetch_steps() {
+			if (this.ps_assigning_step < 0) return;
+			this.loaading = true;
+			axios.get("{{ route('get station active step entourage') }}", { params: {
+					station_id: this.ps_assigning_step,
+					forward: this.ps_step_forward,
+				} }).then(response => {
+					this.steps = response.data;
 					this.loading = false;
 				}).catch(errors => {
 					this.loading = false;
@@ -183,6 +222,16 @@ new Vue({
 			if (this.ps_has_first_step(station)) return station.station.problem.first_steps[0];
 			return null;
 		},
+		ps_has_next_steps(station) {
+			var step = this.ps_step(station);
+			return step != null &&
+				step.nextEdgeCount > 0;
+		},
+		ps_has_previous_steps(station) {
+			var step = this.ps_step(station);
+			return step != null &&
+				step.previousEdgeCount > 0;
+		},
 		ps_step_name(station) {
 			var step = this.ps_step(station);
 			if (step == null) return 'undefined';
@@ -191,8 +240,7 @@ new Vue({
 		ps_is_finished(station) {
 			var step = this.ps_step(station);
 			return step == null ||
-				step.step_next_steps == null ||
-				step.step_next_steps.length == 0;
+				step.nextEdgeCount == 0;
 		},
 		ps_assign_problem(station_id) {
 			this.ps_assigning_problem = station_id;
@@ -214,7 +262,7 @@ new Vue({
 			axios.post("{{ route('set station active problem') }}", {
 				station_id: station_id,
 				problem_id: problem_id,
-			}).then (response => {
+			}).then(response => {
 				if (response.data.success) {
 					this.ps_assigning_problem = -1;
 					this.fetch_stations();
@@ -223,6 +271,30 @@ new Vue({
 			}).catch(errors => {
 				this.loading = false;
 			});
+		},
+		ps_assign_step(station_id, forward = null) {
+			this.ps_assigning_step = station_id;
+			this.ps_step_forward = forward;
+		},
+		ps_save_step(station_id) {
+			var res = confirm("Are you sure?");
+			if (res == true) {
+				this.loading = true;
+				axios.post("{{ route('set station active step') }}", {
+					station_id: station_id,
+					step_id: this.step_id,
+				}).then(response => {
+					if (response.data.success) {
+						this.ps_assigning_step = -1;
+						this.ps_step_forward = null;
+						this.steps = null;
+						this.step_id = -1;
+						this.fetch_stations();
+					}
+				}).catch(errors => {
+					this.loading = false;
+				});
+			}
 		},
 		fetch_data() {
 			this.fetch_stations();
