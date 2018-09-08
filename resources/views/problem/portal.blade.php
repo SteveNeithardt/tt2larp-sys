@@ -15,19 +15,31 @@ border: 1px solid #bbb;
 <div class="container" id="vue">
 	<div class="row justify-content-center">
 		<div class="col-md-12">
-			<h2>@lang ('i.problems')</h2>
+			<h2 class="d-flex align-items-center">
+				@lang ('i.problems')
+				<div class="delete-icon ml-2" v-if="listing_problems && !deleting_problems && !editing_problem" v-on:click="delete_problems(true)" v-cloak></div>
+				<div class="cancel-icon ml-2" v-if="listing_problems && deleting_problems" v-on:click="delete_problems(false)" v-cloak></div>
+			</h2>
 			<span class="btn btn-outline-secondary my-3" v-on:click="back()" v-if="editing_problem" v-cloak>@lang ('i.back')</span>
 		</div>
 		<div class="col-md-6" v-if="listing_problems" v-cloak>
 			<div class="card">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
 				<div class="card-body">
+					<span class="btn btn-primary mb-3" v-if="!adding_problem" v-on:click="addProblem()">@lang ('i.add')</span>
+					<div class="d-flex mb-3 justify-content-between" v-if="adding_problem">
+						<input class="form-control col-md-10" type="text" placeholder="@lang ('i.problem name')" v-model="problem_name" v-if="adding_problem">
+						<div class="col-md-2 d-flex align-items-center">
+							<div class="cancel-icon" v-on:click="resetProblem()"></div>
+							<div class="save-icon ml-2" v-if="valid_problem" v-on:click="storeProblem()"></div>
+						</div>
+					</div>
 					<ul class="list">
-						<li class="thumb" v-for="problem in filtered_problems" v-on:click="editProblem(problem.id)">@{{ problem.name }}</li>
+						<li class="d-flex align-items-center" v-for="problem in filtered_problems">
+							<div class="flex-grow-1 thumb" v-on:click="editProblem(problem.id)">@{{ problem.name }}</div>
+							<div class="delete-icon" v-on:click="deleteProblem(problem.id)" v-if="deleting_problems"></div>
+						</li>
 					</ul>
-					<span class="btn btn-primary" v-if="!adding_problem" v-on:click="addProblem()">@lang ('i.add')</span>
-					<input class="form-control" type="text" v-model="problem_name" v-if="adding_problem">
-					<span class="btn btn-primary mt-3" v-if="adding_problem && valid_problem" v-on:click="storeProblem()">@lang ('i.submit')</span>
 				</div>
 			</div>
 		</div>
@@ -125,6 +137,7 @@ new Vue({
 			listing_problems: false,
 			filter_name: null,
 
+			deleting_problems: false,
 			adding_problem: false,
 			editing_problem: false,
 			problem_id: null,
@@ -277,6 +290,10 @@ new Vue({
 				})
 				.catch(errors => {});
 		},
+		delete_problems(active) {
+			if (this.editing_problem) return;
+			this.deleting_problems = active;
+		},
 		resetProblem: function() {
 			this.adding_problem = false;
 			this.editing_problem = false;
@@ -383,6 +400,30 @@ new Vue({
 					}
 				})
 				.catch(errors => {});
+		},
+		get_problem_name(id) {
+			var result = this.problems.filter(p => p.id == id);
+			return result.length == 1 ? result[0].name : 'undefined';
+		},
+		async deleteProblem(id) {
+			if (! this.deleting_problems) return;
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.get_problem_name(id)),
+				type: 'error',
+				showCancelButton: true,
+			});
+			this.deleting_problems = false;
+			if (res.value == true) {
+				axios.post("{{ route('delete problem') }}", {
+					id: id,
+				}).then(response => {
+					if (response.data.success) {
+						this.fetch_problems();
+					}
+				}).catch(errors => {
+				});
+			}
 		},
 		storeStep: function() {
 			if (!this.valid_step) return;

@@ -9,6 +9,21 @@ class Step extends Model
 	protected $table = 'steps';
 
 	/**
+	 * upon boot, declare what happens on delete
+	 */
+	protected static function boot()
+	{
+		parent::boot();
+
+		static::deleting(function ($step) {
+			$step->problem()->detach();
+			foreach ($step->stepNextSteps as $stepNextStep) {
+				$stepNextStep->delete();
+			}
+		});
+	}
+
+	/**
 	 * Properties added to a serialization of this instance
 	 */
 	protected $appends = [

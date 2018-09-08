@@ -2,6 +2,8 @@
 
 namespace tt2larp\Http\Controllers;
 
+use Validator;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -36,7 +38,7 @@ class ProblemController extends Controller
 	/**
 	 * store a single problem (insert/update)
 	 */
-	public function store(Request $request)
+	public function storeProblem(Request $request)
 	{
 		$request->validate([
 			'id' => 'nullable|integer',
@@ -63,6 +65,30 @@ class ProblemController extends Controller
 			$problem->name = $name;
 			$problem->save();
 		}
+
+		return new JsonResponse([ 'success' => true ]);
+	}
+
+	/**
+	 * delete a single Problem
+	 */
+	public function deleteProblem(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'id' => 'required|integer',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$problem = Problem::find($request->id);
+
+		if ($problem->problemStation()->exists()) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.Problem is active on a ProblemStation.') ], 422);
+		}
+
+		$problem->delete();
 
 		return new JsonResponse([ 'success' => true ]);
 	}

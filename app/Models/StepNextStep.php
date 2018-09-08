@@ -8,7 +8,18 @@ class StepNextStep extends Model
 {
 	protected $table = 'step_next_steps';
 
-	//@todo possibliity of having 'AND' relations within a single step (some kind of morphto many-to-many relationship to abilities)
+	/**
+	 * upon boot, declare what happens on delete
+	 */
+	protected static function boot()
+	{
+		parent::boot();
+
+		static::deleting(function ($stepNextStep) {
+			$stepNextStep->codes()->delete();
+			$stepNextStep->abilities()->detach();
+		});
+	}
 
 	/**
 	 * Step that spawned this

@@ -173,6 +173,7 @@ new Vue({
 			return result.length == 1 ? result[0].name : 'undefined';
 		},
 		async deleteCharacter(id) {
+			if (! this.deleting_characters) return;
 			const res = await swal({
 				title: "@lang ('i.Are you sure?')",
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.character_name(id)),

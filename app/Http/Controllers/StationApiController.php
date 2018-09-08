@@ -51,7 +51,10 @@ class StationApiController extends Controller
 
 		$basestation = Station::find($station_id);
 		if ($basestation === null) {
-			return new JsonResponse([ 'success' => false, 'message' => "Station $station_id doesn't exist." ], 422);
+			return new JsonResponse([
+				'success' => false,
+				'message' => "Station $station_id doesn't exist.",
+			], 422);
 		}
 
 		$basestation->last_ping = now();
@@ -68,7 +71,10 @@ class StationApiController extends Controller
 			return $this->crafting($request, $station);
 		}
 
-		return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Station' ]) ], 400);
+		return new JsonResponse([
+			'success' => false,
+			'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Station' ]),
+		], 400);
 	}
 
 	/**
@@ -87,16 +93,22 @@ class StationApiController extends Controller
 
 		$problem = $station->problem;
 		if ($problem === null) {
-			return new JsonResponse([ 'success' => true, 'message' => __("There are no problems on this station.") ]);
+			return new JsonResponse([ 'success' => true ]);
 		}
 		$step = $station->step;
 		if ($step === null) {
 			$step = $problem->firstSteps()->first();
-			if ($step === null) abort("This should be impossible.");
+			if ($step === null) {//abort("This should be impossible.");
+				return new JsonResponse([ 'success' => true ]);
+			}
 		}
 
 		if ($request->codes === null || count($request->codes) === 0) {
-			return new JsonResponse([ 'success' => true, 'message' => $step->description ]);
+			return new JsonResponse([
+				'success' => true,
+				'messages' => [ $step->description ],
+				'keep' => false,
+			);
 		}
 
 		// from all codes sent through the api
@@ -109,7 +121,11 @@ class StationApiController extends Controller
 			$instance = $code->coded;
 			if ($instance instanceof Character) {
 				if ($character !== null) {
-					return new JsonResponse([ 'success' => false, 'message' => __('More than one character present in input array.') ], 422);
+					return new JsonResponse([
+						'success' => false,
+						'message' => __('More than one character present in input array.'),
+						'keep' => false,
+					]);
 				}
 				$character = $instance;
 			} else if ($instance instanceof StepNextStep) {
@@ -139,7 +155,11 @@ class StationApiController extends Controller
 			}
 		}
 		if ($successfulNextStep === null) {
-			return new JsonResponse([ 'success' => true, 'messages' => $failure_messages ]);
+			return new JsonResponse([
+				'success' => true,
+				'messages' => $failure_messages
+				'keep' => ($character === null ? true : false),
+			]);
 		}
 
 		$nextStep = $successfulNextStep->nextStep;
@@ -147,7 +167,11 @@ class StationApiController extends Controller
 		$station->step()->associate($nextStep);
 		$station->save();
 
-		return new JsonResponse([ 'success' => true, 'message' => $nextStep->description ]);
+		return new JsonResponse([
+			'success' => true,
+			'message' => $nextStep->description,
+			'keep' => false,
+		]);
 	}
 
 	/**
@@ -174,13 +198,21 @@ class StationApiController extends Controller
 				$characters[] = $instance;
 			} else if ($instance instanceof Article) {
 				if ($article !== null) {
-					return new JsonResponse([ 'success' => false, 'message' => __('More than one article present in input array.') ], 422);
+					return new JsonResponse([
+						'success' => false,
+						'message' => __('More than one article present in input array.'),
+						'keep' => false,
+					]);
 				}
 				$article = $instance;
 			}
 		}
 		if ($article === null) {
-			return new JsonResponse([ 'success' => false, 'message' => __('No article present in input array.') ], 422);
+			return new JsonResponse([
+				'success' => false,
+				'messages' => [ __('No article present in input array.') ],
+				'keep' => true,
+			]);
 		}
 
 		$abilities = Ability::CollapseCharacters($characters);
@@ -199,10 +231,18 @@ class StationApiController extends Controller
 		}
 
 		if (count($parts) === 0) {
-			return new JsonResponse([ 'success' => false, 'message' => 'not enough info' ]);
+			return new JsonResponse([
+				'success' => true,
+				'messages' => [],
+				'keep' => true,
+			]);
 		}
 
-		return new JsonResponse([ 'success' => true, 'messages' => array_column($parts, 'description') ]);
+		return new JsonResponse([
+			'success' => true,
+			'messages' => array_column($parts, 'description'),
+			'keep' => true,
+		]);
 	}
 
 	/**

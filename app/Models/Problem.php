@@ -9,6 +9,20 @@ class Problem extends Model
 	protected $table = 'problems';
 
 	/**
+	 * upon boot, declare what happens on delete
+	 */
+	protected static function boot()
+	{
+		parent::boot();
+
+		static::deleting(function ($program) {
+			foreach ($program->steps as $step) {
+				$step->delete();
+			}
+		});
+	}
+
+	/**
 	 * all steps related to this problem
 	 */
 	public function steps()
@@ -37,5 +51,13 @@ class Problem extends Model
 		}
 
 		return $steps;
+	}
+
+	/**
+	 * ProblemStation on which this Problem is active
+	 */
+	public function problemStation()
+	{
+		return $this->hasOne(ProblemStation::class, 'problem_id', 'id');
 	}
 }

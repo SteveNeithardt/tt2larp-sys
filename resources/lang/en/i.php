@@ -51,6 +51,8 @@ return [
 	'add code' => 'Add Code',
 	'add ability' => 'Add Ability',
 
+	'Problem is active on a ProblemStation.' => 'Problem is active on a ProblemStation.',
+
 	// articles
 	'library' => 'Library',
 	'code' => 'Code',
