@@ -47,11 +47,15 @@ class LibraryController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
 			'code' => 'required|string|min:3|max:8',
 		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		$id = $request->id;
 		$article = Article::find($id);
@@ -97,13 +101,17 @@ class LibraryController extends Controller
 	 */
 	public function storePart(Request $request, $article_id)
 	{
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
 			'description' => 'required|string',
 			'ability_id' => 'nullable|integer',
 			'min_value' => 'nullable|integer',
 		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		$article = Article::find($article_id);
 		if ($article === null) {
@@ -145,9 +153,13 @@ class LibraryController extends Controller
 	 */
 	public function deletePart(Request $request, $article_id)
 	{
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'id' => 'required|integer',
 		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		$article = Article::find($article_id);
 		if ($article === null) {

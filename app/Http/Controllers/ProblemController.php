@@ -40,10 +40,14 @@ class ProblemController extends Controller
 	 */
 	public function storeProblem(Request $request)
 	{
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
 		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		$name = $request->name;
 		if (Problem::where('name', '=', $name)->count() > 0) {
@@ -104,7 +108,9 @@ class ProblemController extends Controller
 	{
 		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
+		if ($problem === null) {
+			return new JsonResponse([ 'success' => false, 'message' => "Problem $problem_id doesn't exist." ], 422);
+		}
 
 		$steps = $problem->getSteps();
 
@@ -121,7 +127,9 @@ class ProblemController extends Controller
 	{
 		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
+		if ($problem === null) {
+			return new JsonResponse([ 'success' => false, 'message' => "Problem $problem_id doesn't exist." ], 422);
+		}
 
 		$stepId = $request->step_id;
 		$step = Step::find($stepId);
@@ -144,11 +152,17 @@ class ProblemController extends Controller
 	{
 		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
+		if ($problem === null) {
+			return new JsonResponse([ 'success' => false, 'message' => "Problem $problem_id doesn't exist." ], 422);
+		}
 
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'step_id' => 'required|integer',
 		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		$step_id = $request->step_id;
 		$step = Step::find($step_id);
@@ -169,9 +183,11 @@ class ProblemController extends Controller
 	{
 		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
+		if ($problem === null) {
+			return new JsonResponse([ 'success' => false, 'message' => "Problem $problem_id doesn't exist." ], 422);
+		}
 
-		$validation = [
+		$validator = Validator::make($request->all(), [
 			'id' => 'nullable|integer',
 			'step_id' => 'required|integer',
 			'next_step_id' => 'required|integer',
@@ -181,8 +197,11 @@ class ProblemController extends Controller
 			'codes' => 'present|array',
 			'codes.*.code' => 'required|string|min:3|max:8',
 			'message' => 'nullable|string',
-		];
-		$request->validate($validation);
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		$id = $request->id;
 
@@ -263,11 +282,17 @@ class ProblemController extends Controller
 	{
 		$problem = Problem::find($problem_id);
 
-		if ($problem === null) abort(422, "Problem $problem_id doesn't exist.");
+		if ($problem === null) {
+			return new JsonResponse([ 'success' => false, 'message' => "Problem $problem_id doesn't exist." ], 422);
+		}
 
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'edge_id' => 'required|integer',
 		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
 		$edge_id = $request->edge_id;
 		$edge = StepNextStep::find($edge_id);
