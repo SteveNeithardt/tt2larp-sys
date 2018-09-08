@@ -72,6 +72,7 @@ return [
 	'offline' => 'Offline',
 	'last activity at %A%' => 'last activity at %A%',
 	'Nothing to do in the library' => 'Nothing to do in the library.',
+	'Nothing to do in the crafting station' => 'Nothing to do in the crafting station.',
 	'active problem is \'%P%\'' => 'Current active Problem is \'%P%\'',
 	'currently on step \'%S%\'' => 'on step \'%S%\'',
 	'problem is finished' => 'Problem is finished.',

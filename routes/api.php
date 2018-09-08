@@ -20,5 +20,4 @@ use Illuminate\Http\Request;
 //    return $request->user();
 //});
 
-Route::get('/library/article', 'LibraryController@article')->name('get article');
-Route::get('/station/problem', 'StationController@tryProblem')->name('try station problem');
+Route::get('/station', 'StationApiController@index')->name('station api');
