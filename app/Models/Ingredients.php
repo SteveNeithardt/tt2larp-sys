@@ -10,7 +10,27 @@ class Ingredient extends Model
 {
 	use HasCodeTrait;
 
-	protected $table = 'ingredient';
+	protected $table = 'ingredients';
+
+	/**
+	 * relations to always eager load
+	 */
+	protected $with = [
+		'codes',
+	];
+
+	/**
+	 * upon boot, declare what happens on delete
+	 */
+	protected static function boot()
+	{
+		parent::boot();
+
+		static::deleting(function ($ingredient) {
+			$ingredient->codes()->delete();
+			$ingredient->recipes()->detach();
+		});
+	}
 
 	/**
 	 * Recipes that use this Ingredient

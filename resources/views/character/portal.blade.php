@@ -19,11 +19,11 @@
 					<ul class="list">
 						<li class="thumb" v-for="character in filtered_characters" v-on:click="editCharacter(character.id)" v-cloak>@{{ character.name }} (@{{ character.code }})</li>
 					</ul>
-					<span class="btn btn-primary mt-2" v-on:click="editCharacter()" v-cloak>@lang ('i.add')</span>
 				</div>
 			</div>
 		</div>
 		<div class="col-md-6">
+			<span class="btn btn-primary mb-2" v-on:click="editCharacter()" v-if="!editing" v-cloak>@lang ('i.add')</span>
 			<div class="card" v-if="editing" v-cloak>
 				<div class="card-header">@lang ('i.edit')</div>
 				<div class="card-body">

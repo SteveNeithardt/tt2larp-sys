@@ -45,7 +45,7 @@ class ProblemController extends Controller
 
 		$name = $request->name;
 		if (Problem::where('name', '=', $name)->count() > 0) {
-			return new JsonResponse([ 'success' => false, 'message' => __( "Problem named ':name' already exists.", [ 'name' => $name ] ) ]);
+			return new JsonResponse([ 'success' => false, 'message' => __( ":instance named ':name' already exists.", [ 'instance' => 'Problem', 'name' => $name ] ) ]);
 		}
 
 		$id = $request->id;

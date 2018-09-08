@@ -23,12 +23,13 @@
 			</div>
 		</div>
 		<div class="col-md-6">
-			<span class="btn btn-primary mb-2" v-on:click="edit()" v-cloak>@lang ('i.add')</span>
+			<span class="btn btn-primary mb-2" v-on:click="edit()" v-if="!editing" v-cloak>@lang ('i.add')</span>
 			<div class="card" v-if="editing" v-cloak>
 				<div class="card-header">@lang ('i.edit')</div>
 				<div class="card-body">
 					<input class="form-control" type="text" v-model="name">
-					<span class="btn btn-primary mt-3" v-on:click="submit()">@lang ('i.save')</span>
+					<span class="btn btn-primary mt-3" v-on:click="submit()">@lang ('i.submit')</span>
+					<span class="btn btn-outline-secondary mt-3" v-on:click="reset()">@lang ('i.cancel')</span>
 				</div>
 			</div>
 		</div>
@@ -50,16 +51,15 @@ new Vue({
 		}
 	},
 	computed: {
-		filtered_abilities: function() {
+		filtered_abilities() {
 			if (this.filter_name == null) return this.abilities;
 			else return this.abilities.filter(a => a.name.indexOf(this.filter_name) > -1);
 		},
 	},
 	methods: {
-		edit: function(id = -1) {
+		edit(id = -1) {
+			this.reset();
 			this.editing = true;
-			this.id = null;
-			this.name = null;
 			if (id == -1) return;
 			var result = this.abilities.filter(a => a.id == id);
 			if (result.length == 1) {
@@ -67,15 +67,18 @@ new Vue({
 				this.name = result[0].name;
 			}
 		},
-		submit: function() {
+		reset() {
+			this.editing = false;
+			this.id = null;
+			this.name = null;
+		},
+		submit() {
 			axios.post("{{ route('store ability') }}", {
 				name: this.name,
 				id: this.id,
 			}).then(response => {
 				this.abilities = response.data;
-				this.id = null;
-				this.name = null;
-				this.editing = false;
+				this.reset();
 			})
 			.catch(errors => {});
 		},

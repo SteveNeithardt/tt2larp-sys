@@ -140,7 +140,7 @@ class StationController extends Controller
 		} else {
 			$problem = Problem::find($problem_id);
 			if ($problem === null) {
-				return new JsonResponse([ 'success' => false, 'message' => __('i.The requested problem doesn\'t exist.') ], 422);
+				return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Problem' ]) ], 422);
 			}
 
 			$basestation->station->problem()->associate($problem);

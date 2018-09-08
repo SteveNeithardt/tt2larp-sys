@@ -2,6 +2,9 @@
 
 namespace tt2larp\Traits;
 
+use ReflectionClass;
+use RuntimeException;
+
 use tt2larp\Models\Code;
 
 trait HasCodeTrait
@@ -10,9 +13,20 @@ trait HasCodeTrait
 	 * Code(s) referencing this Model
 	 */
 	public function codes()
+	//public function code()//@TODO @investigate
 	{
 		return $this->morphMany(Code::class, 'coded');
+		//return $this->morphOne(Code::class, 'coded');//@TODO @investigate
 	}
+
+	/**
+	 * get code attribute
+	 */
+	//public function getCodeAttribute()
+	//{
+		//$code = $this->codes()->first();
+		//return $code === null ? null : $code->code;
+	//}
 
 	/**
 	 * helper method for associating code
@@ -34,9 +48,9 @@ trait HasCodeTrait
 			$coded = $c->coded;
 			if ($coded !== null) {
 				$name = (new ReflectionClass($coded))->getShortName() . '(' . $coded->name . ')';
-				throw new RuntimeException(__( "':code' is already assigned to :instance.", [ 'code' => $code, ':instance' => $name ] ));
+				throw new RuntimeException(__( "':code' is already assigned to :instance.", [ 'code' => $code, 'instance' => $name ] ));
 			}
-			$this->codes()->associate($c);
+			$this->codes()->save($c);
 		} else {
 			$this->codes()->create([ 'code' => $code ]);
 		}

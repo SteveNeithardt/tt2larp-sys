@@ -35,11 +35,7 @@ class LibraryController extends Controller
 
 		foreach ($articles as $article) {
 			$code = $article->codes->first();
-			if ($code !== null) {
-				$article->code = $article->codes->first()->code;
-			} else {
-				$article->code = null;
-			}
+			$article->code = $code === null ? null : $code->code;
 			unset($article->codes);
 		}
 
@@ -65,7 +61,7 @@ class LibraryController extends Controller
 
 		$name = $request->name;
 		if ($name !== $article->name && Article::where('name', '=', $name)->count() > 0) {
-			return new JsonResponse([ 'success' => false, 'message' => __( "Article named ':name' already exists.", [ 'name' => $name ] ) ]);
+			return new JsonResponse([ 'success' => false, 'message' => __( ":instance named ':name' already exists.", [ 'instance' => 'Article', 'name' => $name ] ) ]);
 		} else {
 			$article->name = $name;
 		}
@@ -95,7 +91,7 @@ class LibraryController extends Controller
 	}
 
 	/**
-	 * store a signel part (insert/update)
+	 * store a single part (insert/update)
 	 */
 	public function storePart(Request $request, $article_id)
 	{

@@ -48,4 +48,11 @@ Route::group([ 'middleware' => 'auth' ], function() {
 	Route::post('/station/problem', 'StationController@setActiveProblem')->name('set station active problem');
 	Route::post('/station/step', 'StationController@setActiveStep')->name('set station active step');
 	Route::get('/station/step', 'StationController@getStepEntourage')->name('get station active step entourage');
+
+	Route::get('/crafting', 'CraftingController@portal')->name('crafting portal');
+	Route::get('/crafting/list', 'CraftingController@getList')->name('get recipes');
+	Route::post('/crafting/recipe/store', 'CraftingController@storeRecipe')->name('store recipe');
+	Route::post('/crafting/recipe/delete', 'CraftingController@deleteRecipe')->name('delete recipe');
+	//Route::post('/crafting/ingredient/store', 'CraftingController@storeIngredient')->name('store ingredient');
+	//Route::post('/crafting/ingredient/delete', 'CraftingController@deleteIngredient')->name('delete ingredient');
 });

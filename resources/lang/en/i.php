@@ -14,6 +14,9 @@ return [
 	'edit' => 'Edit',
 	'submit' => 'Submit',
 	'delete' => 'Delete',
+	'The requested :instance doesn\'t exist.' => 'The requested :instance doesn\'t exist.',
+	':instance named \':name\' already exists.' => ':instance named \':name\' already exists.',
+
 
 	// step_next_step
 	'select type' => 'Select type...',
@@ -32,8 +35,6 @@ return [
 	'problem name' => 'Problem name',
 	'edit name' => 'Edit name',
 	'save name' => 'Save name',
-
-	'Problem named \':name\' already exists.' => 'Problem named \':name\' already exists.',
 
 	'regen graph' => 'Regenerate graph',
 
@@ -57,11 +58,14 @@ return [
 	'save part' => 'Save part',
 	'no ability' => 'No Ability',
 
-	'Article named \':name\' already exists.' => 'Article named \':name\' already exists.',
-
 	// api get article
 	'More than one article present in input array.' => 'More than one article present in input array.',
 	'No article present in input array.' => 'No article present in input array.',
+
+	// crafting
+	'crafting' => 'Crafting',
+	'save recipe' => 'Save recipe',
+	'add ingredient' => 'Add ingredient',
 
 	// stations
 	'stations' => 'Stations',
@@ -76,11 +80,9 @@ return [
 	'assign new problem' => 'Assign new Problem',
 
 	// api set station active problem
-	'The requested problem doesn\'t exist.' => 'The requested problem doesn\'t exist.',
 	'The requested station is not a ProblemStation. Invalid Request.' => 'The requested station is not a ProblemStation. Invalid Request.',
 
 	// api set station active step
-	'The requested Step doesn\'t exist.' => 'The requested Step doesn\'t exist.',
 	'Invalid forward value, must be non-zero.' => 'Invalid forward value, must be non-zero.',
 
 	// api try station problem
