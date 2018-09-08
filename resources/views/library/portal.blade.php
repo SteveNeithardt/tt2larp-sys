@@ -17,31 +17,34 @@
 			<div class="card">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
 				<div class="card-body">
+					<span class="btn btn-primary mb-3" v-if="!adding_article" v-on:click="addArticle()">@lang ('i.add')</span>
+					<div class="d-flex mb-3 justify-content-between" v-if="adding_article">
+						<input class="form-control col-md-5" type="text" v-model="article_name" placeholder="@lang ('i.name')">
+						<input class="form-control col-md-4" type="text" v-model="article_code" placeholder="@lang ('i.code')">
+						<div class="col-md-2 d-flex align-items-center">
+							<div class="cancel-icon" v-on:click="resetArticle()"></div> 
+							<div class="save-icon ml-2" v-if="valid_article" v-on:click="storeArticle()"></div>
+						</div>
+					</div>
 					<ul class="list">
 						<li class="thumb" v-for="article in filtered_articles" v-on:click="editArticle(article.id)">@{{ article.name }} (@{{ article.code }})</li>
 					</ul>
-					<span class="btn btn-primary" v-if="!adding_article" v-on:click="addArticle()">@lang ('i.add')</span>
-					<div class="d-flex mt-3 justify-content-between" v-if="adding_article">
-						<input class="form-control col-md-5" type="text" v-model="article_name" placeholder="@lang ('i.name')">
-						<input class="form-control col-md-4" type="text" v-model="article_code" placeholder="@lang ('i.code')">
-						<div class="col-md-2"><span class="btn btn-primary" v-if="valid_article" v-on:click="storeArticle()">@lang ('i.submit')</span></div>
-					</div>
 				</div>
 			</div>
 		</div>
-		<div class="col-md-12 mb-4" v-if="editing_article" v-cloak>
+		<div class="col-md-6 mb-4" v-if="editing_article" v-cloak>
 			<div class="card">
 				<div class="card-header">
-					<div v-if="!adding_article">
+					<div class="d-flex align-items-center my-1" v-if="!adding_article">
 						@{{ article_name }} (@{{ article_code }})
-						<span class="btn btn-outline-primary ml-3" v-on:click="addArticle()">@lang ('i.edit article')</span>
+						<div class="edit-icon ml-3" v-on:click="addArticle()"></div>
 					</div>
-					<div class="d-flex justify-content-between" v-if="adding_article">
+					<div class="d-flex justify-content-between align-items-center" v-if="adding_article">
 						<input class="form-control col-md-4" type="text" v-model="article_name" placeholder="@lang ('i.name')">
 						<input class="form-control col-md-4" type="text" v-model="article_code" placeholder="@lang ('i.code')">
-						<div class="col-md-3">
-							<span class="btn btn-primary" v-if="valid_article" v-on:click="storeArticle(false)">@lang ('i.submit')</span>
-							<span class="btn btn-outline-secondary" v-on:click="resetAddArticle()">@lang ('i.cancel')</span> 
+						<div class="col-md-3 d-flex align-items-center">
+							<div class="cancel-icon" v-on:click="resetAddArticle()"></div> 
+							<div class="save-icon ml-2" v-if="valid_article" v-on:click="storeArticle(false)"></div>
 						</div>
 					</div>
 				</div>
@@ -65,7 +68,7 @@
 					<textarea class="form-control" v-model="part_description" placeholder="@lang ('i.part description')"></textarea>
 					<div class="mt-3">
 						<span class="btn btn-primary mr-2" v-on:click="storePart()" v-if="valid_part">@lang ('i.save part')</span>
-						<span class="btn btn-outline-danger mr-2" v-on:click="deletePart()">@lang ('i.delete')</span>
+						<span class="btn btn-outline-danger mr-2" v-on:click="deletePart()" v-if="can_delete_part">@lang ('i.delete')</span>
 						<span class="btn btn-outline-secondary" v-on:click="resetPart()">@lang ('i.cancel')</span>
 					</div>
 				</div>
@@ -117,7 +120,8 @@ new Vue({
 			return (this.article_name != null &&
 				this.article_name.length > 2 &&
 				this.article_code != null &&
-				this.article_code.length > 2);
+				this.article_code.length > 2 &&
+				this.article_code.length < 9);
 		},
 		valid_part() {
 			return (
@@ -134,14 +138,16 @@ new Vue({
 				)
 			);
 		},
+		can_delete_part() {
+			return this.part_id != null;
+		},
 	},
 	watch: {
 	},
 	methods: {
 		back() {
 			if (this.editing_article) {
-				this.resetArticle();
-				this.listing_articles = true;
+				this.fetch_articles();
 				return;
 			}
 		},
@@ -177,6 +183,7 @@ new Vue({
 			this.editing_article = false;
 			this.article_id = null;
 			this.article_name = null;
+			this.article_code = null;
 			this.parts = null;
 			this.resetPart();
 		},

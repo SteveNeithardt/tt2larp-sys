@@ -51,7 +51,6 @@ return [
 	// articles
 	'library' => 'Library',
 	'code' => 'Code',
-	'edit article' => 'Edit article',
 
 	'add part' => 'Add part',
 	'save part' => 'Save part',

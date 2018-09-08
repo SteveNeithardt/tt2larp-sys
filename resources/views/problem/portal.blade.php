@@ -33,17 +33,17 @@ border: 1px solid #bbb;
 		</div>
 		<div class="col-md-12 mb-4" v-if="editing_problem" v-cloak>
 			<div class="card">
-				<div class="card-header d-flex">
-					<div v-if="!adding_problem">
+				<div class="card-header">
+					<div class="d-flex align-items-center my-1" v-if="!adding_problem">
 						@{{ problem_name }}
-						<span class="btn btn-outline-primary ml-3" v-on:click="addProblem()">@lang ('i.edit name')</span>
+						<div class="edit-icon ml-3" v-on:click="addProblem()"></div>
 					</div>
-					<div class="col-md-8" v-if="adding_problem">
-						<input class="form-control" type="text" placeholder="@lang ('i.problem name')" v-model="problem_name">
-					</div>
-					<div class="col-md-3" v-if="adding_problem">
-						<span class="btn btn-primary" v-on:click="storeProblem(false)">@lang ('i.save name')</span>
-						<span class="btn btn-outline-secondary" v-on:click="resetAddProblem()">@lang ('i.cancel')</span>
+					<div class="d-flex align-items-center" v-if="adding_problem">
+						<input class="form-control col-md-6" type="text" placeholder="@lang ('i.problem name')" v-model="problem_name">
+						<div class="col-md-3 d-flex align-items-center ml-5">
+							<div class="cancel-icon" v-on:click="resetAddProblem()"></div>
+							<div class="save-icon ml-2" v-on:click="storeProblem(false)"></div>
+						</div>
 					</div>
 				</div>
 				<div class="card-body">
