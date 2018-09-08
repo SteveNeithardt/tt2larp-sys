@@ -155,10 +155,13 @@ new Vue({
 		},
 		activity_warning(timestamp) {
 			if (timestamp == null) {
-				//complexify this for offline
 				return "alert-danger";
 			}
-			if ((new Date) - (new Date(timestamp)) > 30000) {
+			var difference = (new Date) - (new Date(timestamp));
+			if (difference > 600000) {// 10 minutes
+				return "alert-danger";
+			}
+			if (difference > 10000) {// 10 seconds
 				return "alert-warning";
 			}
 			return "alert-success";
@@ -228,15 +231,31 @@ new Vue({
 		ps_assign_problem(station_id) {
 			this.ps_assigning_problem = station_id;
 		},
-		ps_save_problem(station_id) {
+		async ps_save_problem(station_id) {
 			if (this.ps_assigning_problem < 0) return;
 			if (this.problem_id != null && this.problem_id >= 0) {
-				this.ps_commit_problem(station_id, this.problem_id);
+				const res = await swal({
+					title: "@lang ('i.Are you sure?')",
+					text: "@lang ('i.The Station will now have an active Problem')",
+					type: "info",
+					showCancelButton: true,
+				});
+				if (res.value == true) {
+					this.ps_commit_problem(station_id, this.problem_id);
+				} else {
+					this.ps_assigning_problem = -1;
+					this.problem_id = -1;
+				}
 			}
 		},
-		ps_cancel_problem(station_id) {
-			var res = confirm("Are you sure?");
-			if (res == true) {
+		async ps_cancel_problem(station_id) {
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.The Station will no longer have any active Problem.')",
+				type: "warning",
+				showCancelButton: true,
+			});
+			if (res.value == true) {
 				this.ps_commit_problem(station_id, -1);
 			}
 		},
@@ -259,9 +278,14 @@ new Vue({
 			this.ps_assigning_step = station_id;
 			this.ps_step_forward = forward;
 		},
-		ps_save_step(station_id) {
-			var res = confirm("Are you sure?");
-			if (res == true) {
+		async ps_save_step(station_id) {
+			const res = await swal({
+			title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.The active Problem will be forcibly moved to a the new Step.')",
+				type: "warning",
+				showCancelButton: true,
+			})
+			if (res.value == true) {
 				this.loading = true;
 				axios.post("{{ route('set station active step') }}", {
 					station_id: station_id,
@@ -277,6 +301,9 @@ new Vue({
 				}).catch(errors => {
 					this.loading = false;
 				});
+			} else {
+				this.ps_assigning_step = -1;
+				this.ps_step_forward = null;
 			}
 		},
 		fetch_data() {

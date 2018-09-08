@@ -17,7 +17,6 @@ return [
 	'The requested :instance doesn\'t exist.' => 'The requested :instance doesn\'t exist.',
 	':instance named \':name\' already exists.' => ':instance named \':name\' already exists.',
 
-
 	// step_next_step
 	'select type' => 'Select type...',
 	'abilities' => 'Abilities',
@@ -77,8 +76,13 @@ return [
 	'currently on step \'%S%\'' => 'on step \'%S%\'',
 	'problem is finished' => 'Problem is finished.',
 	'no active problem' => 'No active Problem.',
+	'no problem' => 'No Problem',
 	'cancel problem' => 'Cancel Problem',
 	'assign new problem' => 'Assign new Problem',
+	'Are you sure?' => 'Are you sure?',
+	'The Station will no longer have any active Problem.' => 'The Station will no longer have any active Problem.',
+	'The active Problem will be forcibly moved to a the new Step.' => 'The active Problem will be forcibly moved to a the new Step.',
+	'The Station will now have an active Problem' => 'The Station will now have an active Problem.',
 
 	// api set station active problem
 	'The requested station is not a ProblemStation. Invalid Request.' => 'The requested station is not a ProblemStation. Invalid Request.',
