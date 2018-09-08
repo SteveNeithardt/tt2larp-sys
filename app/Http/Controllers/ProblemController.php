@@ -153,7 +153,7 @@ class ProblemController extends Controller
 			'abilities.*.id' => 'required|integer',
 			'abilities.*.value' => 'required|integer',
 			'codes' => 'present|array',
-			'codes.*.code' => 'required|string',
+			'codes.*.code' => 'required|string|min:3|max:8',
 			'message' => 'nullable|string',
 		];
 		$request->validate($validation);

@@ -219,6 +219,7 @@ new Vue({
 		valid_edge: function() {
 			if (this.edge_source == null) return false;
 			if (this.edge_target == null) return false;
+			if (this.edge_codes.some(c => c.code.length < 3 || c.code.length > 8)) return false;
 			return true;
 		},
 		tree: function() {

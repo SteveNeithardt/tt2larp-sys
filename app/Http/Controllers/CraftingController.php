@@ -57,7 +57,7 @@ class CraftingController extends Controller
 			'ingredients' => 'nullable|array',
 			'ingredients.*.id' => 'required|integer',
 			'ingredients.*.name' => 'required|string|min:3',
-			'ingredients.*.code' => 'required|string|min:3',
+			'ingredients.*.code' => 'required|string|min:3|max:8',
 		]);
 
 		if ($validator->fails()) {
@@ -120,75 +120,4 @@ class CraftingController extends Controller
 
 		return new JsonResponse([ 'success' => true ]);
 	}
-//
-	///**
-	// * store a single Ingredient (insert/update)
-	// */
-	//public function storeIngredient(Request $request)
-	//{
-		//$validator = Validator::make($request->all(), [
-			//'ingredient_id' => 'nullable|integer',
-			//'recipe_id' => 'required|integer',
-			//'name' => 'required|string|min:3',
-			//'code' => 'required|string|min:3',
-		//]);
-//
-		//if ($validator->fails()) {
-			//return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
-		//}
-//
-		//$recipe = Recipe::find($request->recipe_id);
-		//if ($recipe === null) {
-			//return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Recipe' ]) ], 400);
-		//}
-//
-		//$ingredient = Ingredient::find($request->ingredient_id);
-		//if ($ingredient === null) {
-			//$ingredient = new Ingredient()
-			//$ingredient->name = $request->name;
-			//$ingredient->save();
-		//} else {
-			//$ingredient->name = $request->name;
-		//}
-		//$ingredient->assignCode($request->code);
-		//$ingredient->save();
-//
-		//$attached = false;
-		//foreach ($ingredient->recipes as $r) {
-			//if ($r->id === $recipe->id) {
-				//$attached = true;
-				//break;
-			//}
-		//}
-		//if ($attached === false) {
-			//$ingredient->recipes()->attach($recipe->id);
-		//}
-//
-		//return new JsonResponse([ 'success' => true ]);
-	//}
-//
-	///**
-	// * delete a single Ingredient
-	// */
-	//public function deleteIngredient(Request $request)
-	//{
-		//$validator = Validator::make($request->all(), [
-			//'ingredient_id' => 'required|integer',
-		//]);
-//
-		//if ($validator->fails()) {
-			//return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
-		//}
-//
-		//$ingredient = Ingredient::find($request->ingredient_id);
-		//if ($ingredient === null) {
-			//return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Ingredient' ]) ], 400);
-		//}
-//
-		//$ingredient->recipes()->detach();
-		//$ingredient->recipe()->dissociate();
-		//$ingredient->delete();
-//
-		//return new JsonResponse([ 'success' => true ]);
-	//}
 }

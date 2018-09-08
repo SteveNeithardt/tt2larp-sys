@@ -210,7 +210,7 @@ class StationController extends Controller
 		$validator = Validator::make($request->all(), [
 			'station_id' => 'required|integer',
 			'codes' => 'required|array',
-			'codes.*' => 'required|string|distinct|min:3',
+			'codes.*' => 'required|string',
 		]);
 
 		if ($validator->fails()) {

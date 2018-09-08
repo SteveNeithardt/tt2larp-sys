@@ -50,7 +50,7 @@ class LibraryController extends Controller
 		$request->validate([
 			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
-			'code' => 'required|string|min:3',
+			'code' => 'required|string|min:3|max:8',
 		]);
 
 		$id = $request->id;
@@ -151,7 +151,7 @@ class LibraryController extends Controller
 	{
 		$validator = Validator::make($request->all(), [
 			'codes' => 'required|array',
-			'codes.*' => 'required|string|distinct|min:3',
+			'codes.*' => 'required|string|distinct|min:3|max:8',
 		]);
 
 		if ($validator->fails()) {

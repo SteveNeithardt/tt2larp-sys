@@ -30,6 +30,7 @@
 					<input class="form-control my-2" type="text" v-model="name" placeholder="@lang ('i.name')">
 					<input class="form-control my-2" type="text" v-model="code" placeholder="@lang ('i.code')">
 					<textarea class="form-control my-2" v-model="description"></textarea>
+					<div>TODO: abilities that show the thing</div>
 					<hr>
 					<ul class="list">
 						<li v-for="ingredient in ingredients" class="d-flex justify-content-between align-items-center">

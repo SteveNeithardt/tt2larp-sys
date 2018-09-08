@@ -155,6 +155,7 @@ new Vue({
 		},
 		activity_warning(timestamp) {
 			if (timestamp == null) {
+				//complexify this for offline
 				return "alert-danger";
 			}
 			if ((new Date) - (new Date(timestamp)) > 30000) {

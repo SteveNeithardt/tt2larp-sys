@@ -78,8 +78,9 @@ new Vue({
 			);
 		},
 		valid() {
-			return (this.name != null && this.player != null &&
-				this.name.length > 3 && this.player.length > 3);
+			return (this.name != null && this.name.length > 2 &&
+				this.player != null && this.player.length > 2 &&
+				this.code != null && this.code.length > 2 && this.code.length < 9);
 		},
 	},
 	watch: {
@@ -141,6 +142,7 @@ new Vue({
 			}
 		},
 		submit() {
+			if (!valid) return;
 			axios.post("{{ route('store character') }}", {
 				id: this.id,
 				name: this.name,

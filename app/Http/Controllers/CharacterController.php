@@ -55,7 +55,7 @@ class CharacterController extends Controller
 			'name' => 'required|string|min:3',
 			'description' => 'nullable|string',
 			'player' => 'required|string|min:3',
-			'code' => 'required|string|min:3',
+			'code' => 'required|string|min:3|max:8',
 		]);
 
 		$id = $request->id;
