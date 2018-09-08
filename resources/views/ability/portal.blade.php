@@ -12,23 +12,26 @@
 		<div class="col-md-12 mb-3">
 			<h2>@lang ('i.abilities')</h2>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-6" v-if="listing_abilities" v-cloak>
 			<div class="card">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
 				<div class="card-body">
 					<ul class="list">
-						<li class="thumb" v-for="ability in filtered_abilities" v-on:click="edit(ability.id)" v-cloak>@{{ ability.name }}</li>
+						<li class="d-flex justify-content-between align-items-center" v-for="ability in filtered_abilities" v-cloak>
+							<div v-on:click="edit(ability.id)">@{{ ability.name }}</div>
+							<div class="delete-icon" v-on:click="deleteAbility(ability.id)"></div>
+						</li>
 					</ul>
 				</div>
 			</div>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-6" v-if="listing_abilities" v-cloak>
 			<span class="btn btn-primary mb-2" v-on:click="edit()" v-if="!editing" v-cloak>@lang ('i.add')</span>
 			<div class="card" v-if="editing" v-cloak>
 				<div class="card-header">@lang ('i.edit')</div>
 				<div class="card-body">
 					<input class="form-control" type="text" v-model="name">
-					<span class="btn btn-primary mt-3" v-on:click="submit()">@lang ('i.submit')</span>
+					<span class="btn btn-primary mt-3" v-on:click="submit()" v-if="valid_ability">@lang ('i.submit')</span>
 					<span class="btn btn-outline-secondary mt-3" v-on:click="reset()">@lang ('i.cancel')</span>
 				</div>
 			</div>
@@ -43,6 +46,7 @@ new Vue({
 	el: '#vue',
 	data() {
 		return {
+			listing_abilities: false,
 			abilities: {!! json_encode($abilities) !!},
 			filter_name: null,
 			editing: false,
@@ -55,8 +59,20 @@ new Vue({
 			if (this.filter_name == null) return this.abilities;
 			else return this.abilities.filter(a => a.name.indexOf(this.filter_name) > -1);
 		},
+		valid_ability() {
+			return (this.name != null &&
+				this.name.length > 2);
+		},
 	},
 	methods: {
+		fetch_abilities() {
+			if (this.editing) return;
+			this.reset();
+			axios.get("{{ route('get abilities') }}").then(response => {
+				this.abilities = response.data;
+				this.listing_abilities = true;
+			}).catch(errors => {});
+		},
 		edit(id = -1) {
 			this.reset();
 			this.editing = true;
@@ -67,6 +83,36 @@ new Vue({
 				this.name = result[0].name;
 			}
 		},
+		ability_name(id) {
+			var result = this.abilities.filter(a => a.id == id);
+			return result.length == 1 ? result[0].name : 'undefined';
+		},
+		async deleteAbility(id) {
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.ability_name(id)),
+				type: 'error',
+				showCancelButton: true,
+			});
+			if (res.value == true) {
+				axios.post("{{ route('delete ability') }}", {
+					id: id,
+				}).then(response => {
+					if (response.data.success) {
+						this.editing = false;
+						this.fetch_abilities();
+					}
+				}).catch(errors => {
+				console.log(errors);
+					swal({
+						title: errors.response.status,
+						text: errors.response.data.message,
+						type: 'error',
+						timeout: 2500,
+					});
+				});
+			}
+		},
 		reset() {
 			this.editing = false;
 			this.id = null;
@@ -74,14 +120,19 @@ new Vue({
 		},
 		submit() {
 			axios.post("{{ route('store ability') }}", {
-				name: this.name,
 				id: this.id,
+				name: this.name,
 			}).then(response => {
-				this.abilities = response.data;
-				this.reset();
+				if (response.data.success) {
+					this.editing = false;
+					this.fetch_abilities();
+				}
 			})
 			.catch(errors => {});
 		},
+	},
+	mounted() {
+		this.$nextTick(this.fetch_abilities);
 	},
 });
 </script>

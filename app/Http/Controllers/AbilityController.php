@@ -2,6 +2,8 @@
 
 namespace tt2larp\Http\Controllers;
 
+use Validator;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -34,13 +36,20 @@ class AbilityController extends Controller
 	}
 
 	/**
-	 * store a single ability (insert/update)
+	 * store a single Ability (insert/update)
 	 */
-	public function store(Request $request)
+	public function storeAbility(Request $request)
 	{
-		$id = $request->id;
+		$validator = Validator::make($request->all(), [
+			'id' => 'sometimes|integer',
+			'name' => 'required|string|min:3',
+		]);
 
-		$ability = Ability::find($id);
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$ability = Ability::find($request->id);
 
 		if ($ability === null) $ability = new Ability();
 
@@ -48,8 +57,46 @@ class AbilityController extends Controller
 
 		$ability->save();
 
-		$abilities = Ability::select('id', 'name')->orderBy('name')->get();
+		return new JsonResponse([ 'success' => true ]);
+	}
 
-		return $this->getList();
+	/**
+	 * delete a single Ability
+	 */
+	public function deleteAbility(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'id' => 'required|integer',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$ability = Ability::find($request->id);
+
+		if ($ability === null) {
+			return new JsonResponse([ 'success' => true, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Ability' ]) ], 400);
+		}
+
+		if ($ability->characters()->exists()) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.Ability has :instances attached to it.', [ 'instances' => 'Characters' ]) ], 422);
+		}
+
+		if ($ability->stepNextSteps()->exists()) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.Ability has :instances attached to it.', [ 'instances' => 'StepNextSteps' ]) ], 422);
+		}
+
+		if ($ability->recipes()->exists()) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.Ability has :instances attached to it.', [ 'instances' => 'Recipes' ]) ], 422);
+		}
+
+		if ($ability->parts()->exists()) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.Ability has :instances attached to it.', [ 'instances' => 'Parts' ]) ], 422);
+		}
+
+		$ability->delete();
+
+		return new JsonResponse([ 'success' => true ]);
 	}
 }

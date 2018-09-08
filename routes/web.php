@@ -21,7 +21,8 @@ Route::group([ 'middleware' => 'auth' ], function() {
 
 	Route::get('/ability', 'AbilityController@portal')->name('ability portal');
 	Route::get('/ability/list', 'AbilityController@getList')->name('get abilities');
-	Route::post('/ability/store', 'AbilityController@store')->name('store ability');
+	Route::post('/ability/store', 'AbilityController@storeAbility')->name('store ability');
+	Route::post('/ability/delete', 'AbilityController@deleteAbility')->name('delete ability');
 
 	Route::get('/character', 'CharacterController@portal')->name('character portal');
 	Route::get('/character/list', 'CharacterController@getList')->name('get characters');
@@ -41,6 +42,7 @@ Route::group([ 'middleware' => 'auth' ], function() {
 	Route::post('/library/store', 'LibraryController@store')->name('store article');
 	Route::get('/library/{article_id}/list', 'LibraryController@getPartList')->name('get parts');
 	Route::post('/library/{article_id}/part/store', 'LibraryController@storePart')->name('store part');
+	Route::post('/library/{article_id}/part/delete', 'LibraryController@deletePart')->name('delete part');
 
 	Route::get('/station', 'StationController@portal')->name('station portal');
 	Route::get('/station/list', 'StationController@getList')->name('get stations');

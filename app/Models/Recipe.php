@@ -37,6 +37,14 @@ class Recipe extends Model
 	}
 
 	/**
+	 * Abilities this Recipe needs
+	 */
+	public function abilities()
+	{
+		return $this->belongsToMany(Ability::class, 'recipe_abilities', 'recipe_id', 'ability_id');
+	}
+
+	/**
 	 * Ingredients this Recipe uses
 	 */
 	public function ingredients()

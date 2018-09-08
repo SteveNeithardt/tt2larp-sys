@@ -23,6 +23,9 @@ return [
 	'ability type' => 'ability',
 	'code type' => 'code',
 
+	// abilities
+	'Ability has :instances attached to it.' => 'Ability has :instances attached to it.',
+
 	// characters
 	'characters' => 'Characters',
 	'search' => 'Search...',
@@ -55,6 +58,9 @@ return [
 	'add part' => 'Add part',
 	'save part' => 'Save part',
 	'no ability' => 'No Ability',
+
+	'This will delete \'%P%\' permanently.' => 'This will delete \'%P%\' permanently.',
+	'AbilityId can\'t be null when min value is set.' => 'AbilityId can\'t be null when min value is set.',
 
 	// api get article
 	'More than one article present in input array.' => 'More than one article present in input array.',

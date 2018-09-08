@@ -15,4 +15,12 @@ class Part extends Model
 	{
 		return $this->belongsTo(Article::class, 'article_id', 'id');
 	}
+
+	/**
+	 * Ability this Part needs
+	 */
+	public function ability()
+	{
+		return $this->belongsTo(Ability::class, 'ability_id', 'id');
+	}
 }

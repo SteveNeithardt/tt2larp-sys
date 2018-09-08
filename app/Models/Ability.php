@@ -17,6 +17,30 @@ class Ability extends Model
 	}
 
 	/**
+	 * All StepNextSteps that have this ability
+	 */
+	public function stepNextSteps()
+	{
+		return $this->belongsToMany(StepNextStep::class, 'step_next_step_abilities', 'ability_id', 'step_next_step_id')->withPivot('value');
+	}
+
+	/**
+	 * All Recipes that need this ability
+	 */
+	public function recipes()
+	{
+		return $this->belongsToMany(Recipe::class, 'recipe_abilities', 'ability_id', 'recipe_id');
+	}
+
+	/**
+	 * All Parts that refer to this ability
+	 */
+	public function parts()
+	{
+		return $this->hasMany(Part::class, 'ability_id', 'id');
+	}
+
+	/**
 	 * Collapse an array of Characters into their cumulative sum of abilities
 	 *
 	 * @param  array of Character

@@ -270,8 +270,24 @@ new Vue({
 				})
 				.catch(errors => {});
 		},
-		deletePart() {
-			alert("TODO");
+		async deletePart() {
+			if (!this.can_delete_part) return;
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.part_name),
+				type: 'warning',
+				showCancelButton: true,
+			});
+			if (res.value == true) {
+				const url = "{{ route('delete part', ['article_id' => '%R%']) }}";
+				axios.post(url.replace('%R%', this.article_id), {
+					id: this.part_id,
+				}).then(response => {
+					if (response.data.success) {
+						this.fetch_parts();
+					}
+				}).catch(errors => {});
+			}
 		},
 		fetch_data: function() {
 			this.fetch_articles();

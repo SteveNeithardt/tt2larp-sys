@@ -83,7 +83,9 @@ class LibraryController extends Controller
 	public function getPartList($article_id)
 	{
 		$article = Article::find($article_id);
-		if ($article === null) abort(400, "Article $article_id doesn't exist.");
+		if ($article === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Article' ]) ], 400);
+		}
 
 		$parts = $article->parts;
 
@@ -104,7 +106,9 @@ class LibraryController extends Controller
 		]);
 
 		$article = Article::find($article_id);
-		if ($article === null) abort(400, "Article $article_id doesn't exist.");
+		if ($article === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Article' ]) ], 400);
+		}
 
 		$part_id = $request->id;
 		$part = Part::find($part_id);
@@ -120,16 +124,43 @@ class LibraryController extends Controller
 
 		if ($ability_id !== null && $min_value !== null) {
 			$ability = Ability::find($ability_id);
-			if ($ability === null) abort(422, "AbilityId can't be null when min value is set.");
+			if ($ability === null) {
+				return new JsonResponse([ 'success' => false, 'message' => __('i.AbilityId can\'t be null when min value is set.') ], 422);
+			}
 
-			$min_value = min(3, max(0, (int)$min_value));
-			$part->ability_id = $ability->id;
+			$min_value = max(0, (int)$min_value);
+			$part->ability()->associate($ability);
 			$part->min_value = $min_value;
 		} else {
 			$part->ability_id = null;
 			$part->min_value = null;
 		}
 		$part->save();
+
+		return new JsonResponse([ 'success' => true ]);
+	}
+
+	/**
+	 * delete a single Part
+	 */
+	public function deletePart(Request $request, $article_id)
+	{
+		$request->validate([
+			'id' => 'required|integer',
+		]);
+
+		$article = Article::find($article_id);
+		if ($article === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Article' ]) ], 400);
+		}
+
+		$part_id = $request->id;
+		$part = Part::find($part_id);
+		if ($part === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Part' ]) ], 400);
+		}
+
+		$part->delete();
 
 		return new JsonResponse([ 'success' => true ]);
 	}
