@@ -41,7 +41,8 @@ Route::group([ 'middleware' => 'auth' ], function() {
 
 	Route::get('/library', 'LibraryController@portal')->name('library portal');
 	Route::get('/library/list', 'LibraryController@getList')->name('get articles');
-	Route::post('/library/store', 'LibraryController@store')->name('store article');
+	Route::post('/library/store', 'LibraryController@storeArticle')->name('store article');
+	Route::post('/library/delete', 'LibraryController@deleteArticle')->name('delete article');
 	Route::get('/library/{article_id}/list', 'LibraryController@getPartList')->name('get parts');
 	Route::post('/library/{article_id}/part/store', 'LibraryController@storePart')->name('store part');
 	Route::post('/library/{article_id}/part/delete', 'LibraryController@deletePart')->name('delete part');

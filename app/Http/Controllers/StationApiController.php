@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 use tt2larp\Models\Ability;
+use tt2larp\Models\Article;
 use tt2larp\Models\Code;
 use tt2larp\Models\Character;
 use tt2larp\Models\LibraryStation;
@@ -108,7 +109,7 @@ class StationApiController extends Controller
 				'success' => true,
 				'messages' => [ $step->description ],
 				'keep' => false,
-			);
+			]);
 		}
 
 		// from all codes sent through the api
@@ -157,7 +158,7 @@ class StationApiController extends Controller
 		if ($successfulNextStep === null) {
 			return new JsonResponse([
 				'success' => true,
-				'messages' => $failure_messages
+				'messages' => $failure_messages,
 				'keep' => ($character === null ? true : false),
 			]);
 		}

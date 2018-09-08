@@ -10,7 +10,11 @@
 <div class="container" id="vue">
 	<div class="row justify-content-center">
 		<div class="col-md-12 mb-3">
-			<h2>@lang ('i.library')</h2>
+			<h2 class="d-flex align-items-center">
+				@lang ('i.library')
+				<div class="delete-icon ml-2" v-if="listing_articles && !deleting_articles && !editing_article" v-on:click="delete_articles(true)" v-cloak></div>
+				<div class="cancel-icon ml-2" v-if="listing_articles && deleting_articles" v-on:click="delete_articles(false)" v-cloak></div>
+			</h2>
 			<span class="btn btn-outline-secondary my-3" v-on:click="back()" v-if="editing_article" v-cloak>@lang ('i.back')</span>
 		</div>
 		<div class="col-md-8" v-if="listing_articles" v-cloak>
@@ -27,7 +31,10 @@
 						</div>
 					</div>
 					<ul class="list">
-						<li class="thumb" v-for="article in filtered_articles" v-on:click="editArticle(article.id)">@{{ article.name }} (@{{ article.code }})</li>
+						<li class="d-flex align-items-center" v-for="article in filtered_articles">
+							<div class="flex-grow-1 thumb" v-on:click="editArticle(article.id)">@{{ article.name }} (@{{ article.code }})</div>
+							<div class="delete-icon" v-on:click="deleteArticle(article.id)" v-if="deleting_articles"></div>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -87,10 +94,11 @@ new Vue({
 	el: '#vue',
 	data() {
 		return {
-			listing_articles: false,
 			articles: null,
+			listing_articles: false,
 			filter_name: null,
 
+			deleting_articles: false,
 			adding_article: false,
 			editing_article: false,
 			article_id: null,
@@ -178,6 +186,10 @@ new Vue({
 				})
 				.catch(errors => {});
 		},
+		delete_articles(active) {
+			if (this.editing_article) return;
+			this.deleting_articles = active;
+		},
 		resetArticle() {
 			this.adding_article = false;
 			this.editing_article = false;
@@ -250,6 +262,30 @@ new Vue({
 					}
 				})
 				.catch(errors => {});
+		},
+		get_article_name(id) {
+			var result = this.articles.filter(a => a.id == id);
+			return result.length == 1 ? result[0].name : 'undefined';
+		},
+		async deleteArticle(id) {
+			if (!this.deleting_articles) return;
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.get_article_name(id)),
+				type: 'error',
+				showCancelButton: true,
+			});
+			this.deleting_articles = false;
+			if (res.value == true) {
+				axios.post("{{ route('delete article') }}", {
+					id: id,
+				}).then(response => {
+					if (response.data.success) {
+						this.fetch_articles();
+					}
+				}).catch(errors => {
+				});
+			}
 		},
 		storePart() {
 			if (!this.valid_part) return;

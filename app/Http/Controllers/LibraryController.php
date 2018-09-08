@@ -45,7 +45,7 @@ class LibraryController extends Controller
 	/**
 	 * store a single article (insert/update)
 	 */
-	public function store(Request $request)
+	public function storeArticle(Request $request)
 	{
 		$validator = Validator::make($request->all(), [
 			'id' => 'nullable|integer',
@@ -79,6 +79,26 @@ class LibraryController extends Controller
 		}
 
 		return new JsonResponse(['success' => true ]);
+	}
+
+	/**
+	 * Delete a single Article
+	 */
+	public function deleteArticle(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'id' => 'required|integer',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$article = Article::find($request->id);
+
+		$article->delete();
+
+		return new JsonResponse([ 'success' => true ]);
 	}
 
 	/**
