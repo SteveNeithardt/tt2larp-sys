@@ -2,6 +2,8 @@
 
 namespace tt2larp\Http\Controllers;
 
+use Validator;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -48,9 +50,9 @@ class CharacterController extends Controller
 	/**
 	 * store a single character (insert/update)
 	 */
-	public function store(Request $request)
+	public function storeCharacter(Request $request)
 	{
-		$request->validate([
+		$validator = Validator::make($request->all(), [
 			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
 			'description' => 'nullable|string',
@@ -58,9 +60,11 @@ class CharacterController extends Controller
 			'code' => 'required|string|min:3|max:8',
 		]);
 
-		$id = $request->id;
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
 
-		$character = Character::find($id);
+		$character = Character::find($request->id);
 
 		if ($character === null) $character = new Character();
 
@@ -92,5 +96,25 @@ class CharacterController extends Controller
 		}
 
 		return $this->getList();
+	}
+
+	/**
+	 * delete a single Character
+	 */
+	public function deleteCharacter(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'id' => 'required|integer',
+		]);
+
+		if ($validator->fails()) {
+			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
+		}
+
+		$character = Character::find($request->id);
+
+		$character->delete();
+
+		return new JsonResponse([ 'success' => true ]);
 	}
 }

@@ -10,14 +10,21 @@
 <div class="container" id="vue">
 	<div class="row justify-content-center">
 		<div class="col-md-12 mb-3">
-			<h2>@lang ('i.characters')</h2>
+			<h2 class="d-flex align-items-center">
+				@lang ('i.characters')
+				<div class="delete-icon ml-2" v-if="!deleting_characters && !editing" v-on:click="delete_characters(true)" v-cloak></div>
+				<div class="cancel-icon ml-2" v-if="deleting_characters" v-on:click="delete_characters(false)" v-cloak></div>
+			</h2>
 		</div>
 		<div class="col-md-6">
-			<div class="card">
+			<div class="card" v-cloak>
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
 				<div class="card-body">
 					<ul class="list">
-						<li class="thumb" v-for="character in filtered_characters" v-on:click="editCharacter(character.id)" v-cloak>@{{ character.name }} (@{{ character.code }})</li>
+						<li class="d-flex align-items-center" v-for="character in filtered_characters">
+							<div class="flex-grow-1 thumb" v-on:click="editCharacter(character.id)">@{{ character.name }} (@{{ character.code }})</div>
+							<div class="delete-icon" v-on:click="deleteCharacter(character.id)" v-if="deleting_characters"></div>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -43,7 +50,7 @@
 							</div>
 						</div>
 					</div>
-					<span v-if="valid" class="btn btn-primary mt-3" v-on:click="submit()" v-cloak>@lang ('i.submit')</span>
+					<span v-if="valid_character" class="btn btn-primary mt-3" v-on:click="submit()" v-cloak>@lang ('i.submit')</span>
 					<span class="btn btn-outline-secondary mt-3" v-on:click="resetCharacter()">@lang ('i.cancel')</span>
 				</div>
 			</div>
@@ -67,6 +74,7 @@ new Vue({
 			player: null,
 			abilities: null,
 			description: null,
+			deleting_characters: false,
 		}
 	},
 	computed: {
@@ -77,7 +85,7 @@ new Vue({
 				(c.code != null && c.code.indexOf(this.filter_name) > -1)
 			);
 		},
-		valid() {
+		valid_character() {
 			return (this.name != null && this.name.length > 2 &&
 				this.player != null && this.player.length > 2 &&
 				this.code != null && this.code.length > 2 && this.code.length < 9);
@@ -94,6 +102,7 @@ new Vue({
 			this.fetch_abilities();
 		},
 		fetch_characters() {
+			this.resetCharacter();
 			axios.get("{{ route('get characters') }}")
 				.then(response => {
 					this.characters = response.data;
@@ -106,6 +115,10 @@ new Vue({
 					this.abilities = response.data;
 				})
 				.catch(errors => {});
+		},
+		delete_characters(active) {
+			if (this.editing) return;
+			this.deleting_characters = active;
 		},
 		resetCharacter() {
 			this.editing = false;
@@ -142,7 +155,7 @@ new Vue({
 			}
 		},
 		submit() {
-			if (!valid) return;
+			if (!this.valid_character) return;
 			axios.post("{{ route('store character') }}", {
 				id: this.id,
 				name: this.name,
@@ -154,6 +167,29 @@ new Vue({
 				this.characters = response.data;
 				this.resetCharacter();
 			}).catch(errors => {});
+		},
+		character_name(id) {
+			var result = this.characters.filter(c => c.id == id);
+			return result.length == 1 ? result[0].name : 'undefined';
+		},
+		async deleteCharacter(id) {
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.character_name(id)),
+				type: 'error',
+				showCancelButton: true,
+			});
+			this.deleting_characters = false;
+			if (res.value == true) {
+				axios.post("{{ route('delete character') }}", {
+					id: id,
+				}).then(response => {
+					if (response.data.success) {
+						this.fetch_characters();
+					}
+				}).catch(errors => {
+				});
+			}
 		},
 	},
 	mounted() {

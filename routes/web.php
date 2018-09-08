@@ -26,7 +26,8 @@ Route::group([ 'middleware' => 'auth' ], function() {
 
 	Route::get('/character', 'CharacterController@portal')->name('character portal');
 	Route::get('/character/list', 'CharacterController@getList')->name('get characters');
-	Route::post('/character/store', 'CharacterController@store')->name('store character');
+	Route::post('/character/store', 'CharacterController@storeCharacter')->name('store character');
+	Route::post('/character/delete', 'CharacterController@deleteCharacter')->name('delete character');
 
 	Route::get('/problem', 'ProblemController@portal')->name('problem portal');
 	Route::get('/problem/list', 'ProblemController@getList')->name('get problems');

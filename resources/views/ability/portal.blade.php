@@ -10,7 +10,11 @@
 <div class="container" id="vue">
 	<div class="row justify-content-center">
 		<div class="col-md-12 mb-3">
-			<h2>@lang ('i.abilities')</h2>
+			<h2 class="d-flex align-items-center">
+				@lang ('i.abilities')
+				<div class="delete-icon ml-2" v-if="!deleting_abilities && !editing" v-on:click="delete_abilities(true)" v-cloak></div>
+				<div class="cancel-icon ml-2" v-if="deleting_abilities" v-on:click="delete_abilities(false)" v-cloak></div>
+			</h2>
 		</div>
 		<div class="col-md-6" v-if="listing_abilities" v-cloak>
 			<div class="card">
@@ -18,8 +22,8 @@
 				<div class="card-body">
 					<ul class="list">
 						<li class="d-flex justify-content-between align-items-center" v-for="ability in filtered_abilities" v-cloak>
-							<div v-on:click="edit(ability.id)">@{{ ability.name }}</div>
-							<div class="delete-icon" v-on:click="deleteAbility(ability.id)"></div>
+							<div class="flex-grow-1 thumb" v-on:click="edit(ability.id)">@{{ ability.name }}</div>
+							<div class="delete-icon" v-on:click="deleteAbility(ability.id)" v-if="deleting_abilities"></div>
 						</li>
 					</ul>
 				</div>
@@ -47,11 +51,12 @@ new Vue({
 	data() {
 		return {
 			listing_abilities: false,
-			abilities: {!! json_encode($abilities) !!},
+			abilities: null,
 			filter_name: null,
 			editing: false,
 			id: null,
 			name: null,
+			deleting_abilities: false,
 		}
 	},
 	computed: {
@@ -72,6 +77,10 @@ new Vue({
 				this.abilities = response.data;
 				this.listing_abilities = true;
 			}).catch(errors => {});
+		},
+		delete_abilities(active) {
+			if (this.editing) return;
+			this.deleting_abilities = active;
 		},
 		edit(id = -1) {
 			this.reset();

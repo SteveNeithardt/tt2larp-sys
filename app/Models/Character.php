@@ -13,6 +13,19 @@ class Character extends Model
 	protected $table = 'characters';
 
 	/**
+	 * upon boot, declare what happens on delete
+	 */
+	protected static function boot()
+	{
+		parent::boot();
+
+		static::deleting(function ($character) {
+			$character->codes()->delete();
+			$character->abilities()->detach();
+		});
+	}
+
+	/**
 	 * All abilities a character has
 	 */
 	public function abilities()
