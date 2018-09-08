@@ -121,6 +121,7 @@ new Vue({
 			this.deleting_characters = active;
 		},
 		resetCharacter() {
+			this.deleting_characters = false;
 			this.editing = false;
 			this.id = null;
 			this.name = null;

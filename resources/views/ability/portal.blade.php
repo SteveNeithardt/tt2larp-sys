@@ -36,7 +36,7 @@
 				<div class="card-body">
 					<input class="form-control" type="text" v-model="name">
 					<span class="btn btn-primary mt-3" v-on:click="submit()" v-if="valid_ability">@lang ('i.submit')</span>
-					<span class="btn btn-outline-secondary mt-3" v-on:click="reset()">@lang ('i.cancel')</span>
+					<span class="btn btn-outline-secondary mt-3" v-on:click="resetAbility()">@lang ('i.cancel')</span>
 				</div>
 			</div>
 		</div>
@@ -72,7 +72,7 @@ new Vue({
 	methods: {
 		fetch_abilities() {
 			if (this.editing) return;
-			this.reset();
+			this.resetAbility();
 			axios.get("{{ route('get abilities') }}").then(response => {
 				this.abilities = response.data;
 				this.listing_abilities = true;
@@ -83,7 +83,7 @@ new Vue({
 			this.deleting_abilities = active;
 		},
 		edit(id = -1) {
-			this.reset();
+			this.resetAbility();
 			this.editing = true;
 			if (id == -1) return;
 			var result = this.abilities.filter(a => a.id == id);
@@ -122,7 +122,8 @@ new Vue({
 				});
 			}
 		},
-		reset() {
+		resetAbility() {
+			this.deleting_abilities = false;
 			this.editing = false;
 			this.id = null;
 			this.name = null;

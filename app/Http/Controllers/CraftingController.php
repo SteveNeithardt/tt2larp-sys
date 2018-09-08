@@ -7,6 +7,7 @@ use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use tt2larp\Models\Ability;
 use tt2larp\Models\Ingredient;
 use tt2larp\Models\Recipe;
 
@@ -27,6 +28,8 @@ class CraftingController extends Controller
 	{
 		$recipes = Recipe::select('id', 'name', 'description')->with(['ingredients' => function ($q) {
 			$q->select('id', 'name');
+		}, 'abilities' => function ($q) {
+			$q->select('id', 'name');
 		}])->get();
 
 		foreach ($recipes as $recipe) {
@@ -35,6 +38,10 @@ class CraftingController extends Controller
 				$ingredient->code = $code === null ? null : $code->code;
 				unset($ingredient->codes);
 				unset($ingredient->pivot);
+			}
+			foreach ($recipe->abilities as $ability) {
+				$ability->value = $ability->pivot->value;
+				unset($ability->pivot);
 			}
 			$code = $recipe->codes->first();
 			$recipe->code = $code === null ? null : $code->code;
@@ -58,12 +65,16 @@ class CraftingController extends Controller
 			'ingredients.*.id' => 'required|integer',
 			'ingredients.*.name' => 'required|string|min:3',
 			'ingredients.*.code' => 'required|string|min:3|max:8',
+			'abilities' => 'nullable|array',
+			'abilities.*.id' => 'required|integer',
+			'abilities.*.value' => 'required|integer',
 		]);
 
 		if ($validator->fails()) {
 			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
 		}
 
+		// recipe update
 		$recipe = Recipe::find($request->recipe_id);
 		if ($recipe === null) {
 			$recipe = new Recipe();
@@ -77,8 +88,19 @@ class CraftingController extends Controller
 		$recipe->assignCode($request->code);
 		$recipe->save();
 
-		//$ingredients = Ingredient::findMany(collect($request->ingredients)->map(function ($i) { return $i['id']; }));
-		//dump($ingredients);
+		// manage abilities
+		$collected = collect($request->abilities);
+		$abilities = Ability::findMany($collected->map(function ($a) { return $a['id']; }));
+		$valid_ids = $abilities->map(function ($a) { return $a->id; });
+
+		$reduced = $collected->filter(function ($a) use ($valid_ids) {
+			return $valid_ids->contains($a['id']);
+		})->mapWithKeys(function ($a) {
+			return [ $a['id'] => [ 'value' => $a['value'] ] ];
+		});
+		$recipe->abilities()->sync($reduced);
+
+		// manage ingredients
 		$ingredient_ids = [];
 		foreach ($request->ingredients as $ing) {
 			$ingredient = Ingredient::find($ing['id']);
@@ -104,14 +126,14 @@ class CraftingController extends Controller
 	public function deleteRecipe(Request $request)
 	{
 		$validator = Validator::make($request->all(), [
-			'recipe_id' => 'required|integer',
+			'id' => 'required|integer',
 		]);
 
 		if ($validator->fails()) {
 			return new JsonResponse([ 'success' => false, 'errors' => $validator->errors() ], 422);
 		}
 
-		$recipe = Recipe::find($request->recipe_id);
+		$recipe = Recipe::find($request->id);
 		if ($recipe === null) {
 			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Recipe' ]) ], 400);
 		}

@@ -191,6 +191,7 @@ new Vue({
 			this.deleting_articles = active;
 		},
 		resetArticle() {
+			this.deleting_articles = false;
 			this.adding_article = false;
 			this.editing_article = false;
 			this.article_id = null;

@@ -186,14 +186,14 @@ new Vue({
 		},
 	},
 	computed: {
-		filtered_problems: function() {
+		filtered_problems() {
 			if (this.filter_name == null) return this.problems;
 			else return this.problems.filter(a => a.name.indexOf(this.filter_name) > -1);
 		},
-		valid_problem: function() {
+		valid_problem() {
 			return (this.problem_name != null && this.problem_name.length > 2);
 		},
-		valid_step: function() {
+		valid_step() {
 			return (this.step_name != null &&
 				this.step_name.length > 2 &&
 				this.step_description != null &&
@@ -215,27 +215,27 @@ new Vue({
 
 			return true;
 		},
-		edge_source: function() {
+		edge_source() {
 			if (this.edge_source_id != null) {
 				var result = this.steps.filter(s => s.id == this.edge_source_id);
 				if (result.length == 1) return result[0].name;
 			}
 			return null;
 		},
-		edge_target: function() {
+		edge_target() {
 			if (this.edge_target_id != null) {
 				var result = this.steps.filter(s => s.id == this.edge_target_id);
 				if (result.length == 1) return result[0].name;
 			}
 			return null;
 		},
-		valid_edge: function() {
+		valid_edge() {
 			if (this.edge_source == null) return false;
 			if (this.edge_target == null) return false;
 			if (this.edge_codes.some(c => c.code.length < 3 || c.code.length > 8)) return false;
 			return true;
 		},
-		tree: function() {
+		tree() {
 			var _this = this;
 			var nodes = this.steps.map(s => {
 				if (s.first_step == 1) return { id: s.id, label: s.name, color: { background: 'lightgreen', highlight: { background: 'lightgreen' } } };
@@ -259,7 +259,7 @@ new Vue({
 		},
 	},
 	methods: {
-		fetch_problems: function() {
+		fetch_problems() {
 			this.resetProblem();
 			axios.get("{{ route('get problems') }}")
 				.then(response => {
@@ -268,7 +268,7 @@ new Vue({
 				})
 				.catch(errors => {});
 		},
-		fetch_abilities: function() {
+		fetch_abilities() {
 			axios.get("{{ route('get abilities') }}")
 				.then(response => {
 					this.abilities = response.data.map(a => {
@@ -277,7 +277,7 @@ new Vue({
 				})
 				.catch(errors => {});
 		},
-		fetch_steps: function() {
+		fetch_steps() {
 			if (this.problem_id == null) return;
 			this.resetStep();
 			this.resetEdge();
@@ -294,7 +294,8 @@ new Vue({
 			if (this.editing_problem) return;
 			this.deleting_problems = active;
 		},
-		resetProblem: function() {
+		resetProblem() {
+			this.deleting_problems = false;
 			this.adding_problem = false;
 			this.editing_problem = false;
 			this.vis_destroy();
@@ -382,7 +383,7 @@ new Vue({
 				this.editing_edge = true;
 			}
 		},
-		storeProblem: function(fetch = true) {
+		storeProblem(fetch = true) {
 			if (!this.valid_problem) return;
 			axios.post("{{ route('store problem') }}", {
 					id: this.problem_id,
@@ -425,7 +426,7 @@ new Vue({
 				});
 			}
 		},
-		storeStep: function() {
+		storeStep() {
 			if (!this.valid_step) return;
 
 			const url = "{{ route('store node', ['problem_id' => '%R%']) }}";
@@ -441,23 +442,30 @@ new Vue({
 				})
 				.catch(errors => {});
 		},
-		deleteStep() {
+		async deleteStep() {
 			if (!this.can_delete_step) return;
 
-			alert("TODO warning alerts");
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.step_name),
+				type: 'error',
+				showCancelButton: true,
+			});
 
-			const url = "{{ route('delete node', ['problem_id' => '%R%']) }}";
-			axios.post(url.replace('%R%', this.problem_id), {
-					step_id: this.step_id,
-				})
-				.then(response => {
-					if (response.data.success) {
-						this.fetch_steps();
-					}
-				})
-				.catch(errors => {});
+			if (res.value == true) {
+				const url = "{{ route('delete node', ['problem_id' => '%R%']) }}";
+				axios.post(url.replace('%R%', this.problem_id), {
+						step_id: this.step_id,
+					})
+					.then(response => {
+						if (response.data.success) {
+							this.fetch_steps();
+						}
+					})
+					.catch(errors => {});
+			}
 		},
-		storeEdge: function() {
+		storeEdge() {
 			if (!this.valid_edge) return;
 
 			const url = "{{ route('store edge', ['problem_id' => '%R%']) }}";
@@ -482,23 +490,30 @@ new Vue({
 		deleteEdgeAbility(ability_id) {
 			this.edge_abilities = this.edge_abilities.filter(a => a.id != ability_id);
 		},
-		deleteEdge() {
+		async deleteEdge() {
 			if (!this.can_delete_edge) return;
 
-			alert("TODO warning alerts");
+			const res = await swal({
+				title: "@lang ('i.Are you sure?')",
+				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.get_problem_name(id)),
+				type: 'error',
+				showCancelButton: true,
+			});
 
-			const url = "{{ route('delete edge', ['problem_id' => '%R%']) }}";
-			axios.post(url.replace('%R%', this.problem_id), {
-					edge_id: this.edge_id,
-				})
-				.then(response => {
-					if (response.data.success) {
-						this.fetch_steps();
-					}
-				})
-				.catch(errors => {});
+			if (res.value == true) {
+				const url = "{{ route('delete edge', ['problem_id' => '%R%']) }}";
+				axios.post(url.replace('%R%', this.problem_id), {
+						edge_id: this.edge_id,
+					})
+					.then(response => {
+						if (response.data.success) {
+							this.fetch_steps();
+						}
+					})
+					.catch(errors => {});
+			}
 		},
-		back: function() {
+		back() {
 			if (this.editing_problem) {
 				this.resetProblem();
 				this.listing_problems = true;
@@ -512,13 +527,13 @@ new Vue({
 			}
 			return 'N/A';
 		},
-		vis_destroy: function() {
+		vis_destroy() {
 			if (this.$options.vis.instance != null) {
 				this.$options.vis.instance.destroy();
 				this.$options.vis.instance = null;
 			}
 		},
-		vis_make: function() {
+		vis_make() {
 			var _this = this;
 			this.$options.vis.instance = new vis.Network(document.getElementById('vis'), this.tree, this.$options.vis.options);
 			this.$options.vis.instance.on('select', function(params) {
@@ -543,7 +558,7 @@ new Vue({
 				_this.$options.vis.instance.setOptions({ nodes: { physics: false } });
 			});
 		},
-		fetch_data: function() {
+		fetch_data() {
 			this.fetch_problems();
 			this.fetch_abilities();
 		},
