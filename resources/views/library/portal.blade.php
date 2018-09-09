@@ -128,8 +128,8 @@ new Vue({
 			return (this.article_name != null &&
 				this.article_name.length > 2 &&
 				this.article_code != null &&
-				this.article_code.length > 2 &&
-				this.article_code.length < 9);
+				this.article_code.length > 2)
+				//&& this.article_code.length < 9);
 		},
 		valid_part() {
 			return (

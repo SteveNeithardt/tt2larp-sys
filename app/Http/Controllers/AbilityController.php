@@ -41,7 +41,7 @@ class AbilityController extends Controller
 	public function storeAbility(Request $request)
 	{
 		$validator = Validator::make($request->all(), [
-			'id' => 'sometimes|integer',
+			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
 		]);
 

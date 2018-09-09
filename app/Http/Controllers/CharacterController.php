@@ -28,7 +28,7 @@ class CharacterController extends Controller
 	{
 		$characters = Character::select('id', 'name', 'player', 'description')->with(['abilities'=>function($q) {
 			$q->select('id', 'name');
-		}])->with('codes')->get();
+		}])->with('codes')->orderBy('name')->get();
 
 		foreach ($characters as $character) {
 			foreach ($character->abilities as $ability) {
