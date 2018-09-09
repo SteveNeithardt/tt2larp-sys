@@ -6,6 +6,7 @@
 #vis {
 height:400px;
 border: 1px solid #bbb;
+background: #000;
 }
 </style>
 <link href="{{ asset('css/vis.css') }}" rel="stylsheet" type="text/css">
@@ -173,6 +174,24 @@ new Vue({
 					type: "dynamic",
 					roundness: 0.7,
 				},
+				font: {
+					color: '#FFFFFF',
+					background: '#003200',
+					strokeWidth: 0,
+				},
+			},
+			nodes: {
+				color: {
+					border: '#00BC20',
+					background: '#006400',
+					highlight: {
+						border: '#00CC28',
+						background: '#007200',
+					},
+				},
+				font: {
+					color: '#FFFFFF',
+				},
 			},
 			physics: {
 				solver: "repulsion",
@@ -238,7 +257,7 @@ new Vue({
 		tree() {
 			var _this = this;
 			var nodes = this.steps.map(s => {
-				if (s.first_step == 1) return { id: s.id, label: s.name, color: { background: 'lightgreen', highlight: { background: 'lightgreen' } } };
+				if (s.first_step == 1) return { id: s.id, label: s.name, color: { background: '#002000', highlight: { background: '#002000' } } };
 				return { id: s.id, label: s.name };
 			});
 			var edges = this.edges.map(e => {
@@ -413,6 +432,7 @@ new Vue({
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.get_problem_name(id)),
 				type: 'error',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 			this.deleting_problems = false;
 			if (res.value == true) {
@@ -450,6 +470,7 @@ new Vue({
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.step_name),
 				type: 'error',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 
 			if (res.value == true) {
@@ -498,6 +519,7 @@ new Vue({
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.get_problem_name(id)),
 				type: 'error',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 
 			if (res.value == true) {

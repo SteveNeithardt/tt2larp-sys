@@ -180,6 +180,7 @@ new Vue({
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.character_name(id)),
 				type: 'error',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 			this.deleting_characters = false;
 			if (res.value == true) {

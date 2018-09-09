@@ -246,6 +246,7 @@ new Vue({
 					text: "@lang ('i.The Station will now have an active Problem')",
 					type: "info",
 					showCancelButton: true,
+					focusCancel: true,
 				});
 				if (res.value == true) {
 					this.ps_commit_problem(station_id, this.problem_id);
@@ -261,6 +262,7 @@ new Vue({
 				text: "@lang ('i.The Station will no longer have any active Problem.')",
 				type: "warning",
 				showCancelButton: true,
+				focusCancel: true,
 			});
 			if (res.value == true) {
 				this.ps_commit_problem(station_id, -1);
@@ -291,6 +293,7 @@ new Vue({
 				text: "@lang ('i.The active Problem will be forcibly moved to a the new Step.')",
 				type: "warning",
 				showCancelButton: true,
+				focusCancel: true,
 			})
 			if (res.value == true) {
 				this.loading = true;

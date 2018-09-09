@@ -102,6 +102,7 @@ new Vue({
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.ability_name(id)),
 				type: 'error',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 			if (res.value == true) {
 				axios.post("{{ route('delete ability') }}", {

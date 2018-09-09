@@ -1,23 +1,74 @@
-
-// Body
-$body-bg: #f8fafc;
-
 // Typography
 $font-family-sans-serif: "Arial", sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
 
 // Colors
-$blue: #3490dc;
-$indigo: #6574cd;
-$purple: #9561e2;
-$pink: #f66D9b;
-$red: #e3342f;
-$orange: #f6993f;
-$yellow: #ffed4a;
-$green: #38c172;
-$teal: #4dc0b5;
-$cyan: #6cb2eb;
+$white:    #fff !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #6c757d !default;
+$gray-700: #495057 !default;
+$gray-800: #343a40 !default;
+$gray-900: #212529 !default;
+$black:    #000 !default;
 
-$list-color-light: #fafafa;
-$list-color-dark: #f0fafa;
+$blue:    #007bff !default;
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #e83e8c !default;
+$red:     #A82020;
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default;
+$green:   #28a745 !default;
+$teal:    #20c997 !default;
+$cyan:    #17a2b8 !default;
+
+$orange: #FF5500;
+$electricgreen: #00BC20;
+$darkgreen: #006400;
+
+$primary:       $electricgreen;
+$secondary:     $gray-600;
+$success:       $cyan;
+$info:          $darkgreen;
+$warning:       $orange;
+$danger:        $red;
+$light:         $gray-100;
+$dark:          $gray-800;
+
+// Body
+$body-bg: #000400;
+$body-color: #99FFBB;
+
+// Dropdowns
+$dropdown-bg: $darkgreen;
+$dropdown-border-color: rgba($darkgreen, .15);
+$dropdown-link-color: $gray-100;
+$dropdown-link-hover-color: darken($dropdown-link-color, 5%);
+$dropdown-link-hover-bg: $gray-900;
+
+// Cards
+$card-bg: lighten($body-bg, 5%);
+$card-border-color: $darkgreen;
+$card-cap-bg: lighten($card-bg, 5%);
+
+// Lists
+$list-color-light: #001000;
+$list-color-dark: #000800;
+
+// SweetAlert2
+$swal2-backdrop: rgba(255, 255, 255, 0.08);
+$swal2-background: $body-bg;
+$swal2-success: $primary;
+$swal2-error: $danger;
+$swal2-warning: $warning;
+$swal2-info: $secondary;
+$swal2-question: $light !default;
+$swal2-title-color: $white;
+$swal2-content-color: $white;
+$swal2-confirm-button-background-color: $primary;
+$swal2-cancel-button-background-color: $secondary;

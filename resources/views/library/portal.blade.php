@@ -275,6 +275,7 @@ new Vue({
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.get_article_name(id)),
 				type: 'error',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 			this.deleting_articles = false;
 			if (res.value == true) {
@@ -314,6 +315,7 @@ new Vue({
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.part_name),
 				type: 'warning',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 			if (res.value == true) {
 				const url = "{{ route('delete part', ['article_id' => '%R%']) }}";

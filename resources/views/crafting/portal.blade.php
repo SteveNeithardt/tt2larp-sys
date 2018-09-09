@@ -174,6 +174,7 @@ el: '#vue',
 				text: "@lang ('i.This will delete \'%P%\' permanently.')".replace('%P%', this.get_recipe_name(id)),
 				type: 'error',
 				showCancelButton: true,
+				focusCancel: true,
 			});
 			this.deleting_recipes = false;
 			if (res.value == true) {
