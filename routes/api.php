@@ -13,11 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
-//Route::get('/station/{id}/window_info', 'StationController@window_info')->name('station window info');
-//Route::post('/station/{id}/action', 'StationController@action')->name('station action');
-//
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
-
+// api for all stations calling for their data
 Route::get('/station', 'StationApiController@index')->name('station api');
+
+// command center routes
+Route::get('/station/list', 'StationController@getSimpleList')->name('command get stations');

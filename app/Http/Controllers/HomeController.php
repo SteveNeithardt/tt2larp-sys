@@ -15,4 +15,14 @@ class HomeController extends Controller
     {
         return view('home');
     }
+
+	/**
+	 * Show the command terminal.
+	 */
+	public function command()
+	{
+		$title = config('app.name', 'Laravel') . ' - ' . __('i.command center');
+
+		return view('command')->with(compact('title'));
+	}
 }

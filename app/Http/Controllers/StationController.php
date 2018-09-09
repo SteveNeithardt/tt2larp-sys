@@ -2,6 +2,7 @@
 
 namespace tt2larp\Http\Controllers;
 
+use Auth;
 use Validator;
 
 use Illuminate\Http\Request;
@@ -35,6 +36,37 @@ class StationController extends Controller
 		$stations = Station::with('station')->orderBy('name')->get();
 
 		return new JsonResponse($stations);
+	}
+
+	/**
+	 * return all stations for command interface
+	 */
+	public function getSimpleList()
+	{
+		$stations = Station::with('station')->orderBy('name')->get();
+
+		$outstations = [];
+		foreach ($stations as $station) {
+			$active = false;
+			$message = __('i.All is well');
+			if ($station->station instanceof ProblemStation) {
+				if ($station->station->problem !== null) {
+					$active = true;
+					$message = $station->station->alert_message;
+				}
+			}
+			$outstations[] = [
+				'name' => $station->name,
+				'alert' => [
+					'active' => $active,
+					'message' => $message,
+				],
+			];
+		}
+		return new JsonResponse([
+			'success' => true,
+			'stations' => $outstations
+		]);
 	}
 
 	/**
@@ -95,6 +127,7 @@ class StationController extends Controller
 			'stations' => 'required|array',
 			'stations.*.id' => 'required|distinct|integer',
 			'stations.*.name' => 'required|distinct|string',
+			'stations.*.alert_message' => 'sometimes|string',
 		]);
 
 		if ($validator->fails()) {
@@ -108,6 +141,12 @@ class StationController extends Controller
 			}
 			$station->name = $s['name'];
 			$station->save();
+			if (isset($s['alert_message'])) {
+				if ($station->station instanceof ProblemStation) {
+					$station->station->alert_message = $s['alert_message'] ?? '';
+					$station->station->save();
+				}
+			}
 		}
 
 		return new JsonResponse([ 'success' => true ]);

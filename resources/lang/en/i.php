@@ -90,6 +90,7 @@ return [
 	'The Station will no longer have any active Problem.' => 'The Station will no longer have any active Problem.',
 	'The active Problem will be forcibly moved to a the new Step.' => 'The active Problem will be forcibly moved to a the new Step.',
 	'The Station will now have an active Problem' => 'The Station will now have an active Problem.',
+	'alert message' => 'Alert message',
 
 	// api set station active problem
 	'The requested station is not a ProblemStation. Invalid Request.' => 'The requested station is not a ProblemStation. Invalid Request.',
@@ -102,4 +103,11 @@ return [
 	'Station :name (:id) is not a ProblemStation.' => 'Station :name (:id) is not a ProblemStation.',
 	'There are no problems on this station.' => 'There are no problems on this station.',
 	'Nobody is interracting with this station.' => 'Nobody is interracting with this station.',
+
+	// command center
+	'command center' => 'Command center',
+	'All is well' => 'Everything is nominal.',
+
+	// chat
+	'chat interface' => 'Communications',
 ];

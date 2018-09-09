@@ -24,13 +24,16 @@
 					<div class="card-header" :class="activity_warning(station.last_ping)">
 						<h4 class="my-1" v-if="!editing_names">@{{ station.name }}</h4>
 						<input type="text" class="form-control" v-if="editing_names" v-model="station.name">
-						<span>@{{ last_activity_text(station.last_ping) }}</span>
+						<span v-if="!editing_names">@{{ last_activity_text(station.last_ping) }}</span>
 					</div>
 					<div class="card-body">
 						<div v-if="is_library(station)">
 							<div class="alert alert-dark">@lang ('i.Nothing to do in the library')</div>
 						</div>
-						<div v-if="is_problem(station)">
+						<div v-if="editing_names && is_problem(station)">
+							<textarea class="form-control" v-model="station.station.alert_message" placeholder="@lang ('i.alert message')"></textarea>
+						</div>
+						<div v-if="!editing_names && is_problem(station)">
 							<div v-if="ps_has_problem(station)">
 								<div class="alert alert-info">
 									<h5>@{{ "@lang ("i.active problem is '%P%'")".replace('%P%', station.station.problem.name) }}</h5>
@@ -177,7 +180,11 @@ new Vue({
 			if (this.loading) return;
 			this.loading = true;
 			var stations = this.stations.map(s => {
-				return { id: s.id, name: s.name };
+				var obj = { id: s.id, name: s.name };
+				if (s.station.alert_message) {
+					obj.alert_message = s.station.alert_message;
+				}
+				return obj;
 			});
 			axios.post("{{ route('set station names') }}", {
 				stations: stations,

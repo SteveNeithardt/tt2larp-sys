@@ -20,6 +20,12 @@ use tt2larp\Models\StepNextStep;
 
 class StationApiController extends Controller
 {
+	//@TODO
+	//
+	// Do something about all the messages: define a format that shows bold parts
+	// QTextEdit can potentially use html tags to format its text.
+	// Investigate
+
 	/**
 	 * try to solve problem
 	 *

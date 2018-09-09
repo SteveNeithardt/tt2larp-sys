@@ -16,6 +16,14 @@ Route::get('/login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('/login', 'Auth\LoginController@login');
 Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
+Route::get('/command', 'HomeController@command')->name('command');
+Route::get('/communication', 'ChatController@index')->name('chat index');
+
+// chat routes for the communications post
+Route::get('/chat', 'ChatController@messages')->name('get chat list');
+Route::post('/chat', 'ChatController@newMessage')->name('new chat message');
+
+
 Route::group([ 'middleware' => 'auth' ], function() {
 	Route::get('/', 'HomeController@index')->name('home');
 
