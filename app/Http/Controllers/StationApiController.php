@@ -176,7 +176,7 @@ class StationApiController extends Controller
 
 		return new JsonResponse([
 			'success' => true,
-			'message' => $nextStep->description,
+			'messages' => [ $nextStep->description ],
 			'keep' => false,
 		]);
 	}
@@ -217,7 +217,7 @@ class StationApiController extends Controller
 		if ($article === null) {
 			return new JsonResponse([
 				'success' => false,
-				'messages' => [ __('No article present in input array.') ],
+				'message' => __('No article present in input array.'),
 				'keep' => true,
 			]);
 		}
@@ -262,6 +262,91 @@ class StationApiController extends Controller
 	 */
 	public function crafting(Request $request, CraftingStation $station)
 	{
-		return new JsonResponse([ 'success' => true, 'message' => __('i.Nothing to do in the crafting station') ]);
+		if (! $station instanceof CraftingStation) {
+			return new JsonResponse([ 'success' => false, 'message' => __("Station :name (:id) is not a CraftingStation.", [ 'name' => $basestation->name, 'id' => $station_id ]) ], 400);
+		}
+
+		if ($request->codes === null || count($request->codes) === 0) {
+			return new JsonResponse([
+				'success' => true,
+				'messages' => [ $step->description ],
+				'keep' => false,
+			]);
+		}
+
+		// from all codes sent through the api
+		$codes = Code::findMany($request->codes);
+
+		// filter out Recipe instances, Ingredient instances and the Character performing the search.
+		$character = null;
+		$recipe = null;
+		$ingredients = [];
+		foreach ($codes as $code) {
+			$instance = $code->coded;
+			if ($instance instanceof Character) {
+				if ($character !== null) {
+					return new JsonResponse([
+						'success' => false,
+						'message' => __('More than one character present in input array.'),
+						'keep' => false,
+					]);
+				}
+				$character = $instance;
+			} else if ($instance instanceof Recipe) {
+				if ($recipe !== null) {
+					return new JsonResponse([
+						'success' => false,
+						'message' => __('More than one recipe present in input array.'),
+						'keep' => false,
+					]);
+				}
+				$recipe = $instance;
+			} else if ($instance instanceof Ingredient) {
+				$ingredients[] = $ingredient;
+			}
+		}
+
+		if ($character === null) {
+			return new JsonResponse([
+				'success' => false,
+				'message' => __('No character present in input array.'),
+				'keep' => false,
+			]);
+		}
+
+		if ($recipe === null) {
+			//$recipes = $character->availableRecipes();
+			return new JsonResponse([
+				'success' => true,
+				'messages' => [ __('i.Please enter a recipe you know.') ],
+				//'messages' => $recipes,
+				'keep' => true,
+			]);
+		}
+
+		$valid = true;
+		foreach ($recipe->ingredients as $ingredient) {
+			$found = false;
+			foreach ($ingredients as $i) {
+				if ($i->id === $ingredient->id) {
+					$found = true;
+					break;
+				}
+			}
+			$valid = $valid && $found;
+		}
+		if ($valid === false) {
+			return new JsonResponse([
+				'success' => true,
+				'messages' => [ __('i.Not enough ingredients for recipe.') ],
+				'keep' => true,
+			]);
+		}
+
+		return new JsonResponse([
+			'success' => true,
+			'messages' => [ $recipe->description ],
+			'keep' => false,
+		]);
 	}
 }

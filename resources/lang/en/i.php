@@ -73,6 +73,10 @@ return [
 	'save recipe' => 'Save recipe',
 	'add ingredient' => 'Add ingredient',
 
+	// crafting station api
+	'Please enter a recipe you know.' => 'Please enter a recipe you know.',
+	'Not enough ingredients for recipe.' => 'Not enough ingredients for recipe.',
+
 	// stations
 	'stations' => 'Stations',
 	'offline' => 'Offline',
@@ -103,6 +107,11 @@ return [
 	'Station :name (:id) is not a ProblemStation.' => 'Station :name (:id) is not a ProblemStation.',
 	'There are no problems on this station.' => 'There are no problems on this station.',
 	'Nobody is interracting with this station.' => 'Nobody is interracting with this station.',
+
+	// api crafting station
+	'More than one recipe present in input array.' => 'More than one recipe present in input array.',
+	'Station :name (:id) is not a CraftingStation.' => 'Station :name (:id) is not a CraftingStation.',
+	'No character present in input array.' => 'No article present in input array.',
 
 	// command center
 	'command center' => 'Command center',
