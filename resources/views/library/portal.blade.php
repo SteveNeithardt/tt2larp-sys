@@ -15,7 +15,7 @@
 				<div class="delete-icon ml-2" v-if="listing_articles && !deleting_articles && !editing_article" v-on:click="delete_articles(true)" v-cloak></div>
 				<div class="cancel-icon ml-2" v-if="listing_articles && deleting_articles" v-on:click="delete_articles(false)" v-cloak></div>
 			</h2>
-			<span class="btn btn-outline-secondary my-3" v-on:click="back()" v-if="editing_article" v-cloak>@lang ('i.back')</span>
+			<span class="btn btn-secondary my-3" v-on:click="back()" v-if="editing_article" v-cloak>@lang ('i.back')</span>
 		</div>
 		<div class="col-md-8" v-if="listing_articles" v-cloak>
 			<div class="card">
@@ -75,8 +75,8 @@
 					<textarea class="form-control" v-model="part_description" placeholder="@lang ('i.part description')"></textarea>
 					<div class="mt-3">
 						<span class="btn btn-primary mr-2" v-on:click="storePart()" v-if="valid_part">@lang ('i.save part')</span>
-						<span class="btn btn-outline-danger mr-2" v-on:click="deletePart()" v-if="can_delete_part">@lang ('i.delete')</span>
-						<span class="btn btn-outline-secondary" v-on:click="resetPart()">@lang ('i.cancel')</span>
+						<span class="btn btn-danger mr-2" v-on:click="deletePart()" v-if="can_delete_part">@lang ('i.delete')</span>
+						<span class="btn btn-secondary" v-on:click="resetPart()">@lang ('i.cancel')</span>
 					</div>
 				</div>
 			</div>
@@ -120,8 +120,8 @@ new Vue({
 		filtered_articles() {
 			if (this.filter_name == null) return this.articles;
 			else return this.articles.filter(a =>
-				a.name.indexOf(this.filter_name) > -1 ||
-				(a.code != null && a.code.indexOf(this.filter_name) > -1)
+				a.name.indexOfInsensitive(this.filter_name) > -1 ||
+				(a.code != null && a.code.indexOfInsensitive(this.filter_name) > -1)
 			);
 		},
 		valid_article() {

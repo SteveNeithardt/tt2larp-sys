@@ -36,7 +36,7 @@
 				<div class="card-body">
 					<input class="form-control" type="text" v-model="name">
 					<span class="btn btn-primary mt-3" v-on:click="submit()" v-if="valid_ability">@lang ('i.submit')</span>
-					<span class="btn btn-outline-secondary mt-3" v-on:click="resetAbility()">@lang ('i.cancel')</span>
+					<span class="btn btn-secondary mt-3" v-on:click="resetAbility()">@lang ('i.cancel')</span>
 				</div>
 			</div>
 		</div>
@@ -62,7 +62,7 @@ new Vue({
 	computed: {
 		filtered_abilities() {
 			if (this.filter_name == null) return this.abilities;
-			else return this.abilities.filter(a => a.name.indexOf(this.filter_name) > -1);
+			else return this.abilities.filter(a => a.name.indexOfInsensitive(this.filter_name) > -1);
 		},
 		valid_ability() {
 			return (this.name != null &&

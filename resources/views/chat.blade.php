@@ -5,17 +5,18 @@
 [v-cloak] { display:none; }
 html,body { height:100%; }
 * { font-family: monospace; }
+.overflow-y-hidden { overflow-y:hidden; }
 </style>
 @endsection
 
 @section ('content')
 <div class="h-100" id="vue">
-	<div class="h-100 d-flex flex-column-reverse">
-		<div class="d-flex">
+	<div class="h-100 d-flex flex-column-reverse overflow-y-hidden">
+		<div class="d-flex mt-2">
 			<textarea type="text" class="form-control" v-model="new_msg"></textarea>
-			<div class="btn btn-primary" v-on:click="newMessage()">SEND</div>
+			<div class="h-100 thumb d-flex align-items-center p-4" v-on:click="newMessage()">&gt;&gt;</div>
 		</div>
-		<div v-for="message in messages" class="alert alert-success">
+		<div v-for="message in messages" class="mx-3">
 			@{{ message.message }}
 		</div>
 	</div>
@@ -53,7 +54,7 @@ new Vue({
 				message: message,
 			}).then(response => {
 				if (response.data.success) {
-					this.messages.push({ message: message });
+					this.messages.unshift({ message: response.data.message });
 				}
 			}).catch(errors => {
 			});

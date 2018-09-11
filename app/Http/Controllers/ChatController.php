@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 use tt2larp\Models\Chat;
+use tt2larp\Models\Message;
 
 class ChatController extends Controller
 {
@@ -94,11 +95,14 @@ class ChatController extends Controller
 		$user = Auth::user();
 		$user_id = $user === null ? null : $user->id;
 
-		$chat->messages()->create([
-			'message' => $request->message,
-			'user_id' => $user_id,
-		]);
+		$message = new Message();
+		$message->user_id = $user_id;
+		$message->message = $request->message;
+		$chat->messages()->save($message);
 
-		return new JsonResponse([ 'success' => true ]);
+		return new JsonResponse([
+			'success' => true,
+			'message' => $message->time . '>> ' . $message->message,
+		]);
 	}
 }

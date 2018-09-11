@@ -51,7 +51,7 @@
 						</div>
 					</div>
 					<span v-if="valid_character" class="btn btn-primary mt-3" v-on:click="submit()" v-cloak>@lang ('i.submit')</span>
-					<span class="btn btn-outline-secondary mt-3" v-on:click="resetCharacter()">@lang ('i.cancel')</span>
+					<span class="btn btn-secondary mt-3" v-on:click="resetCharacter()">@lang ('i.cancel')</span>
 				</div>
 			</div>
 		</div>
@@ -81,8 +81,8 @@ new Vue({
 		filtered_characters() {
 			if (this.filter_name == null) return this.characters;
 			else return this.characters.filter(c =>
-				c.name.indexOf(this.filter_name) > -1 ||
-				(c.code != null && c.code.indexOf(this.filter_name) > -1)
+				c.name.indexOfInsensitive(this.filter_name) > -1 ||
+				(c.code != null && c.code.indexOfInsensitive(this.filter_name) > -1)
 			);
 		},
 		valid_character() {

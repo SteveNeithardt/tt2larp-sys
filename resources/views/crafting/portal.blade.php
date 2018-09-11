@@ -58,7 +58,7 @@
 					<hr>
 					<div class="mt-3">
 						<span class="btn btn-primary mr-2" v-on:click="storeRecipe()" v-if="valid_recipe">@lang ('i.save recipe')</span>
-						<span class="btn btn-outline-secondary" v-on:click="resetRecipe()">@lang ('i.cancel')</span>
+						<span class="btn btn-secondary" v-on:click="resetRecipe()">@lang ('i.cancel')</span>
 					</div>
 				</div>
 			</div>
@@ -93,8 +93,8 @@ el: '#vue',
 		filtered_recipes() {
 			if (this.filter_name == null) return this.recipes;
 			else return this.recipes.filter(r =>
-				r.name.indexOf(this.filter_name) > -1 ||
-				(r.code != null && r.code.indexOf(this.filter_name) > -1)
+				r.name.indexOfInsensitive(this.filter_name) > -1 ||
+				(r.code != null && r.code.indexOfInsensitive(this.filter_name) > -1)
 			);
 		},
 		valid_recipe() {

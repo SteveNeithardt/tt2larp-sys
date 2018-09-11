@@ -10,12 +10,14 @@ html,body { height:100%; }
 @section ('content')
 <div class="h-100 row no-gutters">
 	<div class="col-md-8 h-100 border-right" id="vue">
-		<div class="d-flex flex-wrap no-gutters p-3" v-if="listing_stations" v-cloak>
-			<div v-for="station in stations" class="col-md-4">
-				<div class="card m-3">
-					<div class="card-header" :class="alert_status(station)">@{{ station.name }}</div>
-					<div class="card-body" :class="alert_status(station)">
-						@{{ station.alert.message }}
+		<div class="d-flex justify-content-center align-items-center h-100">
+			<div class="d-flex flex-wrap no-gutters p-3" v-if="listing_stations" v-cloak>
+				<div v-for="station in stations" class="col-md-4">
+					<div class="card m-3">
+						<div class="card-header" :class="alert_status(station)">@{{ station.name }}</div>
+						<div class="card-body" :class="alert_status(station)">
+							@{{ station.alert.message }}
+						</div>
 					</div>
 				</div>
 			</div>

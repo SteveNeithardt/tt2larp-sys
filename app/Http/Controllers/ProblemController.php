@@ -30,7 +30,7 @@ class ProblemController extends Controller
 	{
 		$problems = Problem::select('id','name')->with(['steps' => function($q) {
 			$q->select('id','name','description');
-		}])->get();
+		}])->orderBy('name')->get();
 
 		return new JsonResponse($problems);
 	}
@@ -61,7 +61,7 @@ class ProblemController extends Controller
 			$problem->name = $name;
 			$problem->save();
 			$step = new Step();
-			$step->name = 'UNDEFINED';
+			$step->name = 'Annonce';
 			$step->description = 'REPLACE ME';
 			$step->save();
 			$problem->steps()->sync([ $step->id => [ 'first_step' => 1 ] ]);
@@ -140,7 +140,9 @@ class ProblemController extends Controller
 		$step->description = $request->description;
 		$step->save();
 
-		$problem->steps()->attach($step);
+		if (!$problem->steps->contains($step)) {
+			$problem->steps()->attach($step);
+		}
 
 		return new JsonResponse(['success' => true]);
 	}

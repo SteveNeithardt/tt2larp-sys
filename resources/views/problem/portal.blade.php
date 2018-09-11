@@ -4,7 +4,7 @@
 <style>
 [v-cloak] { display:none; }
 #vis {
-height:400px;
+height:600px;
 border: 1px solid #bbb;
 background: #000;
 }
@@ -21,7 +21,7 @@ background: #000;
 				<div class="delete-icon ml-2" v-if="listing_problems && !deleting_problems && !editing_problem" v-on:click="delete_problems(true)" v-cloak></div>
 				<div class="cancel-icon ml-2" v-if="listing_problems && deleting_problems" v-on:click="delete_problems(false)" v-cloak></div>
 			</h2>
-			<span class="btn btn-outline-secondary my-3" v-on:click="back()" v-if="editing_problem" v-cloak>@lang ('i.back')</span>
+			<span class="btn btn-secondary my-3" v-on:click="back()" v-if="editing_problem" v-cloak>@lang ('i.back')</span>
 		</div>
 		<div class="col-md-6" v-if="listing_problems" v-cloak>
 			<div class="card">
@@ -62,8 +62,8 @@ background: #000;
 				<div class="card-body">
 					<div id="vis"></div>
 					<span class="btn btn-primary mt-3" v-on:click="addEdge(true)" v-if="!selecting_edge && !editing_step && !editing_edge">@lang ('i.add edge')</span>
-					<span class="btn btn-outline-secondary mt-3" v-on:click="addEdge(false)" v-if="selecting_edge">@lang ('i.cancel')</span>
-					<span class="btn btn-outline-success mt-3 ml-2" v-on:click="vis_make()" v-if="!selecting_edge && !editing_step && !editing_edge">@lang ('i.regen graph')</span>
+					<span class="btn btn-secondary mt-3" v-on:click="addEdge(false)" v-if="selecting_edge">@lang ('i.cancel')</span>
+					<span class="btn btn-success mt-3 ml-2" v-on:click="vis_make()" v-if="!selecting_edge && !editing_step && !editing_edge">@lang ('i.regen graph')</span>
 				</div>
 			</div>
 		</div>
@@ -74,8 +74,8 @@ background: #000;
 					<textarea class="form-control" v-model="step_description" placeholder="@lang ('i.step description')"></textarea>
 					<div class="mt-3">
 						<span class="btn btn-primary mr-2" v-on:click="storeStep()" v-if="valid_step">@lang ('i.save step')</span>
-						<span class="btn btn-outline-danger mr-2" v-on:click="deleteStep()" v-if="can_delete_step">@lang ('i.delete')</span>
-						<span class="btn btn-outline-secondary" v-on:click="resetStep()">@lang ('i.cancel')</span>
+						<span class="btn btn-danger mr-2" v-on:click="deleteStep()" v-if="can_delete_step">@lang ('i.delete')</span>
+						<span class="btn btn-secondary" v-on:click="resetStep()">@lang ('i.cancel')</span>
 					</div>
 				</div>
 			</div>
@@ -100,7 +100,7 @@ background: #000;
 									<div class="delete-icon" v-on:click="deleteEdgeCode(c.code)"></div>
 								</li>
 							</ul>
-							<span class="btn btn-outline-primary mt-2" v-on:click="addEdgeCode()">@lang ('i.add code')</span>
+							<span class="btn btn-primary mt-2" v-on:click="addEdgeCode()">@lang ('i.add code')</span>
 						</div>
 						<div class="col-md-6">
 							<ul class="list">
@@ -110,14 +110,14 @@ background: #000;
 									<div class="delete-icon" v-on:click="deleteEdgeAbility(edge_ability.id)"></div>
 								</li>
 							</ul>
-							<span class="btn btn-outline-primary mt-2" v-on:click="addEdgeAbility()">@lang ('i.add ability')</span>
+							<span class="btn btn-primary mt-2" v-on:click="addEdgeAbility()">@lang ('i.add ability')</span>
 						</div>
 					</div>
 					<hr/>
 					<div class="mt-3">
 						<span class="btn btn-primary mr-2" v-on:click="storeEdge()" v-if="valid_edge">@lang ('i.save edge')</span>
-						<span class="btn btn-outline-danger mr-2" v-on:click="deleteEdge()" v-if="can_delete_edge">@lang ('i.delete')</span>
-						<span class="btn btn-outline-secondary" v-on:click="resetEdge()">@lang ('i.cancel')</span>
+						<span class="btn btn-danger mr-2" v-on:click="deleteEdge()" v-if="can_delete_edge">@lang ('i.delete')</span>
+						<span class="btn btn-secondary" v-on:click="resetEdge()">@lang ('i.cancel')</span>
 					</div>
 				</div>
 			</div>
@@ -207,7 +207,7 @@ new Vue({
 	computed: {
 		filtered_problems() {
 			if (this.filter_name == null) return this.problems;
-			else return this.problems.filter(a => a.name.indexOf(this.filter_name) > -1);
+			else return this.problems.filter(a => a.name.indexOfInsensitive(this.filter_name) > -1);
 		},
 		valid_problem() {
 			return (this.problem_name != null && this.problem_name.length > 2);
@@ -338,6 +338,7 @@ new Vue({
 		resetEdge() {
 			this.editing_edge = false;
 			this.selecting_edge = false;
+			this.edge_id = null;
 			this.edge_source_id = null;
 			this.edge_target_id = null;
 			this.edge_codes = [];
