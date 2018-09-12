@@ -11,3 +11,4 @@ Object.defineProperty(String.prototype, 'indexOfInsensitive', { value:
 		return this.toLowerCase().indexOf((s+'').toLowerCase(), b);
 	}
 });
+

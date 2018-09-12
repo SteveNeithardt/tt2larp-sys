@@ -2,7 +2,6 @@
 
 @section ('css')
 <style>
-[v-cloak] { display:none; }
 #vis {
 height:600px;
 border: 1px solid #bbb;

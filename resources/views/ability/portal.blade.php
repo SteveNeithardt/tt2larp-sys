@@ -1,11 +1,5 @@
 @extends ('layouts.app')
 
-@section ('css')
-<style>
-[v-cloak] { display:none; }
-</style>
-@endsection
-
 @section ('content')
 <div class="container" id="vue">
 	<div class="row justify-content-center">

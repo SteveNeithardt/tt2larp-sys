@@ -2,7 +2,6 @@
 
 @section ('css')
 <style>
-[v-cloak] { display:none; }
 html,body { height:100%; }
 </style>
 @endsection
@@ -23,8 +22,7 @@ html,body { height:100%; }
 			</div>
 		</div>
 	</div>
-	<iframe src="{{ route('chat index') }}" class="col-md-4 h-100 border-0">
-	</iframe>
+	<iframe src="{{ route('chat index') }}" class="col-md-4 h-100 border-0"></iframe>
 </div>
 @endsection
 

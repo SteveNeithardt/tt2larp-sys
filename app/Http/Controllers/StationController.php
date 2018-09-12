@@ -55,6 +55,9 @@ class StationController extends Controller
 					$message = $station->station->alert_message;
 				}
 			}
+			if ($station->station instanceof CraftingStation) {
+				continue;// do not display Crafting Stations on the Commander view
+			}
 			$outstations[] = [
 				'name' => $station->name,
 				'alert' => [

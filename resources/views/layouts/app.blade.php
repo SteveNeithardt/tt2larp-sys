@@ -71,9 +71,66 @@
         <main class="py-4">
             @yield ('content')
         </main>
+
+		@auth
+		<div id="chat" class="fixed-bottom" v-cloak>
+			<span class="chat-icon" v-on:click="toggle(true)">
+				<span class="chat-icon-text">
+					@lang ('i.chat')
+				</span>
+				<span class="chat-icon-number d-flex align-items-center justify-content-center" v-if="number != 0">
+					@{{ number }}
+				</span>
+			</span>
+			<div class="chat-frame" v-if="visible">
+				<iframe src="{{ route('chat index') }}" class="h-100 w-100 border-0"></iframe>
+				<span class="chat-close-icon" v-on:click="toggle(false)"></span>
+			</div>
+		</div>
+		@endauth
     </div>
 
 <script src="{{ asset('js/app.js') }}"></script>
 @yield ('js')
+@auth
+<script>
+new Vue({
+	el: '#chat',
+	data() {
+		return {
+			visible: false,
+			number: 0,
+			id: 1,
+		}
+	},
+	methods: {
+		//todo: something about just getting the number 'since last time' kinda...?
+		fetch_messages() {
+			axios.get("{{ route('get chat list') }}", { params: {
+				chat_id: this.id,
+			}}).then(response => {
+				if (response.data.success) {
+					this.messages = response.data.messages;
+					//this.number = response.data.messages.count;
+				}
+			}).catch(errors => {});
+		},
+		toggle(visible) {
+			this.visible = visible;
+		},
+		fetch_data() {
+			this.fetch_messages();
+
+			setInterval(function() {
+				this.fetch_messages();
+			}.bind(this), 2000);
+		}
+	},
+	mounted() {
+		this.$nextTick(this.fetch_data());
+	},
+});
+</script>
+@endauth
 </body>
 </html>

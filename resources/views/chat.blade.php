@@ -2,7 +2,6 @@
 
 @section ('css')
 <style>
-[v-cloak] { display:none; }
 html,body { height:100%; }
 * { font-family: monospace; }
 .overflow-y-hidden { overflow-y:hidden; }

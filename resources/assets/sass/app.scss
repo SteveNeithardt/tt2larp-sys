@@ -11,6 +11,8 @@
 // Sweetalert2
 @import '~sweetalert2/src/sweetalert2.scss';
 
+[v-cloak] { display:none; }
+
 .navbar-laravel {
 	box-shadow: 0 2px 4px rgba(255, 255, 255, 0.08);
 }
@@ -237,3 +239,73 @@ ul.list {
 	}
 }
 
+.chat-icon {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 70px;
+	height: 70px;
+	border: 1px solid $electricgreen;
+	border-radius: 40px 0 0 0;
+	background: $darkgreen;
+	cursor: pointer;
+}
+.chat-icon-text {
+	position: absolute;
+	right: 50%;
+	bottom: 50%;
+	transform: translate(50%, 50%);
+}
+.chat-icon-number {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 23px;
+	min-width: 23px;
+	background: $body-bg;
+	color: $electricgreen;
+	border: 1px solid $electricgreen;
+	border-radius: 50%;
+}
+.chat-frame {
+	position:absolute;
+	right: 0;
+	bottom: 0;
+	width: 33.33333333%;
+	height: 100vh;
+	border-left: 1px solid $electricgreen;
+	background: $body-bg;
+}
+.chat-close-icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 70px;
+	height: 70px;
+	border: 1px solid $electricgreen;
+	background: $darkgreen;
+	border-left: 0;
+	cursor: pointer;
+
+	&::after, &::before {
+		content: "";
+		position: absolute;
+		top: 32px;
+		left: 2px;
+		background: $electricgreen;
+		width: 68px;
+		height: 2px;
+	}
+	&::after {
+		transform: rotate(-45deg);
+	}
+	&::before {
+		transform: rotate(45deg);
+	}
+	&:hover {
+		background: $body-bg;
+		&::after, &::before {
+			background: $white;
+		}
+	}
+}
