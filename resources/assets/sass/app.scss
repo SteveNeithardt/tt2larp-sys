@@ -309,3 +309,17 @@ ul.list {
 		}
 	}
 }
+
+// specific overrides for select2
+.select2-dropdown {
+	background: $dropdown-bg;
+}
+
+.select2-container--default .select2-results__option[aria-selected="true"] {
+	background-color: darken($dropdown-bg, 5%);
+	color: $white;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+	background-color: darken($dropdown-bg, 8%);
+	color: $white;
+}
