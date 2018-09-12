@@ -96,9 +96,6 @@ return [
 	'The Station will now have an active Problem' => 'The Station will now have an active Problem.',
 	'alert message' => 'Alert message',
 
-	// api set station active problem
-	'The requested station is not a ProblemStation. Invalid Request.' => 'The requested station is not a ProblemStation. Invalid Request.',
-
 	// api set station active step
 	'Invalid forward value, must be non-zero.' => 'Invalid forward value, must be non-zero.',
 
@@ -111,7 +108,7 @@ return [
 	// api crafting station
 	'More than one recipe present in input array.' => 'More than one recipe present in input array.',
 	'Station :name (:id) is not a CraftingStation.' => 'Station :name (:id) is not a CraftingStation.',
-	'No character present in input array.' => 'No article present in input array.',
+	'No character present in input array.' => 'No character present in input array.',
 
 	// command center
 	'command center' => 'Command center',

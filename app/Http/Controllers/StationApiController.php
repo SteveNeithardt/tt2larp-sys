@@ -11,9 +11,12 @@ use tt2larp\Models\Ability;
 use tt2larp\Models\Article;
 use tt2larp\Models\Code;
 use tt2larp\Models\Character;
+use tt2larp\Models\CraftingStation;
+use tt2larp\Models\Ingredient;
 use tt2larp\Models\LibraryStation;
 use tt2larp\Models\ProblemStation;
 use tt2larp\Models\Problem;
+use tt2larp\Models\Recipe;
 use tt2larp\Models\Station;
 use tt2larp\Models\Step;
 use tt2larp\Models\StepNextStep;
@@ -94,10 +97,6 @@ class StationApiController extends Controller
 	 */
 	private function problem(Request $request, ProblemStation $station)
 	{
-		if (! $station instanceof ProblemStation) {
-			return new JsonResponse([ 'success' => false, 'message' => __("Station :name (:id) is not a ProblemStation.", [ 'name' => $basestation->name, 'id' => $station_id ]) ], 400);
-		}
-
 		$problem = $station->problem;
 		if ($problem === null) {
 			return new JsonResponse([ 'success' => true ]);
@@ -130,7 +129,7 @@ class StationApiController extends Controller
 				if ($character !== null) {
 					return new JsonResponse([
 						'success' => false,
-						'message' => __('More than one character present in input array.'),
+						'message' => __('i.More than one character present in input array.'),
 						'keep' => false,
 					]);
 				}
@@ -207,7 +206,7 @@ class StationApiController extends Controller
 				if ($article !== null) {
 					return new JsonResponse([
 						'success' => false,
-						'message' => __('More than one article present in input array.'),
+						'message' => __('i.More than one article present in input array.'),
 						'keep' => false,
 					]);
 				}
@@ -217,7 +216,7 @@ class StationApiController extends Controller
 		if ($article === null) {
 			return new JsonResponse([
 				'success' => false,
-				'message' => __('No article present in input array.'),
+				'message' => __('i.No article present in input array.'),
 				'keep' => true,
 			]);
 		}
@@ -262,14 +261,10 @@ class StationApiController extends Controller
 	 */
 	public function crafting(Request $request, CraftingStation $station)
 	{
-		if (! $station instanceof CraftingStation) {
-			return new JsonResponse([ 'success' => false, 'message' => __("Station :name (:id) is not a CraftingStation.", [ 'name' => $basestation->name, 'id' => $station_id ]) ], 400);
-		}
-
 		if ($request->codes === null || count($request->codes) === 0) {
 			return new JsonResponse([
 				'success' => true,
-				'messages' => [ $step->description ],
+				'messages' => [],
 				'keep' => false,
 			]);
 		}
@@ -287,7 +282,7 @@ class StationApiController extends Controller
 				if ($character !== null) {
 					return new JsonResponse([
 						'success' => false,
-						'message' => __('More than one character present in input array.'),
+						'message' => __('i.More than one character present in input array.'),
 						'keep' => false,
 					]);
 				}
@@ -296,20 +291,20 @@ class StationApiController extends Controller
 				if ($recipe !== null) {
 					return new JsonResponse([
 						'success' => false,
-						'message' => __('More than one recipe present in input array.'),
+						'message' => __('i.More than one recipe present in input array.'),
 						'keep' => false,
 					]);
 				}
 				$recipe = $instance;
 			} else if ($instance instanceof Ingredient) {
-				$ingredients[] = $ingredient;
+				$ingredients[] = $instance;
 			}
 		}
 
 		if ($character === null) {
 			return new JsonResponse([
 				'success' => false,
-				'message' => __('No character present in input array.'),
+				'message' => __('i.No character present in input array.'),
 				'keep' => false,
 			]);
 		}
