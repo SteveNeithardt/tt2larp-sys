@@ -13,7 +13,16 @@
 		</div>
 		<div class="col-md-8" v-if="listing_articles" v-cloak>
 			<div class="card">
-				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name"></div>
+				<div class="card-header d-flex align-items-center">
+					<div class="col-md-6">
+						<input class="form-control" type="text" placeholder="@lang ('i.search')" v-model="filter_name">
+					</div>
+					<div class="col-md-6">
+						<select2 :options="stations" v-model="filter_station" v-if="stations != null">
+							<option value="-1">@lang ('i.No filter')</option>
+						</select2>
+					</div>
+				</div>
 				<div class="card-body">
 					<span class="btn btn-primary mb-3" v-if="!adding_article" v-on:click="addArticle()">@lang ('i.add')</span>
 					<div class="d-flex mb-3 justify-content-between" v-if="adding_article">
@@ -37,12 +46,15 @@
 			<div class="card">
 				<div class="card-header">
 					<div class="d-flex align-items-center my-1" v-if="!adding_article">
-						@{{ article_name }} (@{{ article_code }})
+						@{{ article_name }} (@{{ article_code }}) @{{ station_name }}
 						<div class="edit-icon ml-3" v-on:click="addArticle()"></div>
 					</div>
 					<div class="d-flex justify-content-between align-items-center" v-if="adding_article">
-						<input class="form-control col-md-4" type="text" v-model="article_name" placeholder="@lang ('i.name')">
-						<input class="form-control col-md-4" type="text" v-model="article_code" placeholder="@lang ('i.code')">
+						<input class="form-control col-md-3" type="text" v-model="article_name" placeholder="@lang ('i.name')">
+						<input class="form-control col-md-3" type="text" v-model="article_code" placeholder="@lang ('i.code')">
+						<div class="cold-md-2">
+							<select2 :options="stations" v-model="article_station"></select2>
+						</div>
 						<div class="col-md-3 d-flex align-items-center">
 							<div class="cancel-icon" v-on:click="resetAddArticle()"></div> 
 							<div class="save-icon ml-2" v-if="valid_article" v-on:click="storeArticle(false)"></div>
@@ -88,6 +100,8 @@ new Vue({
 	el: '#vue',
 	data() {
 		return {
+			stations: null,
+			filter_station: -1,
 			articles: null,
 			listing_articles: false,
 			filter_name: null,
@@ -98,6 +112,7 @@ new Vue({
 			article_id: null,
 			article_name: null,
 			article_code: null,
+			article_station: null,
 
 			abilities: null,
 			parts: null,
@@ -111,9 +126,14 @@ new Vue({
 		}
 	},
 	computed: {
-		filtered_articles() {
-			if (this.filter_name == null) return this.articles;
+		filtered_by_library() {
+			if (this.filter_station < 0) return this.articles;
 			else return this.articles.filter(a =>
+				a.library_station_id == this.filter_station);
+		},
+		filtered_articles() {
+			if (this.filter_name == null) return this.filtered_by_library;
+			else return this.filtered_by_library.filter(a =>
 				a.name.indexOfInsensitive(this.filter_name) > -1 ||
 				(a.code != null && a.code.indexOfInsensitive(this.filter_name) > -1)
 			);
@@ -122,8 +142,8 @@ new Vue({
 			return (this.article_name != null &&
 				this.article_name.length > 2 &&
 				this.article_code != null &&
-				this.article_code.length > 2)
-				//&& this.article_code.length < 9);
+				this.article_code.length > 2 &&
+				this.article_station != null)
 		},
 		valid_part() {
 			return (
@@ -140,6 +160,14 @@ new Vue({
 				)
 			);
 		},
+		station_name() {
+			if (this.article_station == null) return 'undefined';
+			var res = this.stations.filter(s => s.id == this.article_station);
+			if (res.length == 1) {
+				return res[0].text;
+			}
+			return 'undefined';
+		},
 		can_delete_part() {
 			return this.part_id != null;
 		},
@@ -152,6 +180,15 @@ new Vue({
 				this.fetch_articles();
 				return;
 			}
+		},
+		fetch_stations() {
+			axios.get("{{ route('get library stations') }}")
+				.then(response => {
+					if (response.data.success) {
+						this.stations = response.data.stations
+					}
+				})
+				.catch(errors => {});
 		},
 		fetch_articles: function() {
 			this.resetArticle();
@@ -191,6 +228,7 @@ new Vue({
 			this.article_id = null;
 			this.article_name = null;
 			this.article_code = null;
+			this.article_station = null;
 			this.parts = null;
 			this.resetPart();
 		},
@@ -220,6 +258,7 @@ new Vue({
 				this.article_id = article.id;
 				this.article_name = article.name;
 				this.article_code = article.code;
+				this.article_station = article.library_station_id;
 				this.fetch_parts();
 			}
 		},
@@ -244,6 +283,7 @@ new Vue({
 					id: this.article_id,
 					name: this.article_name,
 					code: this.article_code,
+					station_id: this.article_station,
 				})
 				.then(response => {
 					if (response.data.success) {
@@ -323,6 +363,7 @@ new Vue({
 			}
 		},
 		fetch_data: function() {
+			this.fetch_stations();
 			this.fetch_articles();
 			this.fetch_abilities();
 		},

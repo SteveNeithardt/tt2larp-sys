@@ -34,4 +34,12 @@ class Article extends Model
 	{
 		return $this->hasMany(Part::class, 'article_id', 'id');
 	}
+
+	/**
+	 * Library Station this is assigned to
+	 */
+	public function libraryStation()
+	{
+		return $this->belongsTo(LibraryStation::class, 'library_station_id', 'id')->with('stations');
+	}
 }

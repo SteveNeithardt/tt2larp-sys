@@ -56,6 +56,7 @@ return [
 	// articles
 	'library' => 'Bibliothèque',
 	'code' => 'Code',
+	'No filter' => 'Aucun filtre',
 
 	'add part' => 'Ajouter une partie',
 	'save part' => 'Sauver une partie',

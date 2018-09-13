@@ -73,6 +73,25 @@ class StationController extends Controller
 	}
 
 	/**
+	 * returns all library stations for select2
+	 */
+	public function getLibraryList()
+	{
+		$libraries = LibraryStation::with('stations')->get();
+		$out = [];
+		foreach ($libraries as $library) {
+			$out[] = [
+				'id' => $library->id,
+				'text' => $library->stations->first()->name,
+			];
+		}
+		return new JsonResponse([
+			'success' => true,
+			'stations' => $out
+		]);
+	}
+
+	/**
 	 * get active step entourage for station
 	 */
 	public function getStepEntourage(Request $request)

@@ -57,6 +57,7 @@ Route::group([ 'middleware' => 'auth' ], function() {
 
 	Route::get('/station', 'StationController@portal')->name('station portal');
 	Route::get('/station/list', 'StationController@getList')->name('get stations');
+	Route::get('/station/libraries', 'StationController@getLibraryList')->name('get library stations');
 	Route::post('/station/names', 'StationController@setNames')->name('set station names');
 	Route::post('/station/problem', 'StationController@setActiveProblem')->name('set station active problem');
 	Route::post('/station/step', 'StationController@setActiveStep')->name('set station active step');

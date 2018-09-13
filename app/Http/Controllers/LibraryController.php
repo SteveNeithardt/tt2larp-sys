@@ -15,6 +15,7 @@ use tt2larp\Models\Article;
 use tt2larp\Models\Character;
 use tt2larp\Models\Code;
 use tt2larp\Models\Part;
+use tt2larp\Models\LibraryStation;
 
 class LibraryController extends Controller
 {
@@ -51,6 +52,7 @@ class LibraryController extends Controller
 			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
 			'code' => 'required|string|min:3',
+			'station_id' => 'required|integer',
 		]);
 
 		if ($validator->fails()) {
@@ -62,6 +64,12 @@ class LibraryController extends Controller
 		if ($article === null) {
 			$article = new Article();
 		}
+
+		$station = LibraryStation::find($request->station_id);
+		if ($station === null) {
+			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'LibraryStation' ]) ], 422);
+		}
+		$article->libraryStation()->associate($station);
 
 		$name = $request->name;
 		if ($name !== $article->name && Article::where('name', '=', $name)->count() > 0) {
