@@ -210,7 +210,15 @@ class StationApiController extends Controller
 						'keep' => false,
 					]);
 				}
-				$article = $instance;
+				if ($article->library_station_id === $station->id) {
+					$article = $instance;
+				} else {
+					return new JsonResponse([
+						'success' => false,
+						'message' => __('i.This article is not in this library'),
+						'keep' => false,
+					]);
+				}
 			}
 		}
 		if ($article === null) {

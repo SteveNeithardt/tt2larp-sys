@@ -112,6 +112,9 @@ return [
 	'No character present in input array.' => 'Aucun personnage présent dans la liste en entrée.',
 	'The Character is not allowed to craft Recipe.' => 'Le personnage n\'a pas le droit de fabriquer cette recette.',
 
+	// api library station
+	'This article is not in this library' => 'Cet article n\'est pas présent dans cette bibliothèque.',
+
 	// command center
 	'command center' => 'Centre de commande',
 	'All is well' => 'Situation nominale.',

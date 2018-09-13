@@ -112,6 +112,9 @@ return [
 	'No character present in input array.' => 'No character present in input array.',
 	'The Character is not allowed to craft Recipe.' => 'The Character is not allowed to craft Recipe.',
 
+	// api library station
+	'This article is not in this library' => 'This article is not in this library',
+
 	// command center
 	'command center' => 'Command center',
 	'All is well' => 'Everything is nominal.',
