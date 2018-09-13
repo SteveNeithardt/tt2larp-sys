@@ -21,9 +21,6 @@
 						<span v-if="!editing_names">@{{ last_activity_text(station.last_ping) }}</span>
 					</div>
 					<div class="card-body">
-						<div v-if="is_library(station)">
-							<div class="alert alert-dark">@lang ('i.Nothing to do in the library')</div>
-						</div>
 						<div v-if="editing_names && is_problem(station)">
 							<textarea class="form-control" v-model="station.station.alert_message" placeholder="@lang ('i.alert message')"></textarea>
 						</div>

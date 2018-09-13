@@ -12,9 +12,9 @@ html,body { height:100%; }
 		<div class="d-flex justify-content-center align-items-center h-100">
 			<div class="d-flex flex-wrap no-gutters p-3" v-if="listing_stations" v-cloak>
 				<div v-for="station in stations" class="col-md-4">
-					<div class="card m-3">
-						<div class="card-header" :class="alert_status(station)">@{{ station.name }}</div>
-						<div class="card-body" :class="alert_status(station)">
+					<div class="card m-3" :class="alert_status(station)">
+						<div class="card-header">@{{ station.name }}</div>
+						<div class="card-body">
 							@{{ station.alert.message }}
 						</div>
 					</div>
@@ -49,7 +49,7 @@ new Vue({
 		},
 		alert_status(station) {
 			if (station.alert.active) {
-				return "alert-danger";
+				return "red-blink";
 			}
 			return "";
 		},

@@ -323,3 +323,20 @@ ul.list {
 	background-color: darken($dropdown-bg, 8%);
 	color: $white;
 }
+
+// horror css
+.red-blink {
+	animation-duration: 500ms;
+	animation-name: blink;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+}
+
+@keyframes blink {
+	0%, 49% {
+		background-color: transparent;
+	}
+	50%, 100% {
+		background-color: red;
+	}
+}

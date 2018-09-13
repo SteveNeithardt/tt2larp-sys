@@ -210,7 +210,7 @@ class StationApiController extends Controller
 						'keep' => false,
 					]);
 				}
-				if ($article->library_station_id === $station->id) {
+				if ($instance->library_station_id === $station->id) {
 					$article = $instance;
 				} else {
 					return new JsonResponse([
