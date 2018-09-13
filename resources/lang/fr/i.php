@@ -109,6 +109,7 @@ return [
 	'More than one recipe present in input array.' => 'Plus d\'une recette présente dans la liste en entrée.',
 	'Station :name (:id) is not a CraftingStation.' => 'La station :name (:id) n\'est pas une station atelier.',
 	'No character present in input array.' => 'Aucun personnage présent dans la liste en entrée.',
+	'The Character is not allowed to craft Recipe.' => 'Le personnage n\'a pas le droit de fabriquer cette recette.',
 
 	// command center
 	'command center' => 'Centre de commande',

@@ -32,4 +32,16 @@ class Character extends Model
 	{
 		return $this->belongsToMany(Ability::class, 'character_abilities', 'character_id', 'ability_id')->withPivot('value');
 	}
+
+	/**
+	 * All Recipe ids a character has access to
+	 */
+	public function recipes()
+	{
+		$r = [];
+		foreach ($this->abilities as $ability) {
+			$r[] = $ability->recipes()->wherePivot('value', $ability->pivot->value)->get();
+		}
+		return collect($r)->flatten();
+	}
 }

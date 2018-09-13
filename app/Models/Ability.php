@@ -29,7 +29,7 @@ class Ability extends Model
 	 */
 	public function recipes()
 	{
-		return $this->belongsToMany(Recipe::class, 'recipe_abilities', 'ability_id', 'recipe_id');
+		return $this->belongsToMany(Recipe::class, 'recipe_abilities', 'ability_id', 'recipe_id')->withPivot('value');
 	}
 
 	/**

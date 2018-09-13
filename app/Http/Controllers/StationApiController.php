@@ -309,13 +309,31 @@ class StationApiController extends Controller
 			]);
 		}
 
+		$recipes = $character->recipes();
+
 		if ($recipe === null) {
-			//$recipes = $character->availableRecipes();
+			$messages = $recipes->map(function ($r) {
+				return $r->name . ' [' . $r->codes()->first()->code . ']';
+			});
 			return new JsonResponse([
 				'success' => true,
-				'messages' => [ __('i.Please enter a recipe you know.') ],
-				//'messages' => $recipes,
+				'messages' => $messages,
 				'keep' => true,
+			]);
+		}
+
+		$allowed = false;
+		foreach ($recipes as $r) {
+			if ($r->id === $recipe->id) {
+				$allowed = true;
+				break;
+			}
+		}
+		if ($allowed === false) {
+			return new JsonResponse([
+				'success' => false,
+				'message' => __('i.The Character is not allowed to craft Recipe.'),
+				'keep' => false,
 			]);
 		}
 

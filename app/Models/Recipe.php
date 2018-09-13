@@ -15,10 +15,10 @@ class Recipe extends Model
 	/**
 	 * relations to always eager load
 	 */
-	protected $with = [
-		'codes',
-		'ingredients'
-	];
+	//protected $with = [
+		//'codes',
+		//'ingredients'
+	//];
 
 	/**
 	 * upon boot, declare what happens on delete
@@ -58,5 +58,13 @@ class Recipe extends Model
 	public function craft()
 	{
 		return $this->belongsTo(Ingredient::class, 'craft_id', 'id');
+	}
+
+	/**
+	 * Scope with all relations
+	 */
+	public function scopeWithAll($query)
+	{
+		return $query->with('codes', 'ingredients', 'abilities');
 	}
 }
