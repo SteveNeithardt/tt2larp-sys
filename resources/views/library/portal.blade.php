@@ -26,9 +26,12 @@
 				<div class="card-body">
 					<span class="btn btn-primary mb-3" v-if="!adding_article" v-on:click="addArticle()">@lang ('i.add')</span>
 					<div class="d-flex mb-3 justify-content-between" v-if="adding_article">
-						<input class="form-control col-md-5" type="text" v-model="article_name" placeholder="@lang ('i.name')">
-						<input class="form-control col-md-4" type="text" v-model="article_code" placeholder="@lang ('i.code')">
-						<div class="col-md-2 d-flex align-items-center">
+						<input class="form-control col-md-3" type="text" v-model="article_name" placeholder="@lang ('i.name')">
+						<input class="form-control col-md-3" type="text" v-model="article_code" placeholder="@lang ('i.code')">
+						<div class="col-md-2">
+							<select2 :options="stations" v-model="article_station"></select2>
+						</div>
+						<div class="col-md-3 d-flex align-items-center">
 							<div class="cancel-icon" v-on:click="resetArticle()"></div> 
 							<div class="save-icon ml-2" v-if="valid_article" v-on:click="storeArticle()"></div>
 						</div>
@@ -52,7 +55,7 @@
 					<div class="d-flex justify-content-between align-items-center" v-if="adding_article">
 						<input class="form-control col-md-3" type="text" v-model="article_name" placeholder="@lang ('i.name')">
 						<input class="form-control col-md-3" type="text" v-model="article_code" placeholder="@lang ('i.code')">
-						<div class="cold-md-2">
+						<div class="col-md-2">
 							<select2 :options="stations" v-model="article_station"></select2>
 						</div>
 						<div class="col-md-3 d-flex align-items-center">
