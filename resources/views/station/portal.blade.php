@@ -55,7 +55,10 @@
 								</div>
 								<div v-else>
 									<div class="btn btn-primary" v-on:click="ps_assign_problem(station.id)" v-if="ps_assigning_problem < 0 && !ps_has_problem(station)">@lang ('i.assign new problem')</div>
-									<div class="btn btn-danger" v-on:click="ps_cancel_problem(station.id)" v-if="ps_assigning_problem < 0 && ps_has_problem(station)">@lang ('i.cancel problem')</div>
+									<div class="btn btn-danger" v-on:click="ps_cancel_problem(station.id)" v-if="ps_assigning_problem < 0 && ps_has_problem(station)">
+										<span v-if="ps_is_finished(station)">@lang ('i.terminate problem')</span>
+										<span v-else>@lang ('i.cancel problem')</span>
+									</div>
 								</div>
 							</div>
 						</div>

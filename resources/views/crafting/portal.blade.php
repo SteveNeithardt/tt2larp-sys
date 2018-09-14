@@ -50,7 +50,7 @@
 					</ul>
 					<div class="btn btn-primary my-2" v-on:click="addIngredient()">@lang ('i.add ingredient')</div>
 					<hr>
-					<div class="mt-3">
+					<div class="mt-3" v-if="!storing">
 						<span class="btn btn-primary mr-2" v-on:click="storeRecipe()" v-if="valid_recipe">@lang ('i.save recipe')</span>
 						<span class="btn btn-secondary" v-on:click="resetRecipe()">@lang ('i.cancel')</span>
 					</div>
@@ -67,6 +67,8 @@ new Vue({
 el: '#vue',
 	data() {
 		return {
+			storing: false,
+
 			listing_recipes: false,
 			recipes: null,
 			filter_name: null,
@@ -184,6 +186,7 @@ el: '#vue',
 		},
 		storeRecipe() {
 			if (!this.valid_recipe) return;
+			this.storing = true;
 			axios.post("{{ route('store recipe') }}", {
 					recipe_id: this.recipe_id,
 					name: this.name,
@@ -192,10 +195,13 @@ el: '#vue',
 					ingredients: this.ingredients,
 					abilities: this.recipe_abilities,
 				}).then(response => {
+					this.storing = false;
 					if (response.data.success) {
 						this.fetch_recipes();
 					}
-				}).catch(errors => {});
+				}).catch(errors => {
+					this.storing = false;
+				});
 		},
 		fetch_data() {
 			this.fetch_recipes();

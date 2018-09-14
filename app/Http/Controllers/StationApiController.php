@@ -270,11 +270,7 @@ class StationApiController extends Controller
 	public function crafting(Request $request, CraftingStation $station)
 	{
 		if ($request->codes === null || count($request->codes) === 0) {
-			return new JsonResponse([
-				'success' => true,
-				'messages' => [],
-				'keep' => false,
-			]);
+			return new JsonResponse([ 'success' => true ]);
 		}
 
 		// from all codes sent through the api
