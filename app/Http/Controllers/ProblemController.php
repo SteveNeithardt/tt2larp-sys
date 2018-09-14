@@ -243,11 +243,15 @@ class ProblemController extends Controller
 		// note that codes found but associated to another instance are ignored.
 		foreach ($request->codes as $c) {
 			$codestr = $c['code'];
-			$code = Code::find($codestr);
-			if ($code !== null) {
-				$instance = $code->coded;
-				if ($instance instanceOf StepNextStep && $instance->id == $stepNextStep->id) {
-					$found[] = $code;
+			$rcodes = Code::where('code', $codestr)->get();
+			if (count($rcodes) > 0) {
+				foreach ($rcodes as $code) {
+					if ($code !== null) {
+						$instance = $code->coded;
+						if ($instance instanceOf StepNextStep && $instance->id == $stepNextStep->id) {
+							$found[] = $code;
+						}
+					}
 				}
 			} else {
 				$code = new Code();

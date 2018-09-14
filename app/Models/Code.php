@@ -19,16 +19,6 @@ class Code extends Model
 	public $timestamps = false;
 
 	/**
-	 * Primary key is a string
-	 */
-	public $incrementing = false;
-
-	/**
-	 * Primary key is field $code
-	 */
-	protected $primaryKey = 'code';
-
-	/**
 	 * Get all of the owning coded models
 	 */
 	public function coded()

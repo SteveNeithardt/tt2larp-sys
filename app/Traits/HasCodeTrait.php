@@ -38,24 +38,16 @@ trait HasCodeTrait
 	 */
 	public function assignCode($code)
 	{
-		if ($this->codes()->count() > 0) {
-			$local = $this->codes()->first();
-			if ($local->code === $code) return;
+		$local = $this->codes;
+		foreach ($local as $c) {
+			if ($c->code === $code) return;
 		}
 
-		$c = Code::find($code);
-		if ($c !== null) {
-			$coded = $c->coded;
-			if ($coded !== null) {
-				$name = (new ReflectionClass($coded))->getShortName() . '(' . $coded->name . ')';
-				throw new RuntimeException(__( "':code' is already assigned to :instance.", [ 'code' => $code, 'instance' => $name ] ));
-			}
-			$this->codes()->save($c);
-		} else {
-			$this->codes()->create([ 'code' => $code ]);
-		}
+		$this->codes()->create([ 'code' => $code ]);
 
-		if (isset($local)) $local->delete();
+		foreach ($local as $l) {
+			$l->delete();
+		}
 	}
 
 	/**
@@ -63,12 +55,13 @@ trait HasCodeTrait
 	 */
 	public function removeCode($code)
 	{
-		$c = Code::find($code);
-		if ($c === null) return;
+		$codes = Code::where('code', $code)->get();
 
-		$coded = $c->coded;
-		if ($coded instanceof self && $c->coded_id === $this->id) {
-			$c->delete();
+		foreach ($codes as $c) {
+			$coded = $c->coded;
+			if ($coded instanceof self && $c->coded_id === $this->id) {
+				$c->delete();
+			}
 		}
 	}
 }

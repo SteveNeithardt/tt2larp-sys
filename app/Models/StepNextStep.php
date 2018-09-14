@@ -4,8 +4,12 @@ namespace tt2larp\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use tt2larp\Traits\HasCodeTrait;
+
 class StepNextStep extends Model
 {
+	use HasCodeTrait;
+
 	protected $table = 'step_next_steps';
 
 	/**
@@ -43,13 +47,5 @@ class StepNextStep extends Model
 	public function abilities()
 	{
 		return $this->belongsToMany(Ability::class, 'step_next_step_abilities', 'step_next_step_id', 'ability_id', 'id', 'id')->withPivot('value');
-	}
-	
-	/**
-	 * Codes this instance requires
-	 */
-	public function codes()
-	{
-		return $this->morphMany(Code::class, 'coded');
 	}
 }

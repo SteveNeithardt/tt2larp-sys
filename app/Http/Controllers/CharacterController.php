@@ -37,7 +37,7 @@ class CharacterController extends Controller
 			}
 			$code = $character->codes->first();
 			if ($code !== null) {
-				$character->code = $character->codes->first()->code;
+				$character->code = $code->code;
 			} else {
 				$character->code = null;
 			}
@@ -89,11 +89,7 @@ class CharacterController extends Controller
 
 		$character->abilities()->sync($relations_array);
 
-		try {
-			$character->assignCode($request->code);
-		} catch (RuntimeException $e) {
-			//silentreturn new JsonResponse([ 'success' => false, 'message' => $e->message ]);
-		}
+		$character->assignCode($request->code);
 
 		return $this->getList();
 	}
