@@ -89,7 +89,8 @@ return [
 	'problem is finished' => 'Problème terminé.',
 	'no active problem' => 'Aucun problème actif.',
 	'no problem' => 'Aucun problème',
-	'cancel problem' => 'Annuler problème',
+	'cancel problem' => 'Annuler le problème',
+	'terminate problem' => 'Terminer le problème',
 	'assign new problem' => 'Assigner un nouveau problème',
 	'Are you sure?' => 'En êtes-vous certain?',
 	'The Station will no longer have any active Problem.' => 'La station n\'aura plus de problème actif.',
@@ -121,4 +122,5 @@ return [
 
 	// chat
 	'chat interface' => 'Communications',
+	'chat' => 'Chat',
 ];

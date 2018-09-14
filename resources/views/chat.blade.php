@@ -16,7 +16,7 @@ html,body { height:100%; }
 			<div class="h-100 thumb d-flex align-items-center p-4" v-on:click="newMessage()">&gt;&gt;</div>
 		</div>
 		<div v-for="message in messages" class="mx-3">
-			@{{ message.message }}
+			<span :class="deleted_class(message.deleted)">@{{ message.message }}</span>
 		</div>
 	</div>
 </div>
@@ -31,6 +31,7 @@ new Vue({
 			id: {{ $chat_id }},
 			new_msg: "",
 			messages: null,
+			unreadCount: 0,
 		}
 	},
 	methods: {
@@ -58,12 +59,15 @@ new Vue({
 			}).catch(errors => {
 			});
 		},
+		deleted_class(deleted) {
+			return deleted ? 'deleted' : '';
+		},
 		fetch_data() {
 			this.fetch_messages();
 
 			setInterval(function() {
 				this.fetch_messages();
-			}.bind(this), 2000);
+			}.bind(this), 4000);
 		},
 	},
 	mounted() {

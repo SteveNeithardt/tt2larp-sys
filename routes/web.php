@@ -23,7 +23,6 @@ Route::get('/communication', 'ChatController@index')->name('chat index');
 Route::get('/chat', 'ChatController@messages')->name('get chat list');
 Route::post('/chat', 'ChatController@newMessage')->name('new chat message');
 
-
 Route::group([ 'middleware' => 'auth' ], function() {
 	Route::get('/', 'HomeController@index')->name('home');
 
@@ -67,6 +66,8 @@ Route::group([ 'middleware' => 'auth' ], function() {
 	Route::get('/crafting/list', 'CraftingController@getList')->name('get recipes');
 	Route::post('/crafting/recipe/store', 'CraftingController@storeRecipe')->name('store recipe');
 	Route::post('/crafting/recipe/delete', 'CraftingController@deleteRecipe')->name('delete recipe');
-	//Route::post('/crafting/ingredient/store', 'CraftingController@storeIngredient')->name('store ingredient');
-	//Route::post('/crafting/ingredient/delete', 'CraftingController@deleteIngredient')->name('delete ingredient');
+
+	// authenticated only unread chat stuffs
+	Route::get('/chat/unread', 'ChatController@unread')->name('get chat unread');
+	Route::post('/chat/unread', 'ChatController@markRead')->name('mark chat read');
 });

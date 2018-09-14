@@ -78,8 +78,8 @@
 				<span class="chat-icon-text">
 					@lang ('i.chat')
 				</span>
-				<span class="chat-icon-number d-flex align-items-center justify-content-center" v-if="number != 0">
-					@{{ number }}
+				<span class="chat-icon-number btn-success d-flex align-items-center justify-content-center" v-if="unreadCount != 0">
+					@{{ unreadCount }}
 				</span>
 			</span>
 			<div class="chat-frame" v-if="visible">
@@ -99,31 +99,36 @@ new Vue({
 	data() {
 		return {
 			visible: false,
-			number: 0,
+			unreadCount: 0,
 			id: 1,
 		}
 	},
 	methods: {
-		//todo: something about just getting the number 'since last time' kinda...?
-		fetch_messages() {
-			axios.get("{{ route('get chat list') }}", { params: {
+		fetch_unreadCount() {
+			if (this.visible) return;
+			axios.get("{{ route('get chat unread') }}", { params: {
 				chat_id: this.id,
 			}}).then(response => {
 				if (response.data.success) {
-					this.messages = response.data.messages;
-					//this.number = response.data.messages.count;
+					this.unreadCount = response.data.unreadCount;
 				}
 			}).catch(errors => {});
 		},
 		toggle(visible) {
 			this.visible = visible;
+			if (visible) {
+				axios.post("{{ route('mark chat read') }}", {
+					chat_id: this.id,
+				}).then(response => {
+				}).catch(errors => {});
+			}
 		},
 		fetch_data() {
-			this.fetch_messages();
+			this.fetch_unreadCount();
 
 			setInterval(function() {
-				this.fetch_messages();
-			}.bind(this), 2000);
+				this.fetch_unreadCount();
+			}.bind(this), 4000);
 		}
 	},
 	mounted() {

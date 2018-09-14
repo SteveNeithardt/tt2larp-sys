@@ -90,6 +90,7 @@ return [
 	'no active problem' => 'No active Problem.',
 	'no problem' => 'No Problem',
 	'cancel problem' => 'Cancel Problem',
+	'terminate problem' => 'Terminate Problem',
 	'assign new problem' => 'Assign new Problem',
 	'Are you sure?' => 'Are you sure?',
 	'The Station will no longer have any active Problem.' => 'The Station will no longer have any active Problem.',
@@ -121,4 +122,5 @@ return [
 
 	// chat
 	'chat interface' => 'Communications',
+	'chat' => 'Chat',
 ];

@@ -262,9 +262,6 @@ ul.list {
 	left: 0;
 	height: 23px;
 	min-width: 23px;
-	background: $body-bg;
-	color: $electricgreen;
-	border: 1px solid $electricgreen;
 	border-radius: 50%;
 }
 .chat-frame {
@@ -339,4 +336,8 @@ ul.list {
 	50%, 100% {
 		background-color: red;
 	}
+}
+
+.deleted {
+	text-decoration: line-through;
 }
