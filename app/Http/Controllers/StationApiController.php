@@ -118,11 +118,12 @@ class StationApiController extends Controller
 		}
 
 		// from all codes sent through the api
-		$codes = Code::findMany($request->codes);
+		$codes = Code::whereIn('code', $request->codes)->get();
 
 		// filter out the valid StepNextStep instances and find the Character performing the duty.
 		$stepNextSteps = [];
 		$character = null;
+		$stack = [];
 		foreach ($codes as $code) {
 			$instance = $code->coded;
 			if ($instance instanceof Character) {
@@ -134,8 +135,10 @@ class StationApiController extends Controller
 					]);
 				}
 				$character = $instance;
+				$stack[] = $character->name;
 			} else if ($instance instanceof StepNextStep) {
 				$stepNextSteps[] = $instance;
+				$stack[] = $code->code;
 			}
 		}
 
@@ -164,6 +167,7 @@ class StationApiController extends Controller
 			return new JsonResponse([
 				'success' => true,
 				'messages' => $failure_messages,
+				'str_stack' => ($character === null ? $stack : []),
 				'keep' => ($character === null ? true : false),
 			]);
 		}
@@ -194,14 +198,16 @@ class StationApiController extends Controller
 			return new JsonResponse([ 'success' => true ]);
 		}
 
-		$codes = Code::findMany($request->codes);
+		$codes = Code::whereIn('code', $request->codes)->get();
 
 		$characters = [];
 		$article = null;
+		$stack = [];
 		foreach ($codes as $code) {
 			$instance = $code->coded;
 			if ($instance instanceof Character) {
 				$characters[] = $instance;
+				$stack[] = $instance->name;
 			} else if ($instance instanceof Article) {
 				if ($article !== null) {
 					return new JsonResponse([
@@ -212,6 +218,7 @@ class StationApiController extends Controller
 				}
 				if ($instance->library_station_id === $station->id) {
 					$article = $instance;
+					$stack[] = $code->code;
 				} else {
 					return new JsonResponse([
 						'success' => false,
@@ -225,6 +232,7 @@ class StationApiController extends Controller
 			return new JsonResponse([
 				'success' => false,
 				'message' => __('i.No article present in input array.'),
+				'str_stack' => $stack,
 				'keep' => true,
 			]);
 		}
@@ -248,6 +256,7 @@ class StationApiController extends Controller
 			return new JsonResponse([
 				'success' => true,
 				'messages' => [],
+				'str_stack' => $stack,
 				'keep' => true,
 			]);
 		}
@@ -255,6 +264,7 @@ class StationApiController extends Controller
 		return new JsonResponse([
 			'success' => true,
 			'messages' => array_column($parts, 'description'),
+			'str_stack' => $stack,
 			'keep' => true,
 		]);
 	}
@@ -274,12 +284,13 @@ class StationApiController extends Controller
 		}
 
 		// from all codes sent through the api
-		$codes = Code::findMany($request->codes);
+		$codes = Code::whereIn('code', $request->codes)->get();
 
 		// filter out Recipe instances, Ingredient instances and the Character performing the search.
 		$character = null;
 		$recipe = null;
 		$ingredients = [];
+		$stack = [];
 		foreach ($codes as $code) {
 			$instance = $code->coded;
 			if ($instance instanceof Character) {
@@ -291,6 +302,7 @@ class StationApiController extends Controller
 					]);
 				}
 				$character = $instance;
+				$stack[] = $character->name;
 			} else if ($instance instanceof Recipe) {
 				if ($recipe !== null) {
 					return new JsonResponse([
@@ -300,8 +312,10 @@ class StationApiController extends Controller
 					]);
 				}
 				$recipe = $instance;
+				$stack[] = $code->code;
 			} else if ($instance instanceof Ingredient) {
 				$ingredients[] = $instance;
+				$stack[] = $code->code;
 			}
 		}
 
@@ -322,6 +336,7 @@ class StationApiController extends Controller
 			return new JsonResponse([
 				'success' => true,
 				'messages' => $messages,
+				'str_stack' => $stack,
 				'keep' => true,
 			]);
 		}
@@ -356,6 +371,7 @@ class StationApiController extends Controller
 			return new JsonResponse([
 				'success' => true,
 				'messages' => [ __('i.Not enough ingredients for recipe.') ],
+				'str_stack' => $stack,
 				'keep' => true,
 			]);
 		}
@@ -363,6 +379,7 @@ class StationApiController extends Controller
 		return new JsonResponse([
 			'success' => true,
 			'messages' => [ $recipe->description ],
+			'str_stack' => $stack,
 			'keep' => false,
 		]);
 	}
