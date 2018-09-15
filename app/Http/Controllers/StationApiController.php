@@ -398,7 +398,10 @@ class StationApiController extends Controller
 		}
 
 		$valid = true;
+		$craft_message = [];
+		$craft_message[] = "Ingredients:";
 		foreach ($recipe->ingredients as $ingredient) {
+			$craft_message[] = $ingredient->name;
 			$found = false;
 			foreach ($ingredients as $i) {
 				if ($i->id === $ingredient->id) {
@@ -409,12 +412,14 @@ class StationApiController extends Controller
 			$valid = $valid && $found;
 		}
 
-		//$craft_message = 
-
+		$craft_message = implode("\n- ", $craft_message);
 		if ($valid === false) {
 			return new JsonResponse([
 				'success' => true,
-				'messages' => [ __('i.Not enough ingredients for recipe.') ],
+				'messages' => [
+					$craft_message,
+					__('i.Not enough ingredients for recipe.')
+				],
 				'str_stack' => $stack,
 				'keep' => true,
 			]);

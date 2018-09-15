@@ -40,7 +40,7 @@ class Character extends Model
 	{
 		$r = [];
 		foreach ($this->abilities as $ability) {
-			$r[] = $ability->recipes()->wherePivot('value', $ability->pivot->value)->get();
+			$r[] = $ability->recipes()->wherePivot('value', '<=', $ability->pivot->value)->get();
 		}
 		return collect($r)->flatten();
 	}
