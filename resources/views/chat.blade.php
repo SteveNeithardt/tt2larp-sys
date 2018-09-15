@@ -2,23 +2,27 @@
 
 @section ('css')
 <style>
-html,body { height:100%; }
+html,body { background: #000400; height:100%; }
 * { font-family: monospace; }
-.overflow-y-hidden { overflow-y:hidden; }
-.overflow-scroll { overflow: scroll; }
+.overflow-y-scroll { overflow: scroll; }
 textarea { height: 40px; };
+.chat-fullframe { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+.chat-input { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; }
+.chat-messages { position: absolute; top: 0; left: 0; right: 0; bottom: 84px; }
 </style>
 @endsection
 
 @section ('content')
 <div class="h-100" id="vue">
-	<div class="h-100 d-flex flex-column-reverse overflow-y-hidden">
-		<div class="d-flex mt-2">
+	<div class="chat-fullframe">
+		<div class="chat-input d-flex mt-2">
 			<textarea type="text" class="form-control" v-model="new_msg"></textarea>
 			<div class="h-100 thumb d-flex align-items-center p-4" v-on:click="newMessage()">&gt;&gt;</div>
 		</div>
-		<div v-for="message in messages" class="mx-3">
-			<span :class="deleted_class(message.deleted)">@{{ message.message }}</span>
+		<div class="chat-messages d-flex flex-column-reverse overflow-y-scroll">
+			<div v-for="message in messages" class="mx-3">
+				<span :class="deleted_class(message.deleted)">@{{ message.message }}</span>
+			</div>
 		</div>
 	</div>
 </div>
