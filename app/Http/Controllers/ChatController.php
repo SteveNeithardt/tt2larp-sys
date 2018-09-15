@@ -112,6 +112,8 @@ class ChatController extends Controller
 			$message = new Message();
 			$message->user_id = $user_id;
 			$message->message = $request->message;
+			$message->deleted = false;
+			$message->read = $user_id !== null;
 			$chat->messages()->save($message);
 			return new JsonResponse([
 				'success' => true,
