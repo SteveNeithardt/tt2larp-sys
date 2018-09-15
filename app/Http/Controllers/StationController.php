@@ -51,8 +51,10 @@ class StationController extends Controller
 			$message = __('i.All is well');
 			if ($station->station instanceof ProblemStation) {
 				if ($station->station->problem !== null) {
-					$active = true;
-					$message = $station->station->alert_message;
+					if ($station->station->step === null || $station->station->step->nextEdgeCount > 0) {
+						$active = true;
+						$message = $station->station->alert_message;
+					}
 				}
 			}
 			if ($station->station instanceof CraftingStation) {
