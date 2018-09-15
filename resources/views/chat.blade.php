@@ -5,6 +5,8 @@
 html,body { height:100%; }
 * { font-family: monospace; }
 .overflow-y-hidden { overflow-y:hidden; }
+.overflow-scroll { overflow: scroll; }
+textarea { height: 40px; };
 </style>
 @endsection
 
