@@ -123,24 +123,32 @@ class StationApiController extends Controller
 
 		// filter out the valid StepNextStep instances and find the Character performing the duty.
 		$stepNextSteps = [];
-		$character = null;
+		//$character = null;
+		$characters = [];
 		$stack = [];
 		foreach ($codes as $code) {
 			$instance = $code->coded;
 			if ($instance instanceof Character) {
-				if ($character !== null) {
-					return new JsonResponse([
-						'success' => false,
-						'message' => __('i.More than one character present in input array.'),
-						'keep' => false,
-					]);
-				}
-				$character = $instance;
-				$stack[] = $character->name;
+				$characters[] = $instance;
+				//if ($character !== null) {
+					//return new JsonResponse([
+						//'success' => false,
+						//'message' => __('i.More than one character present in input array.'),
+						//'keep' => false,
+					//]);
+				//}
+				//$character = $instance;
+				$stack[] = $instance->name;
 			} else if ($instance instanceof StepNextStep) {
 				$stepNextSteps[] = $instance;
 				$stack[] = $code->code;
 			}
+		}
+
+		$abilities = Ability::CollapseCharacters($characters);
+		$built = [];
+		foreach ($abilities as $key => $value) {
+			$built[] = (object)[ 'id' => $key, 'pivot' => (object)[ 'value' => $value ] ];
 		}
 
 		$successfulNextStep = null;
@@ -158,9 +166,12 @@ class StationApiController extends Controller
 				}
 			}
 
-			if ($character !== null) {
-				$valid = Ability::CompareAllInFirst($stepNextStep->abilities, $character->abilities);
-				if (count($valid) > 0) {
+			if (count($characters) > 0) {
+			//if ($character !== null) {
+				$valid = Ability::CompareAllInFirst($stepNextStep->abilities, $built);
+				//$valid = Ability::CompareAllInFirst($stepNextStep->abilities, $character->abilities);
+				if (count($valid) == count($stepNextStep->abilities)) {
+				//if (count($valid) > 0) {
 					$successfulNextStep = $stepNextStep;
 					break;
 				}
@@ -170,8 +181,10 @@ class StationApiController extends Controller
 			return new JsonResponse([
 				'success' => true,
 				'messages' => $failure_messages,
-				'str_stack' => ($character === null ? $stack : []),
-				'keep' => ($character === null ? true : false),
+				//'str_stack' => ($character === null ? $stack : []),
+				//'keep' => ($character === null ? true : false),
+				'str_stack' => $stack,
+				'keep' => true,
 			]);
 		}
 
