@@ -244,16 +244,17 @@ class ProblemController extends Controller
 		foreach ($request->codes as $c) {
 			$codestr = $c['code'];
 			$rcodes = Code::where('code', $codestr)->get();
-			if (count($rcodes) > 0) {
-				foreach ($rcodes as $code) {
-					if ($code !== null) {
-						$instance = $code->coded;
-						if ($instance instanceOf StepNextStep && $instance->id == $stepNextStep->id) {
-							$found[] = $code;
-						}
+			$finded = false;
+			foreach ($rcodes as $code) {
+				if ($code !== null) {
+					$instance = $code->coded;
+					if ($instance instanceOf StepNextStep && $instance->id == $stepNextStep->id) {
+						$found[] = $code;
+						$finded = true;
 					}
 				}
-			} else {
+			}
+			if ($finded === false) {
 				$code = new Code();
 				$code->code = $codestr;
 				$new[] = $code;

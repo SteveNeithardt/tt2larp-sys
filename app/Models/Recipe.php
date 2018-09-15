@@ -28,6 +28,7 @@ class Recipe extends Model
 		parent::boot();
 
 		static::deleting(function ($recipe) {
+			$recipe->abilities()->detach();
 			$recipe->craft()->dissociate();
 			$recipe->codes()->delete();
 			foreach ($recipe->ingredients as $ingredient) {
