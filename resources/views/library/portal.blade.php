@@ -75,13 +75,31 @@
 			<div class="card" v-if="editing_part">
 				<div class="card-header"><input class="form-control" type="text" placeholder="@lang ('i.part name')" v-model="part_name"></div>
 				<div class="card-body">
-					<div class="d-flex justify-content-between mb-3">
+					{{--<div class="d-flex justify-content-between mb-3">
 						<div><select2 v-model="part_ability_id" :options="abilities">
 							<option value="-1">@lang ('i.no ability')</option>
 						</select2></div>
 						<input type="number" class="form-control col-md-4" v-model="part_ability_value">
-					</div>
+					</div>--}}
 					<textarea class="form-control" v-model="part_description" placeholder="@lang ('i.part description')"></textarea>
+					<hr>
+					<ul class="list">
+						<li v-for="part_ability in part_abilities" class="d-flex justify-content align-items-center">
+							<div class="col-md-8"><select2 v-model="part_ability.id" :options="abilities"></select2></div>
+							<input type="number" class="form-control col-md-2" v-model="part_ability.value">
+							<div class="delete-icon" v-on:click="deletePartAbility(part_ability.id)"></div>
+						</li>
+					</ul>
+					<div class="btn btn-primary my-2" v-on:click="addPartAbility()">@lang ('i.add ability')</div>
+					<hr>
+					<ul class="list">
+						<li v-for="c in part_codes" class="d-flex justify-content-between align-items-center">
+							<input type="text" class="form-control col-md-5" v-model="c.code" placeholder="@lang ('i.code')">
+							<div class="delete-icon" v-on:click="deletePartCode(c.code)"></div>
+						</li>
+					</ul>
+					<div class="btn btn-primary my-2" v-on:click="addPartCode()">@lang ('i.add code')</div>
+					<hr>
 					<div class="mt-3">
 						<span class="btn btn-primary mr-2" v-on:click="storePart()" v-if="valid_part">@lang ('i.save part')</span>
 						<span class="btn btn-danger mr-2" v-on:click="deletePart()" v-if="can_delete_part">@lang ('i.delete')</span>
@@ -124,8 +142,10 @@ new Vue({
 			part_id: null,
 			part_name: null,
 			part_description: null,
-			part_ability_id: null,
-			part_ability_value: null,
+			//part_ability_id: null,
+			//part_ability_value: null,
+			part_abilities: [],
+			part_codes: [],
 		}
 	},
 	computed: {
@@ -152,15 +172,15 @@ new Vue({
 			return (
 				this.part_name != null &&
 				this.part_name.length > 2 &&
-				this.part_description != null && (
-					(
-						(this.part_ability_id == null || this.part_ability_id < 0) &&
-						(this.part_ability_value == null || this.part_ability_value.length == 0)
-					) || (
-						(this.part_ability_id != null && this.part_ability_id > 0) &&
-						(this.part_ability_value != null && this.part_ability_value > 0)
-					)
-				)
+				this.part_description != null// && (
+					//(
+						//(this.part_ability_id == null || this.part_ability_id < 0) &&
+						//(this.part_ability_value == null || this.part_ability_value.length == 0)
+					//) || (
+						//(this.part_ability_id != null && this.part_ability_id > 0) &&
+						//(this.part_ability_value != null && this.part_ability_value > 0)
+					//)
+				//)
 			);
 		},
 		station_name() {
@@ -243,8 +263,10 @@ new Vue({
 			this.part_id = null;
 			this.part_name = null;
 			this.part_description = null;
-			this.part_ability_id = -1;
-			this.part_ability_value = null;
+			//this.part_ability_id = -1;
+			//this.part_ability_value = null;
+			this.part_abilities = [];
+			this.part_codes = [];
 		},
 		addArticle() {
 			this.adding_article = true;
@@ -265,6 +287,12 @@ new Vue({
 				this.fetch_parts();
 			}
 		},
+		addPartCode() {
+			this.part_codes.push({ code: "" });
+		},
+		addPartAbility() {
+			this.part_abilities.push({ id: -1, value: 0});
+		},
 		editPart(id = -1) {
 			this.resetPart();
 			this.editing_part = true;
@@ -278,6 +306,8 @@ new Vue({
 				this.part_description = part.description;
 				this.part_ability_id = part.ability_id == null ? -1 : part.ability_id;
 				this.part_ability_value = part.min_value;
+				this.part_abilities = part.abilities;
+				this.part_codes = part.codes;
 			}
 		},
 		storeArticle(fetch = true) {
@@ -333,8 +363,10 @@ new Vue({
 					id: this.part_id,
 					name: this.part_name,
 					description: this.part_description,
-					ability_id: this.part_ability_id < 0 ? null : this.part_ability_id,
-					min_value: this.part_ability_value,
+					//ability_id: this.part_ability_id < 0 ? null : this.part_ability_id,
+					//min_value: this.part_ability_value,
+					abilities: this.part_abilities,
+					codes: this.part_codes,
 				})
 				.then(response => {
 					if (response.data.success) {
@@ -344,6 +376,12 @@ new Vue({
 					}
 				})
 				.catch(errors => {});
+		},
+		deletePartCode(code) {
+			this.part_codes = this.part_codes.filter(c => c.code != code);
+		},
+		deletePartAbility(ability_id) {
+			this.part_abilities = this.part_abilities.filter(a => a.id != ability_id);
 		},
 		async deletePart() {
 			if (!this.can_delete_part) return;

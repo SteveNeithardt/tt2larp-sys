@@ -14,6 +14,7 @@ use tt2larp\Models\Character;
 use tt2larp\Models\CraftingStation;
 use tt2larp\Models\Ingredient;
 use tt2larp\Models\LibraryStation;
+use tt2larp\Models\Part;
 use tt2larp\Models\ProblemStation;
 use tt2larp\Models\Problem;
 use tt2larp\Models\Recipe;
@@ -146,7 +147,9 @@ class StationApiController extends Controller
 		$failure_messages = [];
 		$failure_messages[] = $step->description;
 		foreach ($step->stepNextSteps as $stepNextStep) {
-			$failure_messages[] = $stepNextStep->failure_message;
+			if ($stepNextStep->failure_messages !== null && count($stepNextStep->failure_messages) > 0) {
+				$failure_messages[] = $stepNextStep->failure_message;
+			}
 
 			foreach ($stepNextSteps as $potential) {
 				if ($stepNextStep->id === $potential->id) {
@@ -202,6 +205,7 @@ class StationApiController extends Controller
 
 		$characters = [];
 		$article = null;
+		$codeparts = [];
 		$stack = [];
 		foreach ($codes as $code) {
 			$instance = $code->coded;
@@ -226,6 +230,8 @@ class StationApiController extends Controller
 						'keep' => false,
 					]);
 				}
+			} else if ($instance instanceof Part) {
+				$codeparts[] = $part;
 			}
 		}
 		if ($article === null) {
@@ -239,20 +245,42 @@ class StationApiController extends Controller
 
 		$abilities = Ability::CollapseCharacters($characters);
 
-		$parts = [];
-		foreach ($article->parts as $part) {
-			$ability_id = $part->ability_id;
-			$min_value = $part->min_value;
-			if ($ability_id === null || $min_value === null) {
-				$parts[] = $part;
-			} else {
-				if (isset($abilities[$ability_id]) && $abilities[$ability_id] >= $min_value) {
-					$parts[] = $part;
-				}
-			}
+		$built = [];
+		foreach ($abilities as $key => $value) {
+			$built[] = (object)[ 'id' => $key, 'pivot' => (object)[ 'value' => $value ] ];
 		}
 
-		if (count($parts) === 0) {
+		$validparts = [];
+		foreach ($article->parts as $part) {
+			if ($part->abilities->count() == 0 && $part->codes->count() == 0) {
+				$validparts[] = $part;
+				continue;
+			}
+			if ($part->abilities->count() > 0 && $part->codes->count() == 0) {
+				$valid = Ability::CompareAllInFirst($part->abilities, $built);
+				if (count($valid) === count($part->abilities)) {
+					$validparts[] = $part;
+				}
+			}
+			if ($part->abilities->count() == 0 && $part->codes->count() > 0) {
+				foreach ($codeparts as $cp) {
+					if ($cp->id === $part->id) {
+						
+					}
+				}
+			}
+			//$ability_id = $part->ability_id;
+			//$min_value = $part->min_value;
+			//if ($ability_id === null || $min_value === null) {
+				//$parts[] = $part;
+			//} else {
+				//if (isset($abilities[$ability_id]) && $abilities[$ability_id] >= $min_value) {
+					//$parts[] = $part;
+				//}
+			//}
+		}
+
+		if (count($validparts) === 0) {
 			return new JsonResponse([
 				'success' => true,
 				'messages' => [],
@@ -263,7 +291,7 @@ class StationApiController extends Controller
 
 		return new JsonResponse([
 			'success' => true,
-			'messages' => array_column($parts, 'description'),
+			'messages' => array_column($validparts, 'description'),
 			'str_stack' => $stack,
 			'keep' => true,
 		]);

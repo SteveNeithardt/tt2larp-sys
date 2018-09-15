@@ -119,7 +119,14 @@ class LibraryController extends Controller
 			return new JsonResponse([ 'success' => false, 'message' => __('i.The requested :instance doesn\'t exist.', [ 'instance' => 'Article' ]) ], 400);
 		}
 
-		$parts = $article->parts;
+		$parts = $article->parts()->with('codes')->with('abilities')->get();
+
+		foreach ($parts as $part) {
+			foreach ($part->abilities as $ability) {
+				$ability->value = $ability->pivot->value;
+				unset($ability->pivot);
+			}
+		}
 
 		return new JsonResponse($parts);
 	}
@@ -133,8 +140,13 @@ class LibraryController extends Controller
 			'id' => 'nullable|integer',
 			'name' => 'required|string|min:3',
 			'description' => 'required|string',
-			'ability_id' => 'nullable|integer',
-			'min_value' => 'nullable|integer',
+			//'ability_id' => 'nullable|integer',
+			//'min_value' => 'nullable|integer',
+			'abilities' => 'nullable|array',
+			'abilities.*.id' => 'required|integer',
+			'abilities.*.value' => 'required|integer',
+			'codes' => 'nullable|array',
+			'codes.*.code' => 'required|string',
 		]);
 
 		if ($validator->fails()) {
@@ -155,23 +167,46 @@ class LibraryController extends Controller
 		$part->name = $request->name;
 		$part->description = $request->description;
 
-		$ability_id = $request->ability_id;
-		$min_value = $request->min_value;
+		// manage abilities
+		$collected = collect($request->abilities);
+		$abilities = Ability::findMany($collected->map(function ($a) { return $a['id']; }));
+		$valid_ids = $abilities->map(function ($a) { return $a->id; });
 
-		if ($ability_id !== null && $min_value !== null) {
-			$ability = Ability::find($ability_id);
-			if ($ability === null) {
-				return new JsonResponse([ 'success' => false, 'message' => __('i.AbilityId can\'t be null when min value is set.') ], 422);
-			}
-
-			$min_value = max(0, (int)$min_value);
-			$part->ability()->associate($ability);
-			$part->min_value = $min_value;
-		} else {
-			$part->ability_id = null;
-			$part->min_value = null;
-		}
+		$reduced = $collected->filter(function ($a) use ($valid_ids) {
+			return $valid_ids->contains($a['id']);
+		})->mapWithKeys(function ($a) {
+			return [ $a['id'] => [ 'value' => $a['value'] ] ];
+		});
 		$part->save();
+		$part->abilities()->sync($reduced);
+
+		// manage codes
+		//$codes = [];
+		//foreach ($request->codes as $c) {
+			//$code = Code::find($c['code']);
+			//if ($code === null) {
+				//$
+			//}
+			//$codes[] = $code;
+		//}
+
+		//old abilities
+		//$ability_id = $request->ability_id;
+		//$min_value = $request->min_value;
+
+		//if ($ability_id !== null && $min_value !== null) {
+			//$ability = Ability::find($ability_id);
+			//if ($ability === null) {
+				//return new JsonResponse([ 'success' => false, 'message' => __('i.AbilityId can\'t be null when min value is set.') ], 422);
+			//}
+//
+			//$min_value = max(0, (int)$min_value);
+			//$part->ability()->associate($ability);
+			//$part->min_value = $min_value;
+		//} else {
+			//$part->ability_id = null;
+			//$part->min_value = null;
+		//}
 
 		return new JsonResponse([ 'success' => true ]);
 	}
