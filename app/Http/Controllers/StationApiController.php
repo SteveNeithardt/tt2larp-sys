@@ -166,7 +166,7 @@ class StationApiController extends Controller
 				}
 			}
 
-			if (count($characters) > 0) {
+			if (count($characters) > 0 && count($stepNextStep->abilities) > 0) {
 			//if ($character !== null) {
 				$valid = Ability::CompareAllInFirst($stepNextStep->abilities, $built);
 				//$valid = Ability::CompareAllInFirst($stepNextStep->abilities, $character->abilities);
